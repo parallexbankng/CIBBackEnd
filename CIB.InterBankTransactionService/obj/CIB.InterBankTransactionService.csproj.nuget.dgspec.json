@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/Users/kufregodwin/Projects/parallex-backend/CIB.InterBankTransactionService/CIB.InterBankTransactionService.csproj": {}
+    "/Users/kufregodwin/Projects/CIBBackEnd/CIB.InterBankTransactionService/CIB.InterBankTransactionService.csproj": {}
   },
   "projects": {
-    "/Users/kufregodwin/Projects/parallex-backend/CIB.InterBankTransactionService/CIB.InterBankTransactionService.csproj": {
+    "/Users/kufregodwin/Projects/CIBBackEnd/CIB.InterBankTransactionService/CIB.InterBankTransactionService.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/kufregodwin/Projects/parallex-backend/CIB.InterBankTransactionService/CIB.InterBankTransactionService.csproj",
+        "projectUniqueName": "/Users/kufregodwin/Projects/CIBBackEnd/CIB.InterBankTransactionService/CIB.InterBankTransactionService.csproj",
         "projectName": "CIB.InterBankTransactionService",
-        "projectPath": "/Users/kufregodwin/Projects/parallex-backend/CIB.InterBankTransactionService/CIB.InterBankTransactionService.csproj",
+        "projectPath": "/Users/kufregodwin/Projects/CIBBackEnd/CIB.InterBankTransactionService/CIB.InterBankTransactionService.csproj",
         "packagesPath": "/Users/kufregodwin/.nuget/packages/",
-        "outputPath": "/Users/kufregodwin/Projects/parallex-backend/CIB.InterBankTransactionService/obj/",
+        "outputPath": "/Users/kufregodwin/Projects/CIBBackEnd/CIB.InterBankTransactionService/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/kufregodwin/Projects/NuGet.Config",

@@ -8308,11 +8308,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/kufregodwin/Projects/parallex-backend/CIB.CorporateAdmin/CIB.CorporateAdmin.csproj",
+      "projectUniqueName": "/Users/kufregodwin/Projects/CIBBackEnd/CIB.CorporateAdmin/CIB.CorporateAdmin.csproj",
       "projectName": "CIB.CorporateAdmin",
-      "projectPath": "/Users/kufregodwin/Projects/parallex-backend/CIB.CorporateAdmin/CIB.CorporateAdmin.csproj",
+      "projectPath": "/Users/kufregodwin/Projects/CIBBackEnd/CIB.CorporateAdmin/CIB.CorporateAdmin.csproj",
       "packagesPath": "/Users/kufregodwin/.nuget/packages/",
-      "outputPath": "/Users/kufregodwin/Projects/parallex-backend/CIB.CorporateAdmin/obj/",
+      "outputPath": "/Users/kufregodwin/Projects/CIBBackEnd/CIB.CorporateAdmin/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/kufregodwin/Projects/NuGet.Config",
@@ -8328,8 +8328,8 @@
         "net5.0": {
           "targetAlias": "net5.0",
           "projectReferences": {
-            "/Users/kufregodwin/Projects/parallex-backend/CIB.Core/CIB.Core.csproj": {
-              "projectPath": "/Users/kufregodwin/Projects/parallex-backend/CIB.Core/CIB.Core.csproj"
+            "/Users/kufregodwin/Projects/CIBBackEnd/CIB.Core/CIB.Core.csproj": {
+              "projectPath": "/Users/kufregodwin/Projects/CIBBackEnd/CIB.Core/CIB.Core.csproj"
             }
           }
         }

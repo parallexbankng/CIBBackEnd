@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "gMkO4BB3OoatzIZjeM34Gnkn27bdgyb4CkMAHYf3b2WlqsSpiuadiqq9Ghet3QS3PZtcA67ZadFu+733RYwiCg==",
+  "dgSpecHash": "tOj1ZT15xjoIYqITUkFq0l8aNINlC4qgdRnMYUb+67geJhNanee9ziYfJEPbreLpcactWiewb26FL1rrkcSLzw==",
   "success": true,
-  "projectFilePath": "/Users/kufregodwin/Projects/parallex-backend/CIB.BankAdmin/CIB.BankAdmin.csproj",
+  "projectFilePath": "/Users/kufregodwin/Projects/CIBBackEnd/CIB.BankAdmin/CIB.BankAdmin.csproj",
   "expectedPackageFiles": [
     "/Users/kufregodwin/.nuget/packages/automapper/10.1.1/automapper.10.1.1.nupkg.sha512",
     "/Users/kufregodwin/.nuget/packages/automapper.extensions.microsoft.dependencyinjection/8.1.1/automapper.extensions.microsoft.dependencyinjection.8.1.1.nupkg.sha512",

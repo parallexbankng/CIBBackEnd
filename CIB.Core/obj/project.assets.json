@@ -7688,11 +7688,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/kufregodwin/Projects/parallex-backend/CIB.Core/CIB.Core.csproj",
+      "projectUniqueName": "/Users/kufregodwin/Projects/CIBBackEnd/CIB.Core/CIB.Core.csproj",
       "projectName": "CIB.Core",
-      "projectPath": "/Users/kufregodwin/Projects/parallex-backend/CIB.Core/CIB.Core.csproj",
+      "projectPath": "/Users/kufregodwin/Projects/CIBBackEnd/CIB.Core/CIB.Core.csproj",
       "packagesPath": "/Users/kufregodwin/.nuget/packages/",
-      "outputPath": "/Users/kufregodwin/Projects/parallex-backend/CIB.Core/obj/",
+      "outputPath": "/Users/kufregodwin/Projects/CIBBackEnd/CIB.Core/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/kufregodwin/Projects/NuGet.Config",

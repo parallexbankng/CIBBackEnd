@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "I4ci3lZShL6o44c9L6kebEmcbjIvofqLN4Ogne7GmwjOL3rC0DoomivR2mRqluSuYxuUk8qPgk4HnHidnCiU4Q==",
+  "dgSpecHash": "Xw5zup1+wr/vDQewXaluOiGYYc37CWkNX868jhC9QLTs7cMIqxPyCItMXvnE3Wcx9d59rN2NOklkf8Iyfv6RuQ==",
   "success": true,
-  "projectFilePath": "/Users/kufregodwin/Projects/parallex-backend/CIB.IntraBankTransactionService/CIB.IntraBankTransactionService.csproj",
+  "projectFilePath": "/Users/kufregodwin/Projects/CIBBackEnd/CIB.IntraBankTransactionService/CIB.IntraBankTransactionService.csproj",
   "expectedPackageFiles": [
     "/Users/kufregodwin/.nuget/packages/humanizer.core/2.8.26/humanizer.core.2.8.26.nupkg.sha512",
     "/Users/kufregodwin/.nuget/packages/microsoft.csharp/4.7.0/microsoft.csharp.4.7.0.nupkg.sha512",

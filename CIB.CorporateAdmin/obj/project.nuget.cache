@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "JT4IQYnufachI2ImV1mZCaVTjvAYpKBYDt3hi4vYlejIgCQqqvW/Gq2Nhvgae3XIIgvCc+/4Dvrt0YvfFTcafg==",
+  "dgSpecHash": "GV0fmFJ8eTwFBO8Tsl1arPfKFKuBB8c4gYsZdiCKdNaAvJVTGZQuaM5tyA4sWB5BkHIhwPnQEOpu8ZUDcdWb9g==",
   "success": true,
-  "projectFilePath": "/Users/kufregodwin/Projects/parallex-backend/CIB.CorporateAdmin/CIB.CorporateAdmin.csproj",
+  "projectFilePath": "/Users/kufregodwin/Projects/CIBBackEnd/CIB.CorporateAdmin/CIB.CorporateAdmin.csproj",
   "expectedPackageFiles": [
     "/Users/kufregodwin/.nuget/packages/automapper/10.1.1/automapper.10.1.1.nupkg.sha512",
     "/Users/kufregodwin/.nuget/packages/automapper.extensions.microsoft.dependencyinjection/8.1.1/automapper.extensions.microsoft.dependencyinjection.8.1.1.nupkg.sha512",
