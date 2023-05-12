@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <UserSecretsId>dotnet-CIB.InterBankTransactionService-5A09960C-799A-4135-8516-CA02C6F38D60</UserSecretsId>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
+        <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="6.0.1" />
+        <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
+        <PackageReference Include="Serilog.AspNetCore" Version="6.0.1" />
+        <PackageReference Include="Serilog.Extensions.Logging.File" Version="2.0.0" />
+        <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.17" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.17" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.17" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.17" />
+        <PackageReference Include="System.Data.OleDb" Version="6.0.0" />
+    </ItemGroup>
+</Project>
