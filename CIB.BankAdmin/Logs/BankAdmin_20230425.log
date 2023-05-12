@@ -1,0 +1,94 @@
+2023-04-25T12:00:44.0430350+01:00 [INF] () Application Starting.
+2023-04-25T12:00:46.7323370+01:00 [INF] (Microsoft.Hosting.Lifetime) Now listening on: "https://localhost:57425"
+2023-04-25T12:00:46.7582690+01:00 [INF] (Microsoft.Hosting.Lifetime) Now listening on: "http://localhost:43083"
+2023-04-25T12:00:46.7587880+01:00 [INF] (Microsoft.Hosting.Lifetime) Application started. Press Ctrl+C to shut down.
+2023-04-25T12:00:46.7589800+01:00 [INF] (Microsoft.Hosting.Lifetime) Hosting environment: "Development"
+2023-04-25T12:00:46.7601720+01:00 [INF] (Microsoft.Hosting.Lifetime) Content root path: "/Users/kufregodwin/Projects/parallex-backend/CIB.BankAdmin"
+2023-04-25T12:02:17.4682510+01:00 [INF] () Application Starting.
+2023-04-25T12:02:19.1515020+01:00 [INF] (Microsoft.Hosting.Lifetime) Now listening on: "https://localhost:57425"
+2023-04-25T12:02:19.1553070+01:00 [INF] (Microsoft.Hosting.Lifetime) Now listening on: "http://localhost:43083"
+2023-04-25T12:02:19.1560000+01:00 [INF] (Microsoft.Hosting.Lifetime) Application started. Press Ctrl+C to shut down.
+2023-04-25T12:02:19.1561090+01:00 [INF] (Microsoft.Hosting.Lifetime) Hosting environment: "Development"
+2023-04-25T12:02:19.1561730+01:00 [INF] (Microsoft.Hosting.Lifetime) Content root path: "/Users/kufregodwin/Projects/parallex-backend/CIB.BankAdmin"
+2023-04-25T12:04:48.6644110+01:00 [INF] () Application Starting.
+2023-04-25T12:04:50.1639640+01:00 [INF] (Microsoft.Hosting.Lifetime) Now listening on: "https://localhost:57425"
+2023-04-25T12:04:50.1676650+01:00 [INF] (Microsoft.Hosting.Lifetime) Now listening on: "http://localhost:43083"
+2023-04-25T12:04:50.1679800+01:00 [INF] (Microsoft.Hosting.Lifetime) Application started. Press Ctrl+C to shut down.
+2023-04-25T12:04:50.1680430+01:00 [INF] (Microsoft.Hosting.Lifetime) Hosting environment: "Development"
+2023-04-25T12:04:50.1680860+01:00 [INF] (Microsoft.Hosting.Lifetime) Content root path: "/Users/kufregodwin/Projects/parallex-backend/CIB.BankAdmin"
+2023-04-25T12:05:34.4881510+01:00 [INF] (System.Net.Http.HttpClient.tokenClient.LogicalHandler) Start processing HTTP request "POST" http://testapi.parallexbank.com/authenticationservice/api/Authenticate/login
+2023-04-25T12:05:34.4921800+01:00 [INF] (System.Net.Http.HttpClient.tokenClient.ClientHandler) Sending HTTP request "POST" http://testapi.parallexbank.com/authenticationservice/api/Authenticate/login
+2023-04-25T12:07:26.5176990+01:00 [INF] () Application Starting.
+2023-04-25T12:07:28.1671190+01:00 [INF] (Microsoft.Hosting.Lifetime) Now listening on: "https://localhost:57425"
+2023-04-25T12:07:28.1973280+01:00 [INF] (Microsoft.Hosting.Lifetime) Now listening on: "http://localhost:43083"
+2023-04-25T12:07:28.1976910+01:00 [INF] (Microsoft.Hosting.Lifetime) Application started. Press Ctrl+C to shut down.
+2023-04-25T12:07:28.1977510+01:00 [INF] (Microsoft.Hosting.Lifetime) Hosting environment: "Development"
+2023-04-25T12:07:28.1977930+01:00 [INF] (Microsoft.Hosting.Lifetime) Content root path: "/Users/kufregodwin/Projects/parallex-backend/CIB.BankAdmin"
+2023-04-25T12:08:17.1412930+01:00 [INF] (System.Net.Http.HttpClient.tokenClient.LogicalHandler) Start processing HTTP request "POST" http://testapi.parallexbank.com/authenticationservice/api/Authenticate/login
+2023-04-25T12:08:17.1450520+01:00 [INF] (System.Net.Http.HttpClient.tokenClient.ClientHandler) Sending HTTP request "POST" http://testapi.parallexbank.com/authenticationservice/api/Authenticate/login
+2023-04-25T12:15:01.3268670+01:00 [INF] () Application Starting.
+2023-04-25T12:15:02.9954980+01:00 [INF] (Microsoft.Hosting.Lifetime) Now listening on: "https://localhost:57425"
+2023-04-25T12:15:02.9983270+01:00 [INF] (Microsoft.Hosting.Lifetime) Now listening on: "http://localhost:43083"
+2023-04-25T12:15:02.9985880+01:00 [INF] (Microsoft.Hosting.Lifetime) Application started. Press Ctrl+C to shut down.
+2023-04-25T12:15:02.9986370+01:00 [INF] (Microsoft.Hosting.Lifetime) Hosting environment: "Development"
+2023-04-25T12:15:02.9986780+01:00 [INF] (Microsoft.Hosting.Lifetime) Content root path: "/Users/kufregodwin/Projects/parallex-backend/CIB.BankAdmin"
+2023-04-25T12:20:44.2020940+01:00 [ERR] (Microsoft.AspNetCore.Diagnostics.DeveloperExceptionPageMiddleware) An unhandled exception has occurred while executing the request.
+System.InvalidOperationException: Unable to resolve service for type 'CIB.Core.Services.Notification.INotificationService' while attempting to activate 'CIB.BankAdmin.Controllers.CorporateRoleByCorporateController'.
+   at Microsoft.Extensions.DependencyInjection.ActivatorUtilities.GetService(IServiceProvider sp, Type type, Type requiredBy, Boolean isDefaultParameterRequired)
+   at lambda_method62(Closure , IServiceProvider , Object[] )
+   at Microsoft.AspNetCore.Mvc.Controllers.ControllerActivatorProvider.<>c__DisplayClass4_0.<CreateActivator>b__0(ControllerContext controllerContext)
+   at Microsoft.AspNetCore.Mvc.Controllers.ControllerFactoryProvider.<>c__DisplayClass5_0.<CreateControllerFactory>g__CreateController|0(ControllerContext controllerContext)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.InvokeInnerFilterAsync()
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|19_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Routing.EndpointMiddleware.<Invoke>g__AwaitRequestTask|6_0(Endpoint endpoint, Task requestTask, ILogger logger)
+   at CIB.BankAdmin.Extensions.ApiKeyMiddleware.Invoke(HttpContext context) in /Users/kufregodwin/Projects/parallex-backend/CIB.BankAdmin/Extensions/ApiKeyExtension.cs:line 49
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
+   at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+   at Microsoft.AspNetCore.Diagnostics.DeveloperExceptionPageMiddleware.Invoke(HttpContext context)
+2023-04-25T12:23:22.8222770+01:00 [ERR] (Microsoft.AspNetCore.Diagnostics.DeveloperExceptionPageMiddleware) An unhandled exception has occurred while executing the request.
+System.InvalidOperationException: Unable to resolve service for type 'CIB.Core.Services.Notification.INotificationService' while attempting to activate 'CIB.BankAdmin.Controllers.CorporateRoleByCorporateController'.
+   at Microsoft.Extensions.DependencyInjection.ActivatorUtilities.GetService(IServiceProvider sp, Type type, Type requiredBy, Boolean isDefaultParameterRequired)
+   at lambda_method62(Closure , IServiceProvider , Object[] )
+   at Microsoft.AspNetCore.Mvc.Controllers.ControllerActivatorProvider.<>c__DisplayClass4_0.<CreateActivator>b__0(ControllerContext controllerContext)
+   at Microsoft.AspNetCore.Mvc.Controllers.ControllerFactoryProvider.<>c__DisplayClass5_0.<CreateControllerFactory>g__CreateController|0(ControllerContext controllerContext)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.InvokeInnerFilterAsync()
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|19_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Routing.EndpointMiddleware.<Invoke>g__AwaitRequestTask|6_0(Endpoint endpoint, Task requestTask, ILogger logger)
+   at CIB.BankAdmin.Extensions.ApiKeyMiddleware.Invoke(HttpContext context) in /Users/kufregodwin/Projects/parallex-backend/CIB.BankAdmin/Extensions/ApiKeyExtension.cs:line 49
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
+   at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+   at Microsoft.AspNetCore.Diagnostics.DeveloperExceptionPageMiddleware.Invoke(HttpContext context)
+2023-04-25T12:28:37.9519790+01:00 [ERR] (Microsoft.AspNetCore.Diagnostics.DeveloperExceptionPageMiddleware) An unhandled exception has occurred while executing the request.
+System.InvalidOperationException: Unable to resolve service for type 'CIB.Core.Services.Notification.INotificationService' while attempting to activate 'CIB.BankAdmin.Controllers.CorporateRoleByCorporateController'.
+   at Microsoft.Extensions.DependencyInjection.ActivatorUtilities.GetService(IServiceProvider sp, Type type, Type requiredBy, Boolean isDefaultParameterRequired)
+   at lambda_method62(Closure , IServiceProvider , Object[] )
+   at Microsoft.AspNetCore.Mvc.Controllers.ControllerActivatorProvider.<>c__DisplayClass4_0.<CreateActivator>b__0(ControllerContext controllerContext)
+   at Microsoft.AspNetCore.Mvc.Controllers.ControllerFactoryProvider.<>c__DisplayClass5_0.<CreateControllerFactory>g__CreateController|0(ControllerContext controllerContext)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.InvokeInnerFilterAsync()
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|19_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Routing.EndpointMiddleware.<Invoke>g__AwaitRequestTask|6_0(Endpoint endpoint, Task requestTask, ILogger logger)
+   at CIB.BankAdmin.Extensions.ApiKeyMiddleware.Invoke(HttpContext context) in /Users/kufregodwin/Projects/parallex-backend/CIB.BankAdmin/Extensions/ApiKeyExtension.cs:line 49
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
+   at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+   at Microsoft.AspNetCore.Diagnostics.DeveloperExceptionPageMiddleware.Invoke(HttpContext context)
+2023-04-25T12:29:54.0961240+01:00 [INF] () Application Starting.
+2023-04-25T12:29:55.9232780+01:00 [INF] (Microsoft.Hosting.Lifetime) Now listening on: "https://localhost:57425"
+2023-04-25T12:29:55.9707770+01:00 [INF] (Microsoft.Hosting.Lifetime) Now listening on: "http://localhost:43083"
+2023-04-25T12:29:55.9711710+01:00 [INF] (Microsoft.Hosting.Lifetime) Application started. Press Ctrl+C to shut down.
+2023-04-25T12:29:55.9712360+01:00 [INF] (Microsoft.Hosting.Lifetime) Hosting environment: "Development"
+2023-04-25T12:29:55.9713070+01:00 [INF] (Microsoft.Hosting.Lifetime) Content root path: "/Users/kufregodwin/Projects/parallex-backend/CIB.BankAdmin"

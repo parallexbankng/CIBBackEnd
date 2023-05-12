@@ -1,0 +1,15 @@
+/Users/kufregodwin/Projects/parallex-backend/CIB.Core/bin/Release/net5.0/win-x64/CIB.Core.deps.json
+/Users/kufregodwin/Projects/parallex-backend/CIB.Core/bin/Release/net5.0/win-x64/CIB.Core.runtimeconfig.json
+/Users/kufregodwin/Projects/parallex-backend/CIB.Core/bin/Release/net5.0/win-x64/CIB.Core.runtimeconfig.dev.json
+/Users/kufregodwin/Projects/parallex-backend/CIB.Core/bin/Release/net5.0/win-x64/CIB.Core.dll
+/Users/kufregodwin/Projects/parallex-backend/CIB.Core/bin/Release/net5.0/win-x64/CIB.Core.pdb
+/Users/kufregodwin/Projects/parallex-backend/CIB.Core/obj/Release/net5.0/win-x64/CIB.Core.csproj.AssemblyReference.cache
+/Users/kufregodwin/Projects/parallex-backend/CIB.Core/obj/Release/net5.0/win-x64/CIB.Core.GeneratedMSBuildEditorConfig.editorconfig
+/Users/kufregodwin/Projects/parallex-backend/CIB.Core/obj/Release/net5.0/win-x64/CIB.Core.AssemblyInfoInputs.cache
+/Users/kufregodwin/Projects/parallex-backend/CIB.Core/obj/Release/net5.0/win-x64/CIB.Core.AssemblyInfo.cs
+/Users/kufregodwin/Projects/parallex-backend/CIB.Core/obj/Release/net5.0/win-x64/CIB.Core.csproj.CoreCompileInputs.cache
+/Users/kufregodwin/Projects/parallex-backend/CIB.Core/obj/Release/net5.0/win-x64/CIB.Core.dll
+/Users/kufregodwin/Projects/parallex-backend/CIB.Core/obj/Release/net5.0/win-x64/refint/CIB.Core.dll
+/Users/kufregodwin/Projects/parallex-backend/CIB.Core/obj/Release/net5.0/win-x64/CIB.Core.pdb
+/Users/kufregodwin/Projects/parallex-backend/CIB.Core/obj/Release/net5.0/win-x64/CIB.Core.genruntimeconfig.cache
+/Users/kufregodwin/Projects/parallex-backend/CIB.Core/obj/Release/net5.0/win-x64/ref/CIB.Core.dll

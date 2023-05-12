@@ -1,0 +1,16 @@
+2023-05-12T11:50:00.0214490+01:00 [INF] () Corporate Application Starting.
+2023-05-12T11:50:01.0263730+01:00 [INF] (Microsoft.Hosting.Lifetime) Now listening on: "https://localhost:17359"
+2023-05-12T11:50:01.0284170+01:00 [INF] (Microsoft.Hosting.Lifetime) Now listening on: "http://localhost:41309"
+2023-05-12T11:50:01.0285780+01:00 [INF] (Microsoft.Hosting.Lifetime) Application started. Press Ctrl+C to shut down.
+2023-05-12T11:50:01.0286220+01:00 [INF] (Microsoft.Hosting.Lifetime) Hosting environment: "Development"
+2023-05-12T11:50:01.0286510+01:00 [INF] (Microsoft.Hosting.Lifetime) Content root path: "/Users/kufregodwin/Projects/parallex-backend/CIB.CorporateAdmin"
+2023-05-12T11:51:19.0783040+01:00 [INF] (CIB.CorporateAdmin.Controllers.AccountController) Login Attempt Successful "{\"Username\":\"lisa\",\"Password\":\"\",\"CustomerID\":\"C000000250\",\"OTP\":\"0000\",\"Id\":\"1551d738-c38b-42bf-8c24-29dec971ea92\",\"ClientStaffIPAddress\":\"0.0.0.0\",\"IPAddress\":null,\"HostName\":null,\"MACAddress\":null}"
+2023-05-12T11:51:19.1091600+01:00 [INF] (System.Net.Http.HttpClient.IEmailService.LogicalHandler) Start processing HTTP request "POST" http://testapi.parallexbank.com/notificationservice/Notification/SendEmail
+2023-05-12T11:51:19.1099880+01:00 [INF] (System.Net.Http.HttpClient.IEmailService.ClientHandler) Sending HTTP request "POST" http://testapi.parallexbank.com/notificationservice/Notification/SendEmail
+2023-05-12T12:30:30.5882730+01:00 [INF] (Microsoft.Hosting.Lifetime) Application is shutting down...
+2023-05-12T14:45:28.2071680+01:00 [INF] () Corporate Application Starting.
+2023-05-12T14:45:33.1237730+01:00 [INF] (Microsoft.Hosting.Lifetime) Now listening on: "https://localhost:17359"
+2023-05-12T14:45:33.1282480+01:00 [INF] (Microsoft.Hosting.Lifetime) Now listening on: "http://localhost:41309"
+2023-05-12T14:45:33.1287060+01:00 [INF] (Microsoft.Hosting.Lifetime) Application started. Press Ctrl+C to shut down.
+2023-05-12T14:45:33.1288520+01:00 [INF] (Microsoft.Hosting.Lifetime) Hosting environment: "Development"
+2023-05-12T14:45:33.1289280+01:00 [INF] (Microsoft.Hosting.Lifetime) Content root path: "/Users/kufregodwin/Projects/parallex-backend/CIB.CorporateAdmin"

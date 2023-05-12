@@ -1,0 +1,30 @@
+2023-05-12T00:43:19.2998180+01:00 [INF] () Application Starting.
+2023-05-12T00:43:20.5788620+01:00 [INF] (Microsoft.Hosting.Lifetime) Now listening on: "https://localhost:57425"
+2023-05-12T00:43:20.5813540+01:00 [INF] (Microsoft.Hosting.Lifetime) Now listening on: "http://localhost:43083"
+2023-05-12T00:43:20.5815170+01:00 [INF] (Microsoft.Hosting.Lifetime) Application started. Press Ctrl+C to shut down.
+2023-05-12T00:43:20.5815710+01:00 [INF] (Microsoft.Hosting.Lifetime) Hosting environment: "Development"
+2023-05-12T00:43:20.5816190+01:00 [INF] (Microsoft.Hosting.Lifetime) Content root path: "/Users/kufregodwin/Projects/parallex-backend/CIB.BankAdmin"
+2023-05-12T00:46:19.7824750+01:00 [INF] (Microsoft.Hosting.Lifetime) Application is shutting down...
+2023-05-12T14:46:37.0688080+01:00 [INF] () Application Starting.
+2023-05-12T14:46:39.4831140+01:00 [INF] (Microsoft.Hosting.Lifetime) Now listening on: "https://localhost:57425"
+2023-05-12T14:46:39.4883020+01:00 [INF] (Microsoft.Hosting.Lifetime) Now listening on: "http://localhost:43083"
+2023-05-12T14:46:39.4889870+01:00 [INF] (Microsoft.Hosting.Lifetime) Application started. Press Ctrl+C to shut down.
+2023-05-12T14:46:39.4891220+01:00 [INF] (Microsoft.Hosting.Lifetime) Hosting environment: "Development"
+2023-05-12T14:46:39.4891950+01:00 [INF] (Microsoft.Hosting.Lifetime) Content root path: "/Users/kufregodwin/Projects/parallex-backend/CIB.BankAdmin"
+2023-05-12T14:50:10.2770820+01:00 [INF] (System.Net.Http.HttpClient.finnacleClient.LogicalHandler) Start processing HTTP request "POST" http://testapi.parallexbank.com/CoreAPI/api/AD/Authentication
+2023-05-12T14:50:10.2850280+01:00 [INF] (System.Net.Http.HttpClient.finnacleClient.ClientHandler) Sending HTTP request "POST" http://testapi.parallexbank.com/CoreAPI/api/AD/Authentication
+2023-05-12T14:50:40.5511060+01:00 [ERR] (CIB.BankAdmin.Controllers.AccountController) SERVER ERROR "\"   at System.Threading.Tasks.Task`1.GetResultCore(Boolean waitCompletionNotification)\n   at System.Threading.Tasks.Task`1.get_Result()\n   at CIB.Core.Services.Api.ApiService.ADLogin(String UserName, String Password) in /Users/kufregodwin/Projects/parallex-backend/CIB.Core/Services/Api/ApiService.cs:line 173\n   at CIB.BankAdmin.Controllers.AccountController.BankUserLogin(BankUserLoginParam login) in /Users/kufregodwin/Projects/parallex-backend/CIB.BankAdmin/Controllers/AccountController.cs:line 86\"", "\"System.Private.CoreLib\"", "\"One or more errors occurred. (nodename nor servname provided, or not known (testapi.parallexbank.com:80))\""
+2023-05-12T14:52:19.8941080+01:00 [INF] () Application Starting.
+2023-05-12T14:52:21.4693210+01:00 [INF] (Microsoft.Hosting.Lifetime) Now listening on: "https://localhost:57425"
+2023-05-12T14:52:21.4735990+01:00 [INF] (Microsoft.Hosting.Lifetime) Now listening on: "http://localhost:43083"
+2023-05-12T14:52:21.4740490+01:00 [INF] (Microsoft.Hosting.Lifetime) Application started. Press Ctrl+C to shut down.
+2023-05-12T14:52:21.4741460+01:00 [INF] (Microsoft.Hosting.Lifetime) Hosting environment: "Development"
+2023-05-12T14:52:21.4742090+01:00 [INF] (Microsoft.Hosting.Lifetime) Content root path: "/Users/kufregodwin/Projects/parallex-backend/CIB.BankAdmin"
+2023-05-12T14:53:19.6287140+01:00 [INF] (System.Net.Http.HttpClient.finnacleClient.LogicalHandler) Start processing HTTP request "POST" http://testapi.parallexbank.com/CoreAPI/api/AD/Authentication
+2023-05-12T14:53:19.6343460+01:00 [INF] (System.Net.Http.HttpClient.finnacleClient.ClientHandler) Sending HTTP request "POST" http://testapi.parallexbank.com/CoreAPI/api/AD/Authentication
+2023-05-12T14:59:40.9189540+01:00 [INF] () Application Starting.
+2023-05-12T14:59:42.7326250+01:00 [INF] (Microsoft.Hosting.Lifetime) Now listening on: "https://localhost:57425"
+2023-05-12T14:59:42.7355140+01:00 [INF] (Microsoft.Hosting.Lifetime) Now listening on: "http://localhost:43083"
+2023-05-12T14:59:42.7359440+01:00 [INF] (Microsoft.Hosting.Lifetime) Application started. Press Ctrl+C to shut down.
+2023-05-12T14:59:42.7360260+01:00 [INF] (Microsoft.Hosting.Lifetime) Hosting environment: "Development"
+2023-05-12T14:59:42.7365860+01:00 [INF] (Microsoft.Hosting.Lifetime) Content root path: "/Users/kufregodwin/Projects/parallex-backend/CIB.BankAdmin"
