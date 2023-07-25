@@ -35,6 +35,5 @@ namespace CIB.Core.Entities
         public decimal? BulkTransDailyLimit { get; set; }
         public decimal? SingleTransDailyLimit { get; set; }
         public string CorporateEmail { get; set; }
-        public string PreviouseAuthorizationType { get; set; }
     }
 }

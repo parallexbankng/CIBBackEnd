@@ -167,6 +167,7 @@ namespace CIB.Core.Utils
 
             return plaintext;
         }
+       
         public static string DecriptPassword(string password)
         {
             return OpenSSLDecrypt(password, GetEncrptionKey());
@@ -196,16 +197,7 @@ namespace CIB.Core.Utils
 
             return OpenSSLDecrypt(encryptedString, EncrptionKey());
         }
-        public static string DecryptDebitAccount(string encryptedString)
-        {
-            if(string.IsNullOrEmpty(encryptedString))
-            {
-                return encryptedString;
-            }
-
-            return OpenSSLDecrypt(encryptedString, AccountEncrptionKey());
-        }
-
+       
         public static int DecryptInt(string encryptedInt)
         {
             if (string.IsNullOrEmpty(encryptedInt))
@@ -272,6 +264,15 @@ namespace CIB.Core.Utils
         private static string EncrptionKey()
         {
             return "#!$96secure";
+        }
+        public static string DecryptDebitAccount(string encryptedString)
+        {
+            if(string.IsNullOrEmpty(encryptedString))
+            {
+                return encryptedString;
+            }
+
+            return OpenSSLDecrypt(encryptedString, AccountEncrptionKey());
         }
         private static string AccountEncrptionKey()
         {

@@ -25,24 +25,7 @@ namespace CIB.Core.Modules.Authentication.Validation
                 .Matches(new ReqEx().NumberOnly).WithMessage("{PropertyName} is not valid.");
         }
     }
-    public class CorporateLoginValidation : AbstractValidator<CustomerLoginParam>
-    {
-         public CorporateLoginValidation()
-        {
-            RuleFor(p => p.Username.Trim())
-                .NotEmpty().WithMessage("{PropertyName} is required.")
-                .NotNull()
-                .Matches(new ReqEx().AlphaNumeric).WithMessage("{PropertyName} is not valid.");
-            RuleFor(p => p.Password.Trim())
-                .NotEmpty().WithMessage("{PropertyName} is required.")
-                .NotNull()
-                .MinimumLength(5).WithMessage("{PropertyName} must be more than 5 characters.");
-            RuleFor(p => p.CustomerID.Trim())
-                .NotEmpty().WithMessage("{PropertyName} is required.")
-                .NotNull()
-                .Matches(new ReqEx().AlphaNumeric).WithMessage("{PropertyName} is not valid.");
-        }
-    }
+
 
 
     public class ResetPasswordValidation : AbstractValidator<ResetPasswordModel>

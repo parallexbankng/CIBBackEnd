@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using CIB.Core.Common;
 using CIB.Core.Common.Dto;
@@ -114,13 +113,25 @@ namespace CIB.BankAdmin.Controllers
                 return BadRequest(new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: Message.ServerError, responseStatus:false));
             }
         }
+        
         [HttpPost("CustomerNameEnquiry")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public ActionResult<CustomerNameEnquiryResponseModel> CustomerNameEnquiry(CustomerNameEnquiryModel model)
+        public ActionResult<CustomerNameEnquiryResponseModel> CustomerNameEnquiry(GenericRequestDto model)
         {
             var responseModel = new CustomerNameEnquiryResponseModel();
             try
             {
+                if (string.IsNullOrEmpty(model.Data))
+                {
+                    return BadRequest("invalid request");
+                }
+
+                var requestData = JsonConvert.DeserializeObject<CustomerNameEnquiryModel>(Encryption.DecryptStrings(model.Data));
+                if (requestData == null)
+                {
+                    return BadRequest("invalid request data");
+                }
+                
                 if (model == null)
                 {
                     responseModel.responseCode = "400";
@@ -128,14 +139,14 @@ namespace CIB.BankAdmin.Controllers
                     return BadRequest(responseModel);
                 }
 
-                if (string.IsNullOrEmpty(model.Username))
+                if (string.IsNullOrEmpty(requestData.Username))
                 {
                     responseModel.responseCode = "400";
                     responseModel.responseDescription = "username is required";
                     return BadRequest(responseModel);
                 }
 
-                if (string.IsNullOrEmpty(model.CustomerID))
+                if (string.IsNullOrEmpty(requestData.CustomerID))
                 {
                     responseModel.responseCode = "400";
                     responseModel.responseDescription = "customer id is required";
@@ -144,8 +155,8 @@ namespace CIB.BankAdmin.Controllers
 
                 var payload = new CustomerNameEnquiryModel
                 {
-                    CustomerID = Encryption.DecryptStrings(model.CustomerID),
-                    Username = Encryption.DecryptStrings(model.Username)
+                    CustomerID = Encryption.DecryptStrings(requestData.CustomerID),
+                    Username = Encryption.DecryptStrings(requestData.Username)
                 };
 
                 var tblCorporateCustomer = UnitOfWork.CorporateCustomerRepo.GetCorporateCustomerByCustomerID(payload.CustomerID);
@@ -245,27 +256,26 @@ namespace CIB.BankAdmin.Controllers
                 {
                     return StatusCode(400, errormsg);
                 }
-                if(string.IsNullOrEmpty(model.Data))
-                {
-                    return BadRequest("invalid request");
-                }
-
-                var requestData = JsonConvert.DeserializeObject<CreateProfileDto>(Encryption.DecryptStrings(model.Data));
-                if(requestData == null)
-                {
-                    return BadRequest("invalid request data");
-                }
 
                 if (string.IsNullOrEmpty(UserRoleId) || !UnitOfWork.UserRoleAccessRepo.AccessesExist(UserRoleId, Permission.CreateCorporateUserProfile))
                 {
                     return BadRequest("UnAuthorized Access");
                 }
+                 
+                if (string.IsNullOrEmpty(model.Data))
+                {
+                    return BadRequest("invalid request");
+                }
 
+                var requestData = JsonConvert.DeserializeObject<CreateProfileDto>(Encryption.DecryptStrings(model.Data));
+                if (requestData == null)
+                {
+                    return BadRequest("invalid request data");
+                }
                 var payload = new CreateProfileDto
                 {
                     CorporateCustomerId = requestData.CorporateCustomerId,
                     CorporateRoleId = requestData.CorporateRoleId,
-                    Title = requestData.Title,
                     Username = requestData.Username,
                     Phone = requestData.Phone,
                     Email = requestData.Email,
@@ -377,7 +387,7 @@ namespace CIB.BankAdmin.Controllers
             }
         }
 
-        [HttpPost("UpdateTemCorporateProfile")]
+        [HttpPut("UpdateTemCorporateProfile")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         public ActionResult<ResponseDTO<CorporateProfileResponseDto>> UpdateTemCorporateProfile(GenericRequestDto model)
         {
@@ -392,20 +402,19 @@ namespace CIB.BankAdmin.Controllers
                     return StatusCode(400, errormsg);
                 }
 
-                if(string.IsNullOrEmpty(model.Data))
+                if (string.IsNullOrEmpty(UserRoleId) || !UnitOfWork.UserRoleAccessRepo.AccessesExist(UserRoleId, Permission.UpdateCorporateUserProfile))
+                {
+                    return BadRequest("UnAuthorized Access");
+                }
+                if (string.IsNullOrEmpty(model.Data))
                 {
                     return BadRequest("invalid request");
                 }
 
                 var requestData = JsonConvert.DeserializeObject<UpdateProfileDTO>(Encryption.DecryptStrings(model.Data));
-                if(requestData == null)
+                if (requestData == null)
                 {
                     return BadRequest("invalid request data");
-                }
-
-                if (string.IsNullOrEmpty(UserRoleId) || !UnitOfWork.UserRoleAccessRepo.AccessesExist(UserRoleId, Permission.UpdateCorporateUserProfile))
-                {
-                    return BadRequest("UnAuthorized Access");
                 }
                 var payload = new UpdateProfileDTO
                 {
@@ -413,7 +422,6 @@ namespace CIB.BankAdmin.Controllers
                     CorporateCustomerId = requestData.CorporateCustomerId,
                     CorporateRoleId = requestData.CorporateRoleId,
                     Username = requestData.Username,
-                    Title = requestData.Title,
                     Phone = requestData.Phone,
                     Email = requestData.Email,
                     Action = requestData.Action,
@@ -470,7 +478,6 @@ namespace CIB.BankAdmin.Controllers
                     {
                         Id = Guid.NewGuid(),
                         Sn = 0,
-                        Title = payload.Title,
                         FirstName = payload.FirstName,
                         LastName =payload.LastName,
                         MiddleName = payload.MiddleName,
@@ -547,7 +554,7 @@ namespace CIB.BankAdmin.Controllers
             }
         }
 
-        [HttpPost("UpdateProfile")]
+        [HttpPut("UpdateProfile")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         public ActionResult<ResponseDTO<CorporateProfileResponseDto>>UpdateCorporateProfile(GenericRequestDto model)
         {
@@ -561,27 +568,26 @@ namespace CIB.BankAdmin.Controllers
                 {
                     return StatusCode(400, errormsg);
                 }
-                if(string.IsNullOrEmpty(model.Data))
-                {
-                    return BadRequest("invalid request");
-                }
-
-                var requestData = JsonConvert.DeserializeObject<UpdateProfileDTO>(Encryption.DecryptStrings(model.Data));
-                if(requestData == null)
-                {
-                    return BadRequest("invalid request data");
-                }
 
                 if (string.IsNullOrEmpty(UserRoleId) || !UnitOfWork.UserRoleAccessRepo.AccessesExist(UserRoleId, Permission.UpdateCorporateUserProfile))
                 {
                     return BadRequest("UnAuthorized Access");
                 }
+                if (string.IsNullOrEmpty(model.Data))
+                {
+                    return BadRequest("invalid request");
+                }
+
+                var requestData = JsonConvert.DeserializeObject<UpdateProfileDTO>(Encryption.DecryptStrings(model.Data));
+                if (requestData == null)
+                {
+                    return BadRequest("invalid request data");
+                }
                 var payload = new UpdateProfileDTO
                 {
                     Id = requestData.Id,
                     CorporateCustomerId = requestData.CorporateCustomerId,
-                    CorporateRoleId = requestData.CorporateRoleId,
-                    Title = requestData.Title,
+                    CorporateRoleId =requestData.CorporateRoleId,
                     Username = requestData.Username,
                     Phone = requestData.Phone,
                     Email = requestData.Email,
@@ -655,7 +661,6 @@ namespace CIB.BankAdmin.Controllers
                 mapTempProfile.InitiatorId = BankProfile.Id;
                 mapTempProfile.InitiatorUsername = UserName;
                 mapTempProfile.DateRequested = DateTime.Now;
-                mapTempProfile.Title = payload.Title;
                 mapTempProfile.FirstName = payload.FirstName;
                 mapTempProfile.LastName =payload.LastName;
                 mapTempProfile.MiddleName = payload.MiddleName;
@@ -728,7 +733,7 @@ namespace CIB.BankAdmin.Controllers
             }
         }
 
-        [HttpPost("RequestProfileApproval")]
+        [HttpPut("RequestProfileApproval")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         public ActionResult<ResponseDTO<CorporateProfileResponseDto>> RequestProfileApproval(GenericRequestDto model)
         {
@@ -745,20 +750,21 @@ namespace CIB.BankAdmin.Controllers
                 {
                     return StatusCode(400, errormsg);
                 }
-                if(string.IsNullOrEmpty(model.Data))
+
+                if (string.IsNullOrEmpty(UserRoleId) || !UnitOfWork.UserRoleAccessRepo.AccessesExist(UserRoleId, Permission.RequestCorporateUserProfileApproval))
+                {
+                    return BadRequest("UnAuthorized Access");
+                }
+
+                if (string.IsNullOrEmpty(model.Data))
                 {
                     return BadRequest("invalid request");
                 }
 
                 var requestData = JsonConvert.DeserializeObject<SimpleAction>(Encryption.DecryptStrings(model.Data));
-                if(requestData == null)
+                if (requestData == null)
                 {
                     return BadRequest("invalid request data");
-                }
-
-                if (string.IsNullOrEmpty(UserRoleId) || !UnitOfWork.UserRoleAccessRepo.AccessesExist(UserRoleId, Permission.RequestCorporateUserProfileApproval))
-                {
-                    return BadRequest("UnAuthorized Access");
                 }
 
                 var payload = new SimpleAction
@@ -852,7 +858,7 @@ namespace CIB.BankAdmin.Controllers
             }
         }
         
-        [HttpPost("ApproveProfile")]
+        [HttpPut("ApproveProfile")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         public ActionResult<ResponseDTO<CorporateProfileResponseDto>> ApproveProfile(GenericRequestDto model)
         {
@@ -869,20 +875,21 @@ namespace CIB.BankAdmin.Controllers
                 {
                     return StatusCode(400, errormsg);
                 }
-               
-                if(string.IsNullOrEmpty(model.Data))
+
+                if (string.IsNullOrEmpty(UserRoleId) || !UnitOfWork.UserRoleAccessRepo.AccessesExist(UserRoleId, Permission.ApproveCorporateUserProfile))
+                {
+                    return BadRequest("UnAuthorized Access");
+                }
+                
+                if (string.IsNullOrEmpty(model.Data))
                 {
                     return BadRequest("invalid request");
                 }
 
                 var requestData = JsonConvert.DeserializeObject<SimpleAction>(Encryption.DecryptStrings(model.Data));
-                if(requestData == null)
+                if (requestData == null)
                 {
                     return BadRequest("invalid request data");
-                }
-                if (string.IsNullOrEmpty(UserRoleId) || !UnitOfWork.UserRoleAccessRepo.AccessesExist(UserRoleId, Permission.ApproveCorporateUserProfile))
-                {
-                    return BadRequest("UnAuthorized Access");
                 }
                 var payload = new SimpleAction
                 {
@@ -892,6 +899,12 @@ namespace CIB.BankAdmin.Controllers
                     ClientStaffIPAddress = Encryption.DecryptStrings(model.ClientStaffIPAddress),
                     MACAddress = Encryption.DecryptStrings(model.MACAddress)
                 };
+
+
+                if (string.IsNullOrEmpty(payload.Id.ToString()))
+                {
+                    return BadRequest("Invalid Id");
+                }
 
                 var entity = UnitOfWork.TemCorporateProfileRepo.GetByIdAsync(payload.Id);
                 if (entity == null)
@@ -923,7 +936,7 @@ namespace CIB.BankAdmin.Controllers
             }
         }
 
-        [HttpPost("ReActivateProfile")]
+        [HttpPut("ReActivateProfile")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         public ActionResult<ResponseDTO<CorporateProfileResponseDto>> ReActivateProfile(GenericRequestDto model)
         {
@@ -938,20 +951,21 @@ namespace CIB.BankAdmin.Controllers
                 {
                     return StatusCode(400, errormsg);
                 }
-                
-                if(string.IsNullOrEmpty(model.Data))
-                {
-                    return BadRequest("invalid request");
-                }
-                var requestData = JsonConvert.DeserializeObject<SimpleAction>(Encryption.DecryptStrings(model.Data));
-                if(requestData == null)
-                {
-                    return BadRequest("invalid request data");
-                }
 
                 if (string.IsNullOrEmpty(UserRoleId) || !UnitOfWork.UserRoleAccessRepo.AccessesExist(UserRoleId, Permission.RequestCorporateUserProfileApproval))
                 {
                     return BadRequest("UnAuthorized Access");
+                }
+
+                if (string.IsNullOrEmpty(model.Data))
+                {
+                    return BadRequest("invalid request");
+                }
+
+                var requestData = JsonConvert.DeserializeObject<SimpleAction>(Encryption.DecryptStrings(model.Data));
+                if (requestData == null)
+                {
+                    return BadRequest("invalid request data");
                 }
 
                 var payload = new SimpleAction
@@ -962,10 +976,6 @@ namespace CIB.BankAdmin.Controllers
                     ClientStaffIPAddress = Encryption.DecryptStrings(model.ClientStaffIPAddress),
                     MACAddress = Encryption.DecryptStrings(model.MACAddress)
                 };
-                if (string.IsNullOrEmpty(payload.Id.ToString()))
-                {
-                    return BadRequest("Invalid Id");
-                }
                 //var CorporateProfileId = Encryption.DecryptGuid(id);
                 var entity = UnitOfWork.CorporateProfileRepo.GetByIdAsync(payload.Id);
                 if (entity == null)
@@ -995,7 +1005,6 @@ namespace CIB.BankAdmin.Controllers
 
                 }
 
-            
                 var status = (ProfileStatus)entity.Status;
                 var auditTrail = new TblAuditTrail
                 {
@@ -1045,7 +1054,7 @@ namespace CIB.BankAdmin.Controllers
             }
         }
 
-        [HttpPost("DeclineProfile")]
+        [HttpPut("DeclineProfile")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         public ActionResult<ResponseDTO<CorporateProfileResponseDto>> DeclineProfile(GenericRequestDto model)
         {
@@ -1060,19 +1069,20 @@ namespace CIB.BankAdmin.Controllers
                 return StatusCode(400, errormsg);
                 }
 
-                if(string.IsNullOrEmpty(model.Data))
-                {
-                    return BadRequest("invalid request");
-                }
-                var requestData = JsonConvert.DeserializeObject<RequestCorporateProfileDto>(Encryption.DecryptStrings(model.Data));
-                if(requestData == null)
-                {
-                    return BadRequest("invalid request data");
-                }
-
                 if (string.IsNullOrEmpty(UserRoleId) || !UnitOfWork.UserRoleAccessRepo.AccessesExist(UserRoleId, Permission.ApproveCorporateUserProfile))
                 {
                     return BadRequest("UnAuthorized Access");
+                }
+
+                if (string.IsNullOrEmpty(model.Data))
+                {
+                    return BadRequest("invalid request");
+                }
+
+                var requestData = JsonConvert.DeserializeObject<SimpleAction>(Encryption.DecryptStrings(model.Data));
+                if (requestData == null)
+                {
+                    return BadRequest("invalid request data");
                 }
                
                 var payload = new RequestCorporateProfileDto
@@ -1090,7 +1100,6 @@ namespace CIB.BankAdmin.Controllers
                 {
                  return BadRequest("Invalid Id");
                 }
-
 
                 if(!DeclineRequest(entity,payload,out string errorMessage ))
                 {
@@ -1115,7 +1124,7 @@ namespace CIB.BankAdmin.Controllers
             }
         }
 
-        [HttpPost("DeactivateProfile")]
+        [HttpPut("DeactivateProfile")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         public ActionResult<ResponseDTO<CorporateProfileResponseDto>> DeactivateProfile(GenericRequestDto model)
         {
@@ -1130,24 +1139,24 @@ namespace CIB.BankAdmin.Controllers
 
                 if (!IsUserActive(out errormsg))
                 {
-                    return StatusCode(400, errormsg);
-                }
-
-                if(string.IsNullOrEmpty(model.Data))
-                {
-                    return BadRequest("invalid request");
-                }
-                var requestData = JsonConvert.DeserializeObject<RequestCorporateProfileDto>(Encryption.DecryptStrings(model.Data));
-                if(requestData == null)
-                {
-                    return BadRequest("invalid request data");
+                return StatusCode(400, errormsg);
                 }
 
                 if (string.IsNullOrEmpty(UserRoleId) || !UnitOfWork.UserRoleAccessRepo.AccessesExist(UserRoleId, Permission.DeactivateCorporateUserProfile))
                 {
                     return BadRequest("UnAuthorized Access");
                 }
-                
+
+                if (string.IsNullOrEmpty(model.Data))
+                {
+                    return BadRequest("invalid request");
+                }
+
+                var requestData = JsonConvert.DeserializeObject<SimpleAction>(Encryption.DecryptStrings(model.Data));
+                if (requestData == null)
+                {
+                    return BadRequest("invalid request data");
+                }
                 //get profile by id
                 var payload = new RequestCorporateProfileDto
                 {
@@ -1158,14 +1167,6 @@ namespace CIB.BankAdmin.Controllers
                     HostName = Encryption.DecryptStrings(model.HostName),
                     MACAddress = Encryption.DecryptStrings(model.MACAddress),
                 };
-                if (string.IsNullOrEmpty(payload.Id.ToString()))
-                {
-                    return BadRequest("unknow request");
-                }
-                if (string.IsNullOrEmpty(payload.Reason))
-                {
-                    return BadRequest("Reason for de-activating profile is required");
-                }
                 var entity = UnitOfWork.CorporateProfileRepo.GetByIdAsync(payload.Id);
                 if (entity == null)
                 {
@@ -1257,7 +1258,7 @@ namespace CIB.BankAdmin.Controllers
             }
         }
 
-        [HttpPost("UpdateProfileUserRole")]
+        [HttpPut("UpdateProfileUserRole")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         public ActionResult<ResponseDTO<CorporateProfileResponseDto>> UpdateProfileUserRole(GenericRequestDto model)
         {
@@ -1273,19 +1274,20 @@ namespace CIB.BankAdmin.Controllers
                     return StatusCode(400, errormsg);
                 }
 
-                if(string.IsNullOrEmpty(model.Data))
-                {
-                    return BadRequest("invalid request");
-                }
-                var requestData = JsonConvert.DeserializeObject<UpdateProfileUserRoleDTO>(Encryption.DecryptStrings(model.Data));
-                if(requestData == null)
-                {
-                    return BadRequest("invalid request data");
-                }
-
                 if (string.IsNullOrEmpty(UserRoleId) || !UnitOfWork.UserRoleAccessRepo.AccessesExist(UserRoleId, Permission.UpdateCorporateUserRole))
                 {
                     return BadRequest("UnAuthorized Access");
+                }
+
+                if (string.IsNullOrEmpty(model.Data))
+                {
+                    return BadRequest("invalid request");
+                }
+
+                var requestData = JsonConvert.DeserializeObject<UpdateProfileUserRoleDTO>(Encryption.DecryptStrings(model.Data));
+                if (requestData == null)
+                {
+                    return BadRequest("invalid request data");
                 }
                 var payload = new UpdateProfileUserRoleDTO
                 {
@@ -1397,7 +1399,7 @@ namespace CIB.BankAdmin.Controllers
             }
         }
 
-        [HttpPost("EnableLoggedOutProfile")]
+        [HttpPut("EnableLoggedOutProfile")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         public ActionResult<TblCorporateProfile> EnableLoggedOutProfile(GenericRequestDto model)
         {
@@ -1415,19 +1417,20 @@ namespace CIB.BankAdmin.Controllers
                     return StatusCode(400, errormsg);
                 }
 
-                if(string.IsNullOrEmpty(model.Data))
-                {
-                    return BadRequest("invalid request");
-                }
-                var requestData = JsonConvert.DeserializeObject<SimpleAction>(Encryption.DecryptStrings(model.Data));
-                if(requestData == null)
-                {
-                    return BadRequest("invalid request data");
-                }
-
                 if (string.IsNullOrEmpty(UserRoleId) || !UnitOfWork.UserRoleAccessRepo.AccessesExist(UserRoleId, Permission.EnableLoggedOutCorporateUser))
                 {
                     return BadRequest("UnAuthorized Access");
+                }
+
+                if (string.IsNullOrEmpty(model.Data))
+                {
+                    return BadRequest("invalid request");
+                }
+
+                var requestData = JsonConvert.DeserializeObject<SimpleAction>(Encryption.DecryptStrings(model.Data));
+                if (requestData == null)
+                {
+                    return BadRequest("invalid request data");
                 }
                 var payload = new SimpleAction
                 {
@@ -1489,6 +1492,13 @@ namespace CIB.BankAdmin.Controllers
                 UnitOfWork.CorporateProfileRepo.UpdateCorporateProfile(entity);
                 UnitOfWork.TemCorporateProfileRepo.Add(mapTempProfile);
                 UnitOfWork.AuditTrialRepo.Add(auditTrail);
+
+                //update status
+                // entity.Status = entity.Status = (int) ProfileStatus.Active;;
+                // entity.NoOfWrongAttempts = 0;
+                // entity.ReasonsForDeactivation = string.Empty;
+                // UnitOfWork.CorporateProfileRepo.UpdateCorporateProfile(entity);
+                // UnitOfWork.AuditTrialRepo.Add(auditTrail);
                 UnitOfWork.Complete();
                 return Ok(new ResponseDTO<CorporateProfileResponseDto>(_data:Mapper.Map<CorporateProfileResponseDto>(entity),success:true, _message:Message.Success) );
             }
@@ -1510,7 +1520,7 @@ namespace CIB.BankAdmin.Controllers
             {
             if (!IsAuthenticated)
             {
-            return StatusCode(401, "User is not authenticated");
+                return StatusCode(401, "User is not authenticated");
             }
 
             string errormsg = string.Empty;
@@ -1520,20 +1530,22 @@ namespace CIB.BankAdmin.Controllers
                 return StatusCode(400, errormsg);
             }
 
-            if(string.IsNullOrEmpty(model.Data))
-            {
-                return BadRequest("invalid request");
-            }
-            var requestData = JsonConvert.DeserializeObject<SimpleAction>(Encryption.DecryptStrings(model.Data));
-            if(requestData == null)
-            {
-                return BadRequest("invalid request data");
-            }
-
             if (string.IsNullOrEmpty(UserRoleId) || !UnitOfWork.UserRoleAccessRepo.AccessesExist(UserRoleId, Permission.ViewCorporateUserProfile))
             {
                 return BadRequest("UnAuthorized Access");
             }
+
+            if (string.IsNullOrEmpty(model.Data))
+            {
+                return BadRequest("invalid request");
+            }
+
+            var requestData = JsonConvert.DeserializeObject<SimpleAction>(Encryption.DecryptStrings(model.Data));
+            if (requestData == null)
+            {
+                return BadRequest("invalid request data");
+            }
+            
             var payload = new CorporateResetPasswordDto
             {
                 Id = requestData.Id,
@@ -1543,11 +1555,12 @@ namespace CIB.BankAdmin.Controllers
                 HostName = Encryption.DecryptStrings(model.HostName)
             };
 
-
             if (string.IsNullOrEmpty(payload.Id.ToString()))
             {
                 return BadRequest("Id is required");
             }
+
+
             var entity = UnitOfWork.CorporateProfileRepo.GetByIdAsync(payload.Id);
             if (entity == null)
             {
@@ -1631,20 +1644,22 @@ namespace CIB.BankAdmin.Controllers
                 return StatusCode(400, errormsg);
             }
 
-            if(string.IsNullOrEmpty(model.Data))
-            {
-                return BadRequest("invalid request");
-            }
-            var requestData = JsonConvert.DeserializeObject<SimpleAction>(Encryption.DecryptStrings(model.Data));
-            if(requestData == null)
-            {
-                return BadRequest("invalid request data");
-            }
-
             if (string.IsNullOrEmpty(UserRoleId) || !UnitOfWork.UserRoleAccessRepo.AccessesExist(UserRoleId, Permission.ViewCorporateUserProfile))
             {
                 return BadRequest("UnAuthorized Access");
             }
+
+            if (string.IsNullOrEmpty(model.Data))
+            {
+                return BadRequest("invalid request");
+            }
+
+            var requestData = JsonConvert.DeserializeObject<SimpleAction>(Encryption.DecryptStrings(model.Data));
+            if (requestData == null)
+            {
+                return BadRequest("invalid request data");
+            }
+
             var payload = new CorporateResetPasswordDto
             {
                 Id = requestData.Id,
@@ -1653,11 +1668,6 @@ namespace CIB.BankAdmin.Controllers
                 MACAddress = Encryption.DecryptStrings(model.MACAddress),
                 HostName = Encryption.DecryptStrings(model.HostName)
             };
-
-            if (string.IsNullOrEmpty(payload.Id.ToString()))
-            {
-                return BadRequest("Id is required");
-            }
             var entity = UnitOfWork.CorporateProfileRepo.GetByIdAsync(payload.Id);
             if (entity == null)
             {
@@ -1721,280 +1731,6 @@ namespace CIB.BankAdmin.Controllers
             {
                 _logger.LogError("SERVER ERROR {0}, {1}, {2}",Formater.JsonType(ex.StackTrace), Formater.JsonType(ex.Source), Formater.JsonType(ex.Message));
                 return StatusCode(500,new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: Message.ServerError, responseStatus:false));
-            }
-        }
-    
-        [HttpPost("BulkRequestApproved")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(List<BulkError>), StatusCodes.Status400BadRequest)]
-        public ActionResult<ListResponseDTO<CorporateProfileResponseDto>> BulkRequestApproved(GenericRequestDto model)
-        {
-            try
-            {
-                if (!IsAuthenticated)
-                {
-                    return StatusCode(401, "User is not authenticated");
-                }
-
-                string errormsg = string.Empty;
-
-                if (!IsUserActive(out errormsg))
-                {
-                    return StatusCode(400, errormsg);
-                }
-
-                if(string.IsNullOrEmpty(model.Data))
-                {
-                    return BadRequest("invalid request");
-                }
-
-                var requestData = JsonConvert.DeserializeObject<List<SimpleAction>>(Encryption.DecryptStrings(model.Data));
-                if(requestData == null)
-                {
-                    return BadRequest("invalid request data");
-                }
-               
-                if (string.IsNullOrEmpty(UserRoleId) || !UnitOfWork.UserRoleAccessRepo.AccessesExist(UserRoleId, Permission.ApproveCorporateUserProfile))
-                {
-                    return BadRequest("UnAuthorized Access");
-                }
-
-                var responseErrors = new List<BulkError>();
-                foreach(var item in requestData)
-                {
-                    var payload = new SimpleAction
-                    {
-                        Id = item.Id,
-                        IPAddress = Encryption.DecryptStrings(model.IPAddress),
-                        HostName = Encryption.DecryptStrings(model.HostName),
-                        ClientStaffIPAddress = Encryption.DecryptStrings(model.ClientStaffIPAddress),
-                        MACAddress = Encryption.DecryptStrings(model.MACAddress)
-                    };
-
-                    var entity = UnitOfWork.TemCorporateProfileRepo.GetByIdAsync(payload.Id);
-                    if (entity == null)
-                    {
-                        var bulkError = new BulkError
-                        {
-                            Message = "Invalid Id",
-                            ActionInfo = $"UserName : {entity.Username}, Action: {entity.Action}",
-                            Id = payload.Id,
-                        };
-                        responseErrors.Add(bulkError);
-                    }
-                    else
-                    {
-                        if(!ApprovedRequest(entity,payload, out string errorMessage))
-                        {
-                            var bulkError = new BulkError
-                            {
-                                Message = errorMessage,
-                                ActionInfo = $"UserName : {entity.Username}, Action: {entity.Action}",
-                                Id = entity.CorporateProfileId,
-                            };
-                            responseErrors.Add(bulkError);
-                        }
-                    }
-                }
-                if(responseErrors.Any())
-                {
-                    var errorResult = new {
-                        Message = "An error has occurred while processing the Bulk Approval Request.",
-                        Data = responseErrors
-                    };
-                    return BadRequest(errorResult);
-                }
-                return Ok(true);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError("SERVER ERROR {0}, {1}, {2}",Formater.JsonType(ex.StackTrace), Formater.JsonType(ex.Source), Formater.JsonType(ex.Message));
-                return ex.InnerException != null ? BadRequest(new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: ex.InnerException.Message, responseStatus:false)) : StatusCode(500, new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: ex.InnerException != null ? ex.InnerException.Message : ex.Message, responseStatus:false));
-            }
-        }
-
-        [HttpPost("BulkRequestDecline")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(List<BulkError>), StatusCodes.Status400BadRequest)]
-        public ActionResult<ListResponseDTO<CorporateProfileResponseDto>> BulkRequestDecline(GenericRequestDto model)
-        {
-            try
-            {
-                if (!IsAuthenticated)
-                {
-                    return StatusCode(401, "User is not authenticated");
-                }
-
-                string errormsg = string.Empty;
-
-                if (!IsUserActive(out errormsg))
-                {
-                    return StatusCode(400, errormsg);
-                }
-
-                if(string.IsNullOrEmpty(model.Data))
-                {
-                    return BadRequest("invalid request");
-                }
-
-                var requestData = JsonConvert.DeserializeObject<List<SimpleAction>>(Encryption.DecryptStrings(model.Data));
-                if(requestData == null)
-                {
-                    return BadRequest("invalid request data");
-                }
-                var responseErrors = new List<BulkError>();
-                foreach(var item in requestData)
-                {
-                    var payload = new RequestCorporateProfileDto
-                    {
-                        Id = item.Id,
-                        Reason = item.Reason,
-                        IPAddress = Encryption.DecryptStrings(model.IPAddress),
-                        ClientStaffIPAddress = Encryption.DecryptStrings(model.ClientStaffIPAddress),
-                        HostName = Encryption.DecryptStrings(model.HostName),
-                        MACAddress = Encryption.DecryptStrings(model.MACAddress),
-                    };
-                    //get profile by id
-                    var entity = UnitOfWork.TemCorporateProfileRepo.GetByIdAsync(payload.Id);
-                    if (entity == null)
-                    {
-                        var bulkError = new BulkError
-                        {
-                            Message = "Invalid Id",
-                            ActionInfo = $"UserName : {entity.Username}, Action: {entity.Action}",
-                            Id = payload.Id,
-                        };
-                        responseErrors.Add(bulkError);
-                    }
-                    else
-                    {
-                        if(!DeclineRequest(entity,payload,out string errorMessage ))
-                        {
-                            var bulkError = new BulkError
-                            {
-                                Message = errorMessage,
-                                ActionInfo = $"UserName : {entity.Username}, Action: {entity.Action}",
-                                Id = entity.CorporateProfileId,
-                            };
-                            responseErrors.Add(bulkError);
-                        }
-                    }
-                }
-                if(responseErrors.Any())
-                {
-
-                    var errorResult = new {
-                        Message = "An error has occurred while processing the Bulk Decline Request.",
-                        Data = responseErrors
-                    };
-                    return BadRequest(errorResult);
-                }
-                return Ok(true);
-            }
-            catch (Exception ex)
-            {
-                
-                _logger.LogError("SERVER ERROR {0}, {1}, {2}",Formater.JsonType(ex.StackTrace), Formater.JsonType(ex.Source), Formater.JsonType(ex.Message));
-                return ex.InnerException != null ? BadRequest(new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: ex.InnerException.Message, responseStatus:false)) : StatusCode(500, new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: ex.InnerException != null ? ex.InnerException.Message : ex.Message, responseStatus:false));
-            }
-        }
-    
-        [HttpPost("BulkRequestApproval")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(List<BulkError>), StatusCodes.Status400BadRequest)]
-        public ActionResult<ListResponseDTO<CorporateProfileResponseDto>> BulkRequestApproval(GenericRequestDto model)
-        {
-            try
-            {
-                if (!IsAuthenticated)
-                {
-                    return StatusCode(401, "User is not authenticated");
-                }
-
-                string errormsg = string.Empty;
-
-                if (!IsUserActive(out errormsg))
-                {
-                    return StatusCode(400, errormsg);
-                }
-
-                if(string.IsNullOrEmpty(model.Data))
-                {
-                    return BadRequest("invalid request");
-                }
-
-                var requestData = JsonConvert.DeserializeObject<List<SimpleAction>>(Encryption.DecryptStrings(model.Data));
-                if(requestData == null)
-                {
-                    return BadRequest("invalid request data");
-                }
-
-                var responseErrors = new List<BulkError>();
-                foreach(var item in requestData)
-                {
-                    
-                    var payload = new SimpleAction
-                    {
-                        Id = item.Id,
-                        Reason = item.Reason,
-                        IPAddress = Encryption.DecryptStrings(model.IPAddress),
-                        HostName = Encryption.DecryptStrings(model.HostName),
-                        ClientStaffIPAddress = Encryption.DecryptStrings(model.ClientStaffIPAddress),
-                        MACAddress = Encryption.DecryptStrings(model.MACAddress)
-                    };
-                    var entity = UnitOfWork.TemCorporateProfileRepo.GetByIdAsync(payload.Id);
-                    if (entity == null)
-                    {
-                        var bulkError = new BulkError
-                        {
-                            Message = "Invalid Id",
-                            ActionInfo = $"UserName : {entity.Username}, Action: {entity.Action}",
-                            Id = payload.Id
-                        };
-                        responseErrors.Add(bulkError);
-                    }
-                    else
-                    {
-                        if(entity.InitiatorId != BankProfile.Id)
-                        {
-                            var bulkError = new BulkError
-                            {
-                                Message = "This Request Was not Initiated By you",
-                                ActionInfo = $"UserName : {entity.Username}, Action: {entity.Action}",
-                                Id = entity.CorporateProfileId,
-                            };
-                            responseErrors.Add(bulkError);
-                        } 
-                        else
-                        {
-                            if (!RequestApproval(entity, payload, out string errorMessage))
-                            {
-                                var bulkError = new BulkError
-                                {
-                                    Message = errorMessage,
-                                    ActionInfo = $"UserName : {entity.Username}, Action: {entity.Action}",
-                                    Id = entity.CorporateProfileId,
-                                };
-                                responseErrors.Add(bulkError);
-                            }
-                        }
-                    }
-                }
-                if(responseErrors.Any())
-                {
-                    var errorResult = new {
-                        Message = "An error has occurred while processing the Bulk Approval Request.",
-                        Data = responseErrors
-                    };
-                    return BadRequest(errorResult);
-                }
-                return Ok(true);
-            }
-            catch (Exception ex)
-            {
-                
-                _logger.LogError("SERVER ERROR {0}, {1}, {2}",Formater.JsonType(ex.StackTrace), Formater.JsonType(ex.Source), Formater.JsonType(ex.Message));
-                return ex.InnerException != null ? BadRequest(new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: ex.InnerException.Message, responseStatus:false)) : StatusCode(500, new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: ex.InnerException != null ? ex.InnerException.Message : ex.Message, responseStatus:false));
             }
         }
     
@@ -2119,6 +1855,14 @@ namespace CIB.BankAdmin.Controllers
                 entity.Phone1 = requestInfo.Phone1;
                 entity.ApprovalLimit = requestInfo.ApprovalLimit;
                 entity.FullName = requestInfo.FullName;
+
+                // var userStatus = UnitOfWork.CorporateProfileRepo.CheckDuplicate(entity,corporateCustomerDto.Id, true);
+                // if(userStatus.IsDuplicate !="02")
+                // {
+                //     errorMessage = userStatus.Message;
+                //     return false;
+                // }
+
                 var originalStatus = entity.Status == (int) ProfileStatus.Deactivated ? (int) ProfileStatus.Deactivated : (int)ProfileStatus.Active;
                 requestInfo.IsTreated = (int) ProfileStatus.Active;
                 entity.Status = originalStatus;
@@ -2340,7 +2084,6 @@ namespace CIB.BankAdmin.Controllers
             errorMessage = "Unknow Request";
             return false;
         }
-    
         private bool RequestApproval(TblTempCorporateProfile entity, SimpleAction payload, out string errorMessage)
         {
             var corporateCustomerDto =  UnitOfWork.CorporateCustomerRepo.GetByIdAsync((Guid)entity.CorporateCustomerId);
@@ -2551,7 +2294,6 @@ namespace CIB.BankAdmin.Controllers
             errorMessage = "invalid Request";
             return false;
         }
-    
         private bool DeclineRequest(TblTempCorporateProfile entity, RequestCorporateProfileDto payload, out string errorMessage)
         {
             var initiatorProfile = UnitOfWork.BankProfileRepo.GetByIdAsync((Guid)entity.InitiatorId);

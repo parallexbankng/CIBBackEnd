@@ -1,3 +1,4 @@
+
 using AutoMapper;
 using CIB.Core.Common.Interface;
 using CIB.Core.Common.Response;
@@ -20,7 +21,6 @@ using CIB.Core.Services.Notification;
 using CIB.Core.Services.Api.Dto;
 using CIB.CorporateAdmin.Utils;
 using Newtonsoft.Json;
-using CIB.Core.Services.Authentication;
 
 namespace CIB.CorporateAdmin.Controllers
 {
@@ -45,7 +45,7 @@ namespace CIB.CorporateAdmin.Controllers
       IEmailService emailService,
       IFileService fileService,
       IToken2faService token2FaService,
-      IConfiguration config, IAuthenticationService authService) : base(unitOfWork, mapper, accessor, authService)
+      IConfiguration config) : base(unitOfWork, mapper, accessor)
     {
       _apiService = apiService;
       _emailService = emailService;
@@ -130,6 +130,12 @@ namespace CIB.CorporateAdmin.Controllers
           LogFormater<BulkTransactionController>.Error(_logger, "VerifyBulkTransfer", message, JsonConvert.SerializeObject(senderInfo), JsonConvert.SerializeObject(corporateCustomer.CustomerId));
           return BadRequest(message);
         }
+        if (senderInfo.FreezeCode != "N")
+        {
+          var message = $"Source account is On Debit Freeze";
+          LogFormater<BulkTransactionController>.Error(_logger, "VerifyBulkTransfer", message, JsonConvert.SerializeObject(senderInfo), JsonConvert.SerializeObject(corporateCustomer.CustomerId));
+          return BadRequest(message);
+        }
         var dtb = _fileService.ReadExcelFile(model.files);
         if (dtb.Count == 0)
         {
@@ -148,7 +154,8 @@ namespace CIB.CorporateAdmin.Controllers
         decimal totalFeeCharges = 0;
         decimal totalVatsCharger = 0;
         var feeCharges = await UnitOfWork.NipsFeeChargeRepo.ListAllAsync();
-        Parallel.ForEach<VerifyBulkTransactionResponseDto>((IEnumerable<VerifyBulkTransactionResponseDto>)dtb.AsEnumerable(), async row =>
+
+        await Task.WhenAll(dtb.AsEnumerable().Select(async row =>
         {
           var errorMsg = "";
           if (string.IsNullOrEmpty(row.BankCode) || string.IsNullOrEmpty(row.BankCode?.Trim()))
@@ -222,7 +229,7 @@ namespace CIB.CorporateAdmin.Controllers
           }
           row.Error = errorMsg;
           bulkTransactionItems.Add(row);
-        });
+        }));
         if (bulkTransactionItems.Count == 0)
         {
           var message = "Error Reading Excel File. There must be at least one valid entry";
@@ -367,11 +374,12 @@ namespace CIB.CorporateAdmin.Controllers
         };
 
         var userName = $"{CorporateProfile.Username}{tblCorporateCustomer.CustomerId}";
-        // var validOTP = await _2FaService.TokenAuth(userName, payload.Otp);
-        // if(validOTP.ResponseCode != "00"){
-        //   LogFormater<BulkTransactionController>.Error(_logger,"InitiateBulkTransfer",$"2FA API ERROR : {validOTP.ResponseMessage}",JsonConvert.SerializeObject(userName),JsonConvert.SerializeObject(tblCorporateCustomer.CustomerId));
-        //   return BadRequest(validOTP.ResponseMessage);
-        // }
+        var validOTP = await _2FaService.TokenAuth(userName, payload.Otp);
+        if (validOTP.ResponseCode != "00")
+        {
+          LogFormater<BulkTransactionController>.Error(_logger, "InitiateBulkTransfer", $"2FA API ERROR : {validOTP.ResponseMessage}", JsonConvert.SerializeObject(userName), JsonConvert.SerializeObject(tblCorporateCustomer.CustomerId));
+          return BadRequest(validOTP.ResponseMessage);
+        }
 
         //path to image folder
         var path = Path.Combine("wwwroot", "bulkupload", tblCorporateCustomer.CustomerId);
@@ -470,6 +478,12 @@ namespace CIB.CorporateAdmin.Controllers
           LogFormater<BulkTransactionController>.Error(_logger, "InitiateBulkTransfer", message, JsonConvert.SerializeObject(senderInfo), JsonConvert.SerializeObject(tblCorporateCustomer.CustomerId));
           return BadRequest(message);
         }
+        if (senderInfo.FreezeCode != "N")
+        {
+          var message = $"Source account is On Debit Freeze";
+          LogFormater<BulkTransactionController>.Error(_logger, "VerifyBulkTransfer", message, JsonConvert.SerializeObject(senderInfo), JsonConvert.SerializeObject(tblCorporateCustomer.CustomerId));
+          return BadRequest(message);
+        }
 
         tranlg.Id = Guid.NewGuid();
         tranlg.CompanyId = tblCorporateCustomer.Id;
@@ -501,12 +515,12 @@ namespace CIB.CorporateAdmin.Controllers
         tranlg.InterBankTryCount = 0;
         tranlg.InterBankTotalCredits = 0;
         tranlg.Status = 0;
-        tranlg.TransactionReference = Generate16DigitNumber.Create16DigitString();
+        tranlg.TransactionReference = new GenerateBulkTransactionRefrences().Create16DigitString();
 
         var feeCharges = await UnitOfWork.NipsFeeChargeRepo.ListAllAsync();
-
-        Parallel.ForEach<VerifyBulkTransactionResponseDto>((IEnumerable<VerifyBulkTransactionResponseDto>)uploadListItems.AsEnumerable(), async row =>
+        await Task.WhenAll(uploadListItems.AsEnumerable().Select(async row =>
         {
+          var transactionRef = new GenerateBulkTransactionRefrences().Create16DigitString();
           string errorMsg = "";
           if (string.IsNullOrEmpty(row.BankCode) || string.IsNullOrEmpty(row.BankCode?.Trim()))
           {
@@ -581,7 +595,7 @@ namespace CIB.CorporateAdmin.Controllers
                 InitiateDate = DateTime.Now,
                 Fee = row.BankCode != parallexBankCode ? nipsCharge.Fee : 0,
                 Vat = row.BankCode != parallexBankCode ? nipsCharge.Vat : 0,
-                TransactionReference = Generate16DigitNumber.Create16DigitString(),
+                TransactionReference = transactionRef,
               };
               bankNipBulkCreditLogList.Add(nipCreditInfo);
             }
@@ -612,7 +626,7 @@ namespace CIB.CorporateAdmin.Controllers
                   InitiateDate = DateTime.Now,
                   Fee = row.BankCode != parallexBankCode ? nipsCharge.Fee : 0,
                   Vat = row.BankCode != parallexBankCode ? nipsCharge.Vat : 0,
-                  TransactionReference = Generate16DigitNumber.Create16DigitString(),
+                  TransactionReference = transactionRef,
                 };
                 bankNipBulkCreditLogList.Add(nipCreditInfos);
               }
@@ -641,24 +655,26 @@ namespace CIB.CorporateAdmin.Controllers
                   InitiateDate = DateTime.Now,
                   Fee = row.BankCode != parallexBankCode ? nipsCharge.Fee : 0,
                   Vat = row.BankCode != parallexBankCode ? nipsCharge.Vat : 0,
-                  TransactionReference = Generate16DigitNumber.Create16DigitString(),
+                  TransactionReference = transactionRef,
                 };
                 bankNipBulkCreditLogList.Add(nipCreditInfos);
               }
             }
           }
-        });
+        }));
 
         var totalDebitAmountWithOutCharges = bankNipBulkCreditLogList.Where(ctx => ctx.NameEnquiryStatus == 1).Sum(ctx => ctx.CreditAmount);
         var interBankTotalDebitAmount = bankNipBulkCreditLogList.Where(ctx => ctx.NameEnquiryStatus == 1 && ctx.CreditBankCode != parallexBankCode).Sum(ctx => ctx.CreditAmount);
         var intraBankTotalDebitAmount = bankNipBulkCreditLogList.Where(ctx => ctx.NameEnquiryStatus == 1 && ctx.CreditBankCode == parallexBankCode).Sum(ctx => ctx.CreditAmount);
         var interBankCreditItems = bankNipBulkCreditLogList.Where(ctx => ctx.CreditBankCode != parallexBankCode).ToList();
         var intraBankCreditItems = bankNipBulkCreditLogList.Where(ctx => ctx.CreditBankCode == parallexBankCode).ToList();
-
+        var transactionVatRef = new GenerateBulkTransactionRefrences().Create16DigitString();
         if (interBankCreditItems.Any())
         {
           var totalVat = bankNipBulkCreditLogList.Where(ctx => ctx.CreditBankCode != parallexBankCode && ctx.NameEnquiryStatus == 1).Sum(ctx => ctx.Vat);
           var totalFee = bankNipBulkCreditLogList.Where(ctx => ctx.CreditBankCode != parallexBankCode && ctx.NameEnquiryStatus == 1).Sum(ctx => ctx.Fee);
+
+          var transactionFeeRef = new GenerateBulkTransactionRefrences().Create16DigitString();
           bulkSuspenseCreditItems.Add(new TblNipbulkCreditLog
           {
             Id = Guid.NewGuid(),
@@ -689,7 +705,7 @@ namespace CIB.CorporateAdmin.Controllers
             CreditStatus = 2,
             BatchId = batchId,
             NameEnquiryStatus = 0,
-            TransactionReference = Generate16DigitNumber.Create16DigitString(),
+            TransactionReference = transactionFeeRef,
             TryCount = 0,
             CorporateCustomerId = CorporateProfile.CorporateCustomerId,
             CreditDate = DateTime.Now,
@@ -707,7 +723,7 @@ namespace CIB.CorporateAdmin.Controllers
             CreditStatus = 2,
             BatchId = batchId,
             NameEnquiryStatus = 0,
-            TransactionReference = Generate16DigitNumber.Create16DigitString(),
+            TransactionReference = transactionVatRef,
             TryCount = 0,
             CorporateCustomerId = CorporateProfile.CorporateCustomerId,
             CreditDate = DateTime.Now,
@@ -810,7 +826,7 @@ namespace CIB.CorporateAdmin.Controllers
 
           if (postBulkIntraBankBulk.ResponseCode != "00")
           {
-            _logger.LogError("TRANSACTION ERROR {0}, {1}, {2}", Formater.JsonType(postBulkIntraBankBulk.ResponseCode), Formater.JsonType(postBulkIntraBankBulk.ResponseMessage), Formater.JsonType(postBulkIntraBankBulk.ErrorDetail));
+            _logger.LogError("BULK TRANSACTION ERROR {0}, {1}, {2}", Formater.JsonType(postBulkIntraBankBulk.ResponseCode), Formater.JsonType(postBulkIntraBankBulk.ResponseMessage), Formater.JsonType(postBulkIntraBankBulk));
             if (interBankCreditItems.Any())
             {
               UnitOfWork.TransactionRepo.Add(new TblTransaction
@@ -827,7 +843,7 @@ namespace CIB.CorporateAdmin.Controllers
                 SourceAccountNo = senderInfo.AccountNumber,
                 SourceBank = parralexBank,
                 CustAuthId = CorporateProfile.Id,
-                Channel = "WEB",
+                Channel = "2",
                 TransactionReference = tranlg.TransactionReference,
                 SessionId = postBulkIntraBankBulk.TrnId,
                 TranDate = tranDate,
@@ -851,7 +867,7 @@ namespace CIB.CorporateAdmin.Controllers
                 SourceAccountNo = senderInfo.AccountNumber,
                 SourceBank = parralexBank,
                 CustAuthId = CorporateProfile.Id,
-                Channel = "WEB",
+                Channel = "2",
                 TransactionReference = tranlg.TransactionReference,
                 SessionId = postBulkIntraBankBulk.TrnId,
                 TranDate = tranDate,
@@ -907,7 +923,7 @@ namespace CIB.CorporateAdmin.Controllers
                 SourceAccountNo = senderInfo.AccountNumber,
                 SourceBank = parralexBank,
                 CustAuthId = CorporateProfile.Id,
-                Channel = "WEB",
+                Channel = "2",
                 TransactionReference = tranlg.TransactionReference,
                 SessionId = postBulkIntraBankBulk.TrnId,
                 TranDate = DateTime.Now,
@@ -928,7 +944,7 @@ namespace CIB.CorporateAdmin.Controllers
                 SourceAccountNo = senderInfo.AccountNumber,
                 SourceBank = parralexBank,
                 CustAuthId = CorporateProfile.Id,
-                Channel = "WEB",
+                Channel = "2",
                 TransactionReference = bulkSuspenseVatFee[0].TransactionReference,
                 SessionId = postVatResult[0].TransactionReference,
                 TranDate = tranDate,
@@ -949,7 +965,7 @@ namespace CIB.CorporateAdmin.Controllers
                 SourceAccountNo = senderInfo.AccountNumber,
                 SourceBank = parralexBank,
                 CustAuthId = CorporateProfile.Id,
-                Channel = "WEB",
+                Channel = "2",
                 TransactionReference = bulkSuspenseVatFee[1].TransactionReference,
                 SessionId = postVatResult[1].TransactionReference,
                 TranDate = tranDate,
@@ -1011,7 +1027,7 @@ namespace CIB.CorporateAdmin.Controllers
               SourceAccountNo = senderInfo.AccountNumber,
               SourceBank = parralexBank,
               CustAuthId = CorporateProfile.Id,
-              Channel = "WEB",
+              Channel = "2",
               TransactionReference = tranlg.TransactionReference,
               SessionId = postBulkIntraBankBulk.TrnId,
               TranDate = tranDate,
@@ -1029,7 +1045,6 @@ namespace CIB.CorporateAdmin.Controllers
             ClientStaffIpaddress = payload.ClientStaffIPAddress,
             NewFieldValue = "Corporate User: " + CorporateProfile.FullName + "Initiated/Approved transfer of " + tranlg.DebitAmount + "from " + payload.SourceAccountNumber,
             PreviousFieldValue = "",
-            //TransactionId = postBulkIntraBankBulk.RequestId,
             TransactionId = tranlg.TransactionReference,
             UserId = CorporateProfile.Id,
             Username = CorporateProfile.Username,
@@ -1106,7 +1121,7 @@ namespace CIB.CorporateAdmin.Controllers
           UnitOfWork.CorporateApprovalHistoryRepo.AddRange(tblCorporateApprovalHistories);
           UnitOfWork.Complete();
           var firstApproval = tblCorporateApprovalHistories.First(ctx => ctx.ApprovalLevel == 1);
-          var corporateUser = UnitOfWork.CorporateProfileRepo.GetByIdAsync(firstApproval.UserId.Value);
+          var corporateUser = UnitOfWork.CorporateProfileRepo.GetByIdAsync((Guid)firstApproval?.UserId);
           var initiatorName = UnitOfWork.CorporateProfileRepo.GetByIdAsync((Guid)tranlg.InitiatorId);
           ThreadPool.QueueUserWorkItem(_ => _emailService.SendEmail(EmailTemplate.RequestApproval(corporateUser.Email, initiatorName.FullName, string.Format("{0:0.00}", tranlg.DebitAmount))));
         }
@@ -1165,11 +1180,12 @@ namespace CIB.CorporateAdmin.Controllers
         }
 
         var userName = $"{CorporateProfile.Username}{corporateCustomer.CustomerId}";
-        // var validOTP = await _2FaService.TokenAuth(userName, payload.Otp);
-        // if(validOTP.ResponseCode != "00"){
-        //   LogFormater<BulkTransactionController>.Error(_logger,"ApproveBulkTransfer",$"2FA API ERROR:{validOTP.ResponseMessage}",JsonConvert.SerializeObject(userName),JsonConvert.SerializeObject(corporateCustomer.CustomerId));
-        //   return BadRequest(validOTP.ResponseMessage);
-        // }
+        var validOTP = await _2FaService.TokenAuth(userName, payload.Otp);
+        if (validOTP.ResponseCode != "00")
+        {
+          LogFormater<BulkTransactionController>.Error(_logger, "ApproveBulkTransfer", $"2FA API ERROR:{validOTP.ResponseMessage}", JsonConvert.SerializeObject(userName), JsonConvert.SerializeObject(corporateCustomer.CustomerId));
+          return BadRequest(validOTP.ResponseMessage);
+        }
 
         var pendingTranLog = UnitOfWork.NipBulkTransferLogRepo.GetByIdAsync(payload.TranLogId);
         if (pendingTranLog == null)
@@ -1275,9 +1291,10 @@ namespace CIB.CorporateAdmin.Controllers
           var bulkSuspenseCreditItems = new List<TblNipbulkCreditLog>();
           var interBankCreditItems = tblPendingCreditLog.Where(ctx => ctx.CreditBankCode != parallexBankCode).ToList();
           var intraBankCreditItems = tblPendingCreditLog.Where(ctx => ctx.CreditBankCode == parallexBankCode).ToList();
-
+          var transactionFeeRef = new GenerateBulkTransactionRefrences().Create16DigitString();
           if (interBankCreditItems.Count != 0)
           {
+            var transactionVatRef = new GenerateBulkTransactionRefrences().Create16DigitString();
             bulkSuspenseCreditItems.Add(new TblNipbulkCreditLog
             {
               Id = Guid.NewGuid(),
@@ -1308,7 +1325,7 @@ namespace CIB.CorporateAdmin.Controllers
               CreditStatus = 2,
               BatchId = pendingTranLog.BatchId,
               NameEnquiryStatus = 0,
-              TransactionReference = Generate16DigitNumber.Create16DigitString(),
+              TransactionReference = transactionVatRef,
               TryCount = 0,
               CorporateCustomerId = CorporateProfile.CorporateCustomerId,
               CreditDate = DateTime.Now,
@@ -1325,7 +1342,7 @@ namespace CIB.CorporateAdmin.Controllers
               Narration = $"BCHG|{pendingTranLog.Narration}",
               CreditStatus = 2,
               BatchId = pendingTranLog.BatchId,
-              TransactionReference = Generate16DigitNumber.Create16DigitString(),
+              TransactionReference = transactionFeeRef,
               NameEnquiryStatus = 0,
               TryCount = 0,
               CorporateCustomerId = CorporateProfile.CorporateCustomerId,
@@ -1364,7 +1381,7 @@ namespace CIB.CorporateAdmin.Controllers
 
           if (postBulkIntraBankBulk.ResponseCode != "00")
           {
-            _logger.LogError("TRANSACTION ERROR {0}, {1}, {2}", Formater.JsonType(postBulkIntraBankBulk.ResponseMessage), Formater.JsonType(postBulkIntraBankBulk.ResponseCode), Formater.JsonType(postBulkIntraBankBulk.ErrorDetail));
+            _logger.LogError("BULK TRANSACTION ERROR {0}, {1}, {2}", Formater.JsonType(postBulkIntraBankBulk.ResponseMessage), Formater.JsonType(postBulkIntraBankBulk.ResponseCode), Formater.JsonType(postBulkIntraBankBulk));
             if (interBankCreditItems.Count != 0)
             {
               UnitOfWork.TransactionRepo.Add(new TblTransaction
@@ -1381,7 +1398,7 @@ namespace CIB.CorporateAdmin.Controllers
                 SourceAccountNo = pendingTranLog.DebitAccountNumber,
                 SourceBank = parralexBank,
                 CustAuthId = CorporateProfile.Id,
-                Channel = "WEB",
+                Channel = "2",
                 TransactionReference = pendingTranLog.TransactionReference,
                 SessionId = postBulkIntraBankBulk.TrnId,
                 TranDate = DateTime.Now,
@@ -1405,7 +1422,7 @@ namespace CIB.CorporateAdmin.Controllers
                 SourceAccountNo = pendingTranLog.DebitAccountNumber,
                 SourceBank = parralexBank,
                 CustAuthId = CorporateProfile.Id,
-                Channel = "WEB",
+                Channel = "2",
                 TransactionReference = pendingTranLog.TransactionReference,
                 SessionId = postBulkIntraBankBulk.TrnId,
                 TranDate = DateTime.Now,
@@ -1468,7 +1485,7 @@ namespace CIB.CorporateAdmin.Controllers
                 SourceAccountNo = pendingTranLog.DebitAccountNumber,
                 SourceBank = parralexBank,
                 CustAuthId = CorporateProfile.Id,
-                Channel = "WEB",
+                Channel = "2",
                 TransactionReference = pendingTranLog.TransactionReference,
                 SessionId = postBulkIntraBankBulk.TrnId,
                 TranDate = DateTime.Now,
@@ -1489,7 +1506,7 @@ namespace CIB.CorporateAdmin.Controllers
                 SourceAccountNo = pendingTranLog.DebitAccountNumber,
                 SourceBank = parralexBank,
                 CustAuthId = CorporateProfile.Id,
-                Channel = "WEB",
+                Channel = "2",
                 TransactionReference = bulkSuspenseVatFee[0].TransactionReference,
                 SessionId = postVatResult[0].TransactionReference,
                 TranDate = DateTime.Now,
@@ -1510,7 +1527,7 @@ namespace CIB.CorporateAdmin.Controllers
                 SourceAccountNo = pendingTranLog.DebitAccountNumber,
                 SourceBank = parralexBank,
                 CustAuthId = CorporateProfile.Id,
-                Channel = "WEB",
+                Channel = "2",
                 TransactionReference = bulkSuspenseVatFee[1].TransactionReference,
                 SessionId = postVatResult[1].TransactionReference,
                 TranDate = DateTime.Now,
@@ -1571,7 +1588,7 @@ namespace CIB.CorporateAdmin.Controllers
               SourceAccountNo = pendingTranLog.DebitAccountNumber,
               SourceBank = parralexBank,
               CustAuthId = CorporateProfile.Id,
-              Channel = "WEB",
+              Channel = "2",
               TransactionReference = pendingTranLog.TransactionReference,
               SessionId = postBulkIntraBankBulk.TrnId,
               TranDate = DateTime.Now,
@@ -1703,11 +1720,12 @@ namespace CIB.CorporateAdmin.Controllers
         }
 
         var userName = $"{CorporateProfile.Username}{corporateCustomer.CustomerId}";
-        // var validOTP = await _2FaService.TokenAuth(userName, payload.Otp);
-        // if(validOTP.ResponseCode != "00"){
-        //   LogFormater<BulkTransactionController>.Error(_logger,"DeclineTransaction",$"2FA API ERROR:{validOTP.ResponseMessage}",JsonConvert.SerializeObject(userName),JsonConvert.SerializeObject(corporateCustomer.CustomerId));
-        //   return BadRequest(validOTP.ResponseMessage);
-        // }
+        var validOTP = await _2FaService.TokenAuth(userName, payload.Otp);
+        if (validOTP.ResponseCode != "00")
+        {
+          LogFormater<BulkTransactionController>.Error(_logger, "DeclineTransaction", $"2FA API ERROR:{validOTP.ResponseMessage}", JsonConvert.SerializeObject(userName), JsonConvert.SerializeObject(corporateCustomer.CustomerId));
+          return BadRequest(validOTP.ResponseMessage);
+        }
 
         var pendingTranLog = UnitOfWork.NipBulkTransferLogRepo.GetByIdAsync(payload.TranLogId);
         if (pendingTranLog == null)
@@ -2048,7 +2066,6 @@ namespace CIB.CorporateAdmin.Controllers
         return ex.InnerException != null ? BadRequest(new ErrorResponse(responsecode: ResponseCode.SERVER_ERROR, responseDescription: ex.InnerException.Message, responseStatus: false)) : StatusCode(500, new ErrorResponse(responsecode: ResponseCode.SERVER_ERROR, responseDescription: ex.InnerException != null ? ex.InnerException.Message : ex.Message, responseStatus: false));
       }
     }
-
     [HttpGet("DownloadTemplate")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetInterbankUploadSample()
@@ -2179,6 +2196,7 @@ namespace CIB.CorporateAdmin.Controllers
       creditItems.Add(beneficiary);
       foreach (var item in bulkTransaction)
       {
+        var tranReff = new GenerateBulkTransactionRefrences().Create16DigitString();
         var tranNarration = item.Narration.Length > 50 ? Tuple.Create(item.Narration[..50], item.Narration[50..]) : Tuple.Create(item.Narration, "");
         var trnParticulars2 = tranNarration.Item2.Length > 50 ? tranNarration.Item2[..50] : tranNarration.Item2;
         var creditBeneficiary = new PartTrnRec
@@ -2189,19 +2207,20 @@ namespace CIB.CorporateAdmin.Controllers
           currencyCode = "NGN",
           TrnParticulars = tranNarration.Item1,
           ValueDt = tranDate.ToString("MM/dd/yyyy HH:mm:ss"),
-          PartTrnRmks = Generate16DigitNumber.Create16DigitString(),
+          PartTrnRmks = tranReff,
           REFNUM = "",
           RPTCODE = "",
           TRANPARTICULARS2 = trnParticulars2
         };
         creditItems.Add(creditBeneficiary);
       };
+      var tranRef = new GenerateBulkTransactionRefrences().Create16DigitString();
       var intraBankBulkTransfer = new BulkIntrabankTransactionModel
       {
         BankId = "01",
         TrnType = "T",
         TrnSubType = "CI",
-        RequestID = Generate16DigitNumber.Create16DigitString(),
+        RequestID = tranRef,
         PartTrnRec = creditItems,
       };
       return intraBankBulkTransfer;

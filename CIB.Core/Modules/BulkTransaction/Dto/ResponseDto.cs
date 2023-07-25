@@ -22,6 +22,7 @@ namespace CIB.Core.Modules.BulkTransaction.Dto
         public decimal Vat {get;set;}
         public decimal Fee {get;set;}
         public decimal TotalAmount { get; set; }
+        public string Narration { get; set; }
         public List<VerifyBulkTransactionResponseDto> Transaction { get; set; }
   }
 }

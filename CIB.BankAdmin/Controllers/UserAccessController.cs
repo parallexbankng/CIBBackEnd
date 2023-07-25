@@ -9,6 +9,7 @@ using CIB.Core.Common.Interface;
 using CIB.Core.Common.Response;
 using CIB.Core.Entities;
 using CIB.Core.Enums;
+using CIB.Core.Modules.CorporateCustomer.Dto;
 using CIB.Core.Modules.UserAccess.Dto;
 using CIB.Core.Modules.UserAccess.Validation;
 using CIB.Core.Services.Authentication;
@@ -62,7 +63,6 @@ namespace CIB.BankAdmin.Controllers
             return BadRequest(new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: Message.ServerError, responseStatus:false));
         }
     }
-
     [HttpGet("GetUserAccess")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -100,15 +100,18 @@ namespace CIB.BankAdmin.Controllers
             {
                 return StatusCode(401, "User is not authenticated");
             }
-            if(string.IsNullOrEmpty(model.Data))
+
+            if (string.IsNullOrEmpty(model.Data))
             {
                 return BadRequest("invalid request");
             }
+
             var requestData = JsonConvert.DeserializeObject<CreateRequestDto>(Encryption.DecryptStrings(model.Data));
-            if(requestData == null)
+            if (requestData == null)
             {
                 return BadRequest("invalid request data");
             }
+
             var payload = new CreateRequestDto
             {
                 Name = requestData.Name,
@@ -165,12 +168,14 @@ namespace CIB.BankAdmin.Controllers
             {
                 return StatusCode(401, "User is not authenticated");
             }
-            if(string.IsNullOrEmpty(model.Data))
+
+
+            if (string.IsNullOrEmpty(model.Data))
             {
                 return BadRequest("invalid request");
             }
             var requestData = JsonConvert.DeserializeObject<UpdateRequestDto>(Encryption.DecryptStrings(model.Data));
-            if(requestData == null)
+            if (requestData == null)
             {
                 return BadRequest("invalid request data");
             }
@@ -186,16 +191,17 @@ namespace CIB.BankAdmin.Controllers
             };
 
             var validator = new UpdateUserAccessValidation();
-            var results =  validator.Validate(payload);
+            var results = validator.Validate(payload);
             if (!results.IsValid)
             {
-                return UnprocessableEntity(new ValidatorResponse(_data: new Object(), _success: false,_validationResult: results.Errors));
+                return UnprocessableEntity(new ValidatorResponse(_data: new Object(), _success: false, _validationResult: results.Errors));
             }
             var userAccess = UnitOfWork.UserAccessRepo.GetByIdAsync(payload.Id);
-            if(userAccess == null)
+            if (userAccess == null)
             {
                 return BadRequest("Invalid Id.");
             }
+      
             userAccess.Name = payload.Name;
             var auditTrail = new TblAuditTrail
             {
@@ -243,24 +249,21 @@ namespace CIB.BankAdmin.Controllers
                 return BadRequest("Aunthorized Access");
             }
 
-            if(string.IsNullOrEmpty(models.Data))
+
+            if (string.IsNullOrEmpty(models.Data))
             {
                 return BadRequest("invalid request");
             }
             var requestData = JsonConvert.DeserializeObject<List<SetPermissionCreateRequestDto>>(Encryption.DecryptStrings(models.Data));
-            if(requestData == null)
+            if (requestData == null)
             {
                 return BadRequest("invalid request data");
             }
-
-            
-
             //Validate Model
             if (requestData.Count == 0)
             {
                 return BadRequest("Model is empty");
             }
-
 
             var data = requestData.FirstOrDefault();
             var payload = new UpdateRequestDto
@@ -271,7 +274,7 @@ namespace CIB.BankAdmin.Controllers
                 MACAddress = Encryption.DecryptStrings(data.MACAddress)
             };
             var accessList = new List<TblUserAccess>();
-            foreach(var item in requestData)
+            foreach (var item in requestData)
             {
                 var userAccessId = item.Id;
                 var IsCorporate = item.IsCorporate;
@@ -280,13 +283,14 @@ namespace CIB.BankAdmin.Controllers
                 {
                     return BadRequest($"Invalid Id {item.Id}.");
                 }
-                if(userAccess.IsCorporate != IsCorporate)
+                if (userAccess.IsCorporate != IsCorporate)
                 {
                     userAccess.IsCorporate = IsCorporate;
                     UnitOfWork.UserAccessRepo.UpdateCorporateUserPermissions(userAccess);
                     accessList.Add(userAccess);
                 }
             }
+
             var auditTrail = new TblAuditTrail
             {
                 Id = Guid.NewGuid(),
@@ -332,23 +336,29 @@ namespace CIB.BankAdmin.Controllers
             {
                 return StatusCode(400, errormsg);
             }
-
-            if(string.IsNullOrEmpty(model.Data))
-            {
-                return BadRequest("invalid request");
-            }
-            var requestData = JsonConvert.DeserializeObject<AddRoleAccessRequestDto>(Encryption.DecryptStrings(model.Data));
-            if(requestData == null)
-            {
-                return BadRequest("invalid request data");
-            }
             
             // super authorize
             if (!UnitOfWork.UserRoleAccessRepo.IsSuperAdminAuthorizer(UserRoleId))
             {
                 return BadRequest("UnAuthorized Access");
             }
-           
+
+            if (string.IsNullOrEmpty(model.Data))
+            {
+                return BadRequest("invalid request");
+            }
+            var requestData = JsonConvert.DeserializeObject<AddRoleAccessRequestDto>(Encryption.DecryptStrings(model.Data));
+            if (requestData == null)
+            {
+                return BadRequest("invalid request data");
+            }
+
+            // super authorize
+            if (!UnitOfWork.UserRoleAccessRepo.IsSuperAdminAuthorizer(UserRoleId))
+            {
+                return BadRequest("UnAuthorized Access");
+            }
+
             //validate role
             var roleId = Guid.Parse(requestData.RoleId);
             var tblRole = UnitOfWork.RoleRepo.GetByIdAsync(roleId);
@@ -374,7 +384,7 @@ namespace CIB.BankAdmin.Controllers
                 //var _tblRoleUserAccess = UnitOfWork.UserRoleAccessRepo.GetRoleUserAccessesByRoleID(roleId.ToString(),userAccessId.ToString());
                 userAccessList.Add(new TblRoleUserAccess { Id = Guid.NewGuid(), RoleId = roleId.ToString(), UserAccessId = userAccessId.ToString() });
                 newAccessList.Add(theUserAccess.Name);
-              
+
             }
 
             foreach (var item in _previouseRoleUserAccess)
@@ -386,12 +396,13 @@ namespace CIB.BankAdmin.Controllers
                 }
                 previousAccessList.Add(theUserAccess.Name);
             }
-           
-            if(_previouseRoleUserAccess.Count > 0)
+
+            if (_previouseRoleUserAccess.Any())
             {
                 UnitOfWork.UserRoleAccessRepo.RemoveRange(_previouseRoleUserAccess);
                 UnitOfWork.Complete();
             }
+
             var auditTrail = new TblAuditTrail
             {
                 Id = Guid.NewGuid(),
@@ -440,28 +451,23 @@ namespace CIB.BankAdmin.Controllers
                 return StatusCode(400, errormsg);
             }
 
-            if(string.IsNullOrEmpty(model.Data))
-            {
-                return BadRequest("invalid request");
-            }
-            var requestData = JsonConvert.DeserializeObject<AddRoleAccessRequestDto>(Encryption.DecryptStrings(model.Data));
-            if(requestData == null)
-            {
-                return BadRequest("invalid request data");
-            }
-
-            // super authorize
-            // if (!UnitOfWork.UserRoleAccessRepo.IsSuperAdminAuthorizer(UserRoleId))
-            // {
-            //     return BadRequest("UnAuthorized Access");
-            // }
-            
 
             if (!UnitOfWork.UserRoleAccessRepo.AccessesExist(UserRoleId, Permission.AddCorporateRolePermissions))
             {
                 return BadRequest("Aunthorized Access");
             }
-            // //validate role
+
+            if (string.IsNullOrEmpty(model.Data))
+            {
+                return BadRequest("invalid request");
+            }
+            var requestData = JsonConvert.DeserializeObject<AddRoleAccessRequestDto>(Encryption.DecryptStrings(model.Data));
+            if (requestData == null)
+            {
+                return BadRequest("invalid request data");
+            }
+
+                // //validate role
             var roleId = Guid.Parse(requestData.RoleId);
             var tblRole = UnitOfWork.CorporateRoleRepo.GetByIdAsync(roleId);
             if (tblRole == null)
@@ -472,7 +478,7 @@ namespace CIB.BankAdmin.Controllers
             var removeAccessList = new List<TblCorporateRoleUserAccess>();
             var previousAccessList = new List<string>();
             var newAccessList = new List<string>();
-            
+
             // remove previouse one 
             var _previouseRoleUserAccess = UnitOfWork.CorporateUserRoleAccessRepo.GetCorporatePermissions(roleId);
             // create a permission with name
@@ -486,23 +492,10 @@ namespace CIB.BankAdmin.Controllers
                 }
                 userAccessList.Add(new TblCorporateRoleUserAccess { Id = Guid.NewGuid(), CorporateRoleId = roleId.ToString(), UserAccessId = theUserAccess.Id.ToString() });
                 newAccessList.Add(theUserAccess.Name);
-                // var _tblRoleUserAccess = UnitOfWork.CorporateUserRoleAccessRepo.GetCorporateRoleUserAccesses(roleId.ToString(), userAccessId.ToString());
-                // if(_tblRoleUserAccess != null)
-                // {
-                //     previousAccessList.Add(theUserAccess.Name);
-                //     newAccessList.Add(theUserAccess.Name);
-                //     userAccessList.Add(new TblCorporateRoleUserAccess { Id = Guid.NewGuid(), CorporateRoleId = roleId.ToString(), UserAccessId = theUserAccess.Id.ToString() });
-                // }
-                // else
-                // {
-                //     newAccessList.Add(theUserAccess.Name);
-                //     userAccessList.Add(new TblCorporateRoleUserAccess { Id = Guid.NewGuid(), CorporateRoleId = roleId.ToString(), UserAccessId = theUserAccess.Id.ToString() });
-                // }
             }
-            
+
             foreach (var item in _previouseRoleUserAccess)
             {
-                //var userAccessId = Encryption.DecryptGuid(item.UserAccessId);
                 var theUserAccess = UnitOfWork.UserAccessRepo.GetByIdAsync(Guid.Parse(item.UserAccessId));
                 if (theUserAccess == null)
                 {
@@ -510,12 +503,13 @@ namespace CIB.BankAdmin.Controllers
                 }
                 previousAccessList.Add(theUserAccess.Name);
             }
-            
-            if(_previouseRoleUserAccess.Count != 0)
+
+            if (_previouseRoleUserAccess.Count != 0)
             {
                 UnitOfWork.CorporateUserRoleAccessRepo.RemoveRange(_previouseRoleUserAccess);
                 UnitOfWork.Complete();
             }
+
             var auditTrail = new TblAuditTrail
             {
                 Id = Guid.NewGuid(),
@@ -543,7 +537,6 @@ namespace CIB.BankAdmin.Controllers
             {
                 _logger.LogError("SERVER ERROR {0}, {1}, {2}",Formater.JsonType(ex.StackTrace), Formater.JsonType(ex.Source), Formater.JsonType(ex.Message));
             }
-            _logger.LogError("SERVER ERROR {0}, {1}, {2}",Formater.JsonType(ex.StackTrace), Formater.JsonType(ex.Source), Formater.JsonType(ex.Message));
             return BadRequest(new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: Message.ServerError, responseStatus:false));
         }
     }

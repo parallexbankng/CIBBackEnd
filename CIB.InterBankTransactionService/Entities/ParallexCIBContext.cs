@@ -29,6 +29,7 @@ namespace CIB.InterBankTransactionService.Entities
         public virtual DbSet<TblCorporateRoleUserAccess> TblCorporateRoleUserAccesses { get; set; }
         public virtual DbSet<TblCustAuth> TblCustAuths { get; set; }
         public virtual DbSet<TblEmailLog> TblEmailLogs { get; set; }
+        public virtual DbSet<TblFeeCharge> TblFeeCharges { get; set; }
         public virtual DbSet<TblInterbankbeneficiary> TblInterbankbeneficiaries { get; set; }
         public virtual DbSet<TblIntrabankbeneficiary> TblIntrabankbeneficiaries { get; set; }
         public virtual DbSet<TblLoginLog> TblLoginLogs { get; set; }
@@ -54,6 +55,7 @@ namespace CIB.InterBankTransactionService.Entities
         public virtual DbSet<TblUserAccess> TblUserAccesses { get; set; }
         public virtual DbSet<TblWorkflow> TblWorkflows { get; set; }
         public virtual DbSet<TblWorkflowHierarchy> TblWorkflowHierarchies { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasAnnotation("Relational:Collation", "SQL_Latin1_General_CP1_CI_AS");
@@ -214,6 +216,17 @@ namespace CIB.InterBankTransactionService.Entities
                 entity.Property(e => e.Sn).ValueGeneratedOnAdd();
             });
 
+            modelBuilder.Entity<TblFeeCharge>(entity =>
+            {
+                entity.Property(e => e.FeeAmount).HasColumnType("decimal(22, 2)");
+
+                entity.Property(e => e.MaxAmount).HasColumnType("decimal(22, 2)");
+
+                entity.Property(e => e.MinAmount).HasColumnType("decimal(22, 2)");
+
+                entity.Property(e => e.Vat).HasColumnType("decimal(22, 2)");
+            });
+
             modelBuilder.Entity<TblInterbankbeneficiary>(entity =>
             {
                 entity.ToTable("TblInterbankbeneficiary");
@@ -284,6 +297,8 @@ namespace CIB.InterBankTransactionService.Entities
 
                 entity.Property(e => e.CreditDate).HasColumnType("datetime");
 
+                entity.Property(e => e.Fee).HasColumnType("decimal(22, 2)");
+
                 entity.Property(e => e.InitiateDate).HasColumnType("datetime");
 
                 entity.Property(e => e.KycLevel).HasMaxLength(20);
@@ -299,6 +314,8 @@ namespace CIB.InterBankTransactionService.Entities
                 entity.Property(e => e.Sn).ValueGeneratedOnAdd();
 
                 entity.Property(e => e.TransactionReference).HasMaxLength(225);
+
+                entity.Property(e => e.Vat).HasColumnType("decimal(22, 2)");
             });
 
             modelBuilder.Entity<TblNipbulkTransferLog>(entity =>
@@ -331,7 +348,11 @@ namespace CIB.InterBankTransactionService.Entities
 
                 entity.Property(e => e.InitiatorUserName).HasMaxLength(100);
 
+                entity.Property(e => e.InterBankTotalAmount).HasColumnType("decimal(22, 2)");
+
                 entity.Property(e => e.InterBankTryCount).HasColumnName("interBankTryCount");
+
+                entity.Property(e => e.IntraBankTotalAmount).HasColumnType("decimal(22, 2)");
 
                 entity.Property(e => e.IntreBankSuspenseAccountName).HasMaxLength(225);
 
@@ -356,6 +377,10 @@ namespace CIB.InterBankTransactionService.Entities
                 entity.Property(e => e.SuspenseAccountName).HasMaxLength(225);
 
                 entity.Property(e => e.SuspenseAccountNumber).HasMaxLength(120);
+
+                entity.Property(e => e.TotalFee).HasColumnType("decimal(22, 2)");
+
+                entity.Property(e => e.TotalVat).HasColumnType("decimal(22, 2)");
 
                 entity.Property(e => e.TransactionLocation).HasMaxLength(225);
 
@@ -384,7 +409,11 @@ namespace CIB.InterBankTransactionService.Entities
 
                 entity.Property(e => e.CreditAmount).HasColumnType("decimal(18, 2)");
 
+                entity.Property(e => e.Fee).HasColumnType("decimal(18, 2)");
+
                 entity.Property(e => e.Sn).ValueGeneratedOnAdd();
+
+                entity.Property(e => e.Vat).HasColumnType("decimal(18, 2)");
             });
 
             modelBuilder.Entity<TblPendingTranLog>(entity =>
@@ -393,7 +422,11 @@ namespace CIB.InterBankTransactionService.Entities
 
                 entity.Property(e => e.DebitAmount).HasColumnType("decimal(18, 2)");
 
+                entity.Property(e => e.Fee).HasColumnType("decimal(18, 2)");
+
                 entity.Property(e => e.Sn).ValueGeneratedOnAdd();
+
+                entity.Property(e => e.Vat).HasColumnType("decimal(18, 2)");
             });
 
             modelBuilder.Entity<TblRole>(entity =>
@@ -530,6 +563,7 @@ namespace CIB.InterBankTransactionService.Entities
 
             OnModelCreatingPartial(modelBuilder);
         }
+
         partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
     }
 }

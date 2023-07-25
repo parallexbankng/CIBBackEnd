@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 using AutoMapper;
 using CIB.Core.Common;
 using CIB.Core.Common.Dto;
@@ -10,7 +11,6 @@ using CIB.Core.Entities;
 using CIB.Core.Enums;
 using CIB.Core.Modules.CorporateProfile.Dto;
 using CIB.Core.Modules.CorporateProfile.Validation;
-using CIB.Core.Services.Authentication;
 using CIB.Core.Services.Email;
 using CIB.Core.Services.Notification;
 using CIB.Core.Templates;
@@ -31,7 +31,7 @@ namespace CIB.CorporateAdmin.Controllers
         private readonly ILogger<CorporateProfileController> _logger;
         private readonly IConfiguration _config;
         protected readonly INotificationService notify;
-        public CorporateProfileController(INotificationService notify,IConfiguration config,ILogger<CorporateProfileController> logger,IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor accessor,IEmailService emailService,IAuthenticationService authService):base(unitOfWork,mapper,accessor,authService)
+        public CorporateProfileController(INotificationService notify,IConfiguration config,ILogger<CorporateProfileController> logger,IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor accessor,IEmailService emailService) : base( unitOfWork,mapper, accessor)
         {
             this._emailService = emailService;
             this._logger = logger;
@@ -2081,7 +2081,5 @@ namespace CIB.CorporateAdmin.Controllers
             errorMessage = "invalid Request";
             return false;
         }
-    
-    
     }
 }

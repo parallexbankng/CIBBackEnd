@@ -46,6 +46,7 @@ namespace CIB.Core.Modules.CorporateCustomer.Dto
 
     public class StatementOfAccountResponseDto
     {
+        public string? JsonResponse {get;set;}
         public string ResponseCode { get; set; }
         public string ResponseDescription { get; set; }
         public string OpeningBal { get; set; }
@@ -63,8 +64,8 @@ namespace CIB.Core.Modules.CorporateCustomer.Dto
         public string? AvailableBal { get; set; }
         public string? Branch { get; set; }
         public string? Address { get; set; }
-        public string DateRange {get;set;}
-        public string CustomerName{get;set;}
+        public string? CustomerName { get; set; }
+        public string? DateRange { get; set; }
         public List<Statement> Statement { get; set; }
     }
 
@@ -78,17 +79,6 @@ namespace CIB.Core.Modules.CorporateCustomer.Dto
         public string REMARKS { get; set; }
     }
 
-    public class ChangeSignatoryDto
-    {
-        public Guid Id { get; set; }
-        public string CompanyName { get; set; }
-        public string CustomerId { get; set; }
-        public string AuthorizationType { get; set; }
-        public string PreviouseAuthorizationType { get; set; }
-        public int? Status { get; set; }
-        public string ReasonForDeclining { get; set; }
-        public string ReasonForDeactivation { get; set; }
-    }
 
 
 

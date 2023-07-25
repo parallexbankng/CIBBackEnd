@@ -27,5 +27,7 @@ namespace CIB.InterBankTransactionService.Entities
         public string TransactionReference { get; set; }
         public Guid? CorporateCustomerId { get; set; }
         public int? TryCount { get; set; }
+        public decimal? Vat { get; set; }
+        public decimal? Fee { get; set; }
     }
 }

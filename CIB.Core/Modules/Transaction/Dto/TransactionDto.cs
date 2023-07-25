@@ -33,7 +33,7 @@ namespace CIB.Core.Modules.Transaction.Dto
         public string Comment { get; set; }
         public string Otp { get; set; }
     }
-    public class BulkIntrabankTransactionModel:BaseTransactioDto
+    public class BulkIntrabankTransactionModel
     {
         public string BankId {get;set;}
         public string TrnType {get;set;}
@@ -43,12 +43,13 @@ namespace CIB.Core.Modules.Transaction.Dto
     }
     public class BulkIntraBankTransactionResponse
     {
-        public string RequestId {get;set;}
-        public string ResponseCode {get;set;}
-        public string ResponseMessage {get;set;}
-        public string TrnDt {get;set;}
-        public string TrnId {get;set;}
-        public List<ErrorDetail> ErrorDetail {get;set;}
+        public string? RequestId {get;set;}
+        public string? ResponseCode {get;set;}
+        public string? ResponseMessage {get;set;}
+        public string? TrnDt {get;set;}
+        public string? TrnId {get;set;}
+        public List<ErrorDetail>? ErrorDetail {get;set;}
+        public string? JsonResponse {get;set;}
     }
 
     public class ErrorDetail 

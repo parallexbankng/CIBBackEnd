@@ -17,7 +17,6 @@ namespace CIB.Core.Modules.CorporateProfile
     CorporateProfileResponseDto RetrieveProfileByID(Guid id);
     TblCorporateProfile GetProfileByID(Guid id);
     IEnumerable<CorporateProfileResponseDto> GetAllCorporateProfiles();
-    IEnumerable<TblCorporateProfile> GetCorporateProfiles(Guid id);
     IEnumerable<CorporateProfileResponseDto> GetAllCorporateProfilesByCorporateCustomerId(Guid id);
     IEnumerable<CorporateProfileResponseDto> GetSingleSignatoryCorporateProfilesByCorporateCustomerId(Guid id);
     bool IsAdminActive(Guid roleId, Guid CorporateCustomerId);

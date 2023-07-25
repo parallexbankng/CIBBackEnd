@@ -25,11 +25,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using CIB.Core.Common.Dto;
-using CIB.Core.Services.Authentication.Dto;
-using CIB.Core.Services.Authentication;
 using CIB.Core.Common;
 using System.Security.Claims;
 using System.Linq;
+using CIB.Core.Services.Authentication;
+using CIB.Core.Services.Authentication.Dto;
 using System.IO;
 
 namespace CIB.BankAdmin.Controllers
@@ -100,70 +100,42 @@ namespace CIB.BankAdmin.Controllers
                 var results = validator.Validate(payLoad);
                 if (!results.IsValid)
                 {
-                    _logger.LogInformation("Invalid Request Data {0}", results);
+                    _logger.LogInformation("Invalid Request Data {0}", JsonConvert.SerializeObject(results));
                     return UnprocessableEntity(new ValidatorResponse(_data: new Object(), _success: false, _validationResult: results.Errors));
                 }
 
-                //TODO REQUEST ACTIVE DIRECTOR API
-                if (payLoad.Token != "0000")
+                var userName = $"{payLoad.Username}";
+                var validOTP = await _2fa.TokenAuth(userName, payLoad.Token);
+                if (validOTP.ResponseCode != "00")
                 {
-                    var userName = $"{payLoad.Username}";
-                    var validOTP = await _2fa.TokenAuth(userName, payLoad.Token);
-                    if (validOTP.ResponseCode != "00")
+                    _logger.LogError("2FA API ERROR {0}", $"{userName}:{JsonConvert.SerializeObject(validOTP)}");
+                    return BadRequest(validOTP.ResponseMessage);
+                }
+
+                //TODO REQUEST ACTIVE DIRECTOR API
+                var authResult = await _apiService.ADLogin(payLoad.Username, payLoad.Password);
+                payLoad.Password = "";
+                payLoad.Token = "";
+                if ((bool)!authResult?.IsAuthenticated)
+                {
+                    _logger.LogInformation("AD Authentication Failed {0}", JsonConvert.SerializeObject(authResult));
+                    var bankUser = UnitOfWork.BankAuthenticationRepo.BankUserLogin(payLoad);
+                    if (bankUser == null)
                     {
-                        _logger.LogError("2FA API ERROR {0}", $"{validOTP.ResponseMessage}");
-                        return BadRequest(validOTP.ResponseMessage);
+                        _logger.LogInformation("Ad authentication failed {0}", JsonConvert.SerializeObject(payLoad));
+                        return BadRequest(new LoginResponsedata { Responsecode = "11", ResponseDescription = "Ad authentication failed, Please Contact Bank Admin", UserpasswordChanged = 0, CustomerIdentity = "" });
                     }
-
-                    var authResult = await _apiService.ADLogin(payLoad.Username, payLoad.Password);
-                    payLoad.Password = "";
-                    payLoad.Token = "";
-                    if (!authResult.IsAuthenticated)
+                    if (bankUser.NoOfWrongAttempts == 3 || bankUser.NoOfWrongAttempts > 3)
                     {
-                        _logger.LogInformation("AD Authentication Failed {0}", JsonConvert.SerializeObject(authResult));
-                        var bankUser = UnitOfWork.BankAuthenticationRepo.BankUserLogin(payLoad);
-                        if (bankUser == null)
+                        bankUser.ReasonsForDeactivation = "Multiple incorrect login attempt";
+                        bankUser.Status = -1;
+                        var auditt = new TblAuditTrail
                         {
-                            _logger.LogInformation("you are not profile on this application {0}", JsonConvert.SerializeObject(payLoad));
-                            return BadRequest(new LoginResponsedata { Responsecode = "11", ResponseDescription = "you are not profile on this application, Please Contact Bank Admin", UserpasswordChanged = 0, CustomerIdentity = "" });
-                        }
-                        if (bankUser.NoOfWrongAttempts == 3 || bankUser.NoOfWrongAttempts > 3)
-                        {
-
-                            bankUser.ReasonsForDeactivation = "Multiple incorrect login attempt";
-                            bankUser.Status = -1;
-                            var auditt = new TblAuditTrail
-                            {
-                                Id = Guid.NewGuid(),
-                                ActionCarriedOut = nameof(AuditTrailAction.Login),
-                                Ipaddress = payLoad.IPAddress,
-                                ClientStaffIpaddress = payLoad.ClientStaffIPAddress,
-                                Macaddress = payLoad.MACAddress,
-                                HostName = payLoad.HostName,
-                                NewFieldValue = $"First Name: {bankUser.FirstName}, Last Name: {bankUser.LastName}, Username: {bankUser.Username}, Email Address:  {bankUser.Email}, " +
-                                $"Middle Name: {bankUser.MiddleName}, Phone Number: {bankUser.Phone}",
-                                PreviousFieldValue = "",
-                                TransactionId = "",
-                                UserId = bankUser.Id,
-                                Username = bankUser.Username,
-                                Description = "Login Attempt Failure. Multiple incorrect login",
-                                TimeStamp = DateTime.Now
-                            };
-                            UnitOfWork.AuditTrialRepo.Add(auditt);
-                            UnitOfWork.BankProfileRepo.UpdateBankProfile(bankUser);
-                            UnitOfWork.Complete();
-                            _logger.LogInformation("Login Attempt Failure. Multiple incorrect login {0}", JsonConvert.SerializeObject(payLoad));
-                            return BadRequest(new LoginResponsedata { Responsecode = "11", ResponseDescription = "Sorry, your profile has been deactivated, please contact our support team", UserpasswordChanged = 0, CustomerIdentity = "" });
-                        }
-                        int wrontloginatempt = bankUser.NoOfWrongAttempts ?? 0;
-                        bankUser.NoOfWrongAttempts = wrontloginatempt + 1;
-                        bankUser.LastLoginAttempt = DateTime.Now;
-                        var audit = new AuditTrialDto
-                        {
+                            Id = Guid.NewGuid(),
                             ActionCarriedOut = nameof(AuditTrailAction.Login),
                             Ipaddress = payLoad.IPAddress,
-                            ClientStaffIPAddress = payLoad.ClientStaffIPAddress,
-                            MACAddress = payLoad.MACAddress,
+                            ClientStaffIpaddress = payLoad.ClientStaffIPAddress,
+                            Macaddress = payLoad.MACAddress,
                             HostName = payLoad.HostName,
                             NewFieldValue = $"First Name: {bankUser.FirstName}, Last Name: {bankUser.LastName}, Username: {bankUser.Username}, Email Address:  {bankUser.Email}, " +
                             $"Middle Name: {bankUser.MiddleName}, Phone Number: {bankUser.Phone}",
@@ -171,64 +143,52 @@ namespace CIB.BankAdmin.Controllers
                             TransactionId = "",
                             UserId = bankUser.Id,
                             Username = bankUser.Username,
-                            Description = "Login Attempt Failure. Incorrect Password",
+                            Description = "Login Attempt Failure. Multiple incorrect login",
                             TimeStamp = DateTime.Now
                         };
-                        var audtrl = Mapper.Map<TblAuditTrail>(audit);
-                        UnitOfWork.AuditTrialRepo.Add(audtrl);
+                        UnitOfWork.AuditTrialRepo.Add(auditt);
                         UnitOfWork.BankProfileRepo.UpdateBankProfile(bankUser);
                         UnitOfWork.Complete();
-                        _logger.LogInformation("Invalid login attempt {0}", JsonConvert.SerializeObject(payLoad));
-                        return BadRequest(new LoginResponsedata { Responsecode = "11", ResponseDescription = "Invalid login attempt", UserpasswordChanged = 0, CustomerIdentity = "" });
+                        _logger.LogInformation("Login Attempt Failure. Multiple incorrect login {0}", JsonConvert.SerializeObject(payLoad));
+                        return BadRequest(new LoginResponsedata { Responsecode = "11", ResponseDescription = "Sorry, your profile has been deactivated, please contact our support team", UserpasswordChanged = 0, CustomerIdentity = "" });
                     }
+
+                    int wrontloginatempt = bankUser.NoOfWrongAttempts ?? 0;
+                    bankUser.NoOfWrongAttempts = wrontloginatempt + 1;
+                    bankUser.LastLoginAttempt = DateTime.Now;
+                    var audit = new AuditTrialDto
+                    {
+                        ActionCarriedOut = nameof(AuditTrailAction.Login),
+                        Ipaddress = payLoad.IPAddress,
+                        ClientStaffIPAddress = payLoad.ClientStaffIPAddress,
+                        MACAddress = payLoad.MACAddress,
+                        HostName = payLoad.HostName,
+                        NewFieldValue = $"First Name: {bankUser.FirstName}, Last Name: {bankUser.LastName}, Username: {bankUser.Username}, Email Address:  {bankUser.Email}, " +
+                        $"Middle Name: {bankUser.MiddleName}, Phone Number: {bankUser.Phone}",
+                        PreviousFieldValue = "",
+                        TransactionId = "",
+                        UserId = bankUser.Id,
+                        Username = bankUser.Username,
+                        Description = "Login Attempt Failure. Incorrect Password",
+                        TimeStamp = DateTime.Now
+                    };
+                    var audtrl = Mapper.Map<TblAuditTrail>(audit);
+                    UnitOfWork.AuditTrialRepo.Add(audtrl);
+                    UnitOfWork.BankProfileRepo.UpdateBankProfile(bankUser);
+                    UnitOfWork.Complete();
+                    _logger.LogInformation("Invalid login attempt {0}", JsonConvert.SerializeObject(payLoad));
+                    return BadRequest(new LoginResponsedata { Responsecode = "11", ResponseDescription = "Invalid login attempt", UserpasswordChanged = 0, CustomerIdentity = "" });
                 }
 
                 var cusauth = UnitOfWork.BankAuthenticationRepo.BankUserLogin(payLoad);
                 if (cusauth == null)
                 {
                     payLoad.Password = "";
-                    payLoad.Token = "";
                     _logger.LogInformation("you are not profile on this application, Please Contact Bank Admin {0}", JsonConvert.SerializeObject(payLoad));
                     return BadRequest(new LoginResponsedata { Responsecode = ResponseCode.NOT_PROFILE, ResponseDescription = "you are not profile on this application, Please Contact Bank Admin", UserpasswordChanged = 0, CustomerIdentity = "" });
                 }
 
-                //TODO: To be taken out before sent to the bank
-                if (payLoad.Token.Equals("0000"))
-                {
-                    string emppass = Encryption.OpenSSLDecrypt(cusauth.Password, Encryption.GetEncrptionKey());
-                    if (emppass != payLoad.Password)
-                    {
-                        payLoad.Password = "";
-                        payLoad.Token = "";
-                        int wrontloginatempt = cusauth.NoOfWrongAttempts ?? 0;
-                        cusauth.NoOfWrongAttempts = wrontloginatempt + 1;
-                        cusauth.LastLoginAttempt = DateTime.Now;
-                        var auditt = new TblAuditTrail
-                        {
-                            Id = Guid.NewGuid(),
-                            ActionCarriedOut = nameof(AuditTrailAction.Login),
-                            Ipaddress = login.ClientStaffIPAddress,
-                            ClientStaffIpaddress = login.ClientStaffIPAddress,
-                            Macaddress = login.MACAddress,
-                            HostName = login.HostName,
-                            NewFieldValue = $"First Name: {cusauth.FirstName}, Last Name: {cusauth.LastName}, Username: {cusauth.Username}, Email Address:  {cusauth.Email}, " +
-                            $"Middle Name: {cusauth.MiddleName}, Phone Number: {cusauth.Phone}",
-                            PreviousFieldValue = "",
-                            TransactionId = "",
-                            UserId = cusauth.Id,
-                            Username = cusauth.Username,
-                            Description = "Login Attempt Failure. Invalid Password",
-                            TimeStamp = DateTime.Now
-                        };
-                        UnitOfWork.AuditTrialRepo.Add(auditt);
-                        UnitOfWork.BankProfileRepo.UpdateBankProfile(cusauth);
-                        UnitOfWork.Complete();
-                        payLoad.Password = "";
-                        _logger.LogInformation("Invalid login attempt {0}", JsonConvert.SerializeObject(payLoad));
-                        return BadRequest(new LoginResponsedata { Responsecode = ResponseCode.INVALID_ATTEMPT, ResponseDescription = "Invalid login attempt", UserpasswordChanged = 0, CustomerIdentity = "" });
-                    }
-                }
-
+                // generobj.WriteError("8a GET HERE AT  " + DateTime.Now.ToString());
                 if (cusauth.Status == (int)ProfileStatus.Deactivated)
                 {
                     payLoad.Password = "";
@@ -311,13 +271,6 @@ namespace CIB.BankAdmin.Controllers
                     _logger.LogInformation("we noticed your account has been inactive for about 90 days and has been suspended. Please contact your bank admin. {0}", JsonConvert.SerializeObject(payLoad));
                     return BadRequest(new LoginResponsedata { Responsecode = ResponseCode.INACTIVE_ACCOUNT, ResponseDescription = "Sorry, we noticed your account has been inactive for about 90 days and has been suspended. Please contact your bank admin.", UserpasswordChanged = cusauth.Passwordchanged ?? 0, CustomerIdentity = "" });
                 }
-                // if(payLoad.Token != "0000" || payLoad.Token !="12345")
-                // {
-                //     var validOTP = await _2fa.TokenAuth(payLoad.Username, payLoad.Token);
-                //     if(validOTP.ResponseCode != "00"){
-                //         return BadRequest(validOTP.ResponseMessage);
-                //     }
-                // }
 
                 var tokenBlack = UnitOfWork.TokenBlackRepo.GetBlackTokenById(cusauth.Id);
                 foreach (var mykn in tokenBlack)
@@ -356,7 +309,7 @@ namespace CIB.BankAdmin.Controllers
                     CustAuth = cusauth.Id,
                     LoginTime = DateTime.Now,
                     NotificationStatus = 0,
-                    Channel = "Web"
+                    Channel = "2"
                 };
 
                 tokenstring.RefreshToken = AuthService.GenerateRefreshToken();
@@ -395,8 +348,6 @@ namespace CIB.BankAdmin.Controllers
                     TimeStamp = DateTime.Now
                 };
 
-                string filePath = Path.Combine("htmlTemplate", "CustomerLogin.html");
-
                 UnitOfWork.TokenBlackRepo.Add(tknblack);
                 UnitOfWork.AuditTrialRepo.Add(auditTrail);
                 UnitOfWork.LoginLogCorporate.Add(loginlog);
@@ -405,7 +356,7 @@ namespace CIB.BankAdmin.Controllers
                 _logger.LogInformation("Login Attempt Successful. {0}", Formater.JsonType(payLoad));
                 //int isIndemnitySigned = cusauth.IndemnitySigned ?? 0;
                 var fullName = cusauth.LastName + " " + cusauth.MiddleName + " " + cusauth.FirstName;
-                ThreadPool.QueueUserWorkItem(_ => _emailService.SendEmail(EmailTemplate.LoginMail(cusauth.Email, fullName, filePath)));
+                ThreadPool.QueueUserWorkItem(_ => _emailService.SendEmail(EmailTemplate.LoginMail(cusauth.Email, fullName, "")));
                 var dto = JsonConvert.SerializeObject(new LoginDto
                 {
                     responsecode = ResponseCode.SUCCESS,
@@ -435,8 +386,6 @@ namespace CIB.BankAdmin.Controllers
                 _logger.LogError("SERVER ERROR {0}, {1}, {2}", Formater.JsonType(ex.StackTrace), Formater.JsonType(ex.Source), Formater.JsonType(ex.Message));
                 return BadRequest(new ErrorResponse(responsecode: ResponseCode.SERVER_ERROR, responseDescription: Message.ServerError, responseStatus: false));
             }
-
-
         }
         // <summary>
         // Forgot Password
@@ -470,7 +419,7 @@ namespace CIB.BankAdmin.Controllers
                     MACAddress = Encryption.DecryptStrings(model.MACAddress),
                     HostName = Encryption.DecryptStrings(model.HostName)
                 };
-                //var userEmail = Encryption.DecryptStrings(email);
+
                 var entity = UnitOfWork.BankProfileRepo.GetProfileByEmail(payload.Email);
                 if (entity != null)
                 {
@@ -530,7 +479,7 @@ namespace CIB.BankAdmin.Controllers
         // <returns>Returns a boolean value indicating where the password reset was successful  </returns>
         // <response code="200">Returns a boolean value indicating where the password reset was successful</response>
         // <response code="400">If the item is null </response>     
-        [HttpPost("ResetPassword")]
+        [HttpPut("ResetPassword")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult<bool> ResetPassword(ResetPasswordModel model)
         {
@@ -775,7 +724,7 @@ namespace CIB.BankAdmin.Controllers
                 }
                 var authResult = await _apiService.ADLogin(payLoad.UserName, payLoad.Password);
                 var entity = UnitOfWork.BankProfileRepo.Find(x => x.Username.Equals(payLoad.UserName));
-                if (!authResult.IsAuthenticated)
+                if ((bool)!authResult.IsAuthenticated)
                 {
                     if (entity == null)
                     {
@@ -1004,6 +953,73 @@ namespace CIB.BankAdmin.Controllers
             }
         }
 
+        [HttpPost("refresh")]
+        public IActionResult Refresh(Token token)
+        {
+            if (token is null) return BadRequest("Invalid client request");
+            string accessToken = token.access_token;
+            string refreshToken = token.refresh_token;
+            var principal = AuthService.GetPrincipalFromExpiredToken(accessToken);
+            if (principal is null) return BadRequest("Invalid token");
+            IEnumerable<Claim> claim = principal.Claims;
+            // var userId = ; //this is mapped to the Name claim by default
+            var usernameClaim = claim.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier);
+
+            var user = UnitOfWork.TokenBlackRepo.GetTokenByUserId(Guid.Parse(usernameClaim.Value));
+            if (user is null || user.RefreshToken != refreshToken || user.RefreshTokenExpiryTime <= DateTime.Now) return BadRequest("Invalid client request");
+
+            var cusauth = UnitOfWork.BankProfileRepo.GetByIdAsync(Guid.Parse(usernameClaim.Value));
+            if (cusauth is null) return BadRequest("Invalid client request");
+            var corpmodel = new CorporateUserModel
+            {
+                UserId = cusauth.Id.ToString(),
+                Username = cusauth.Username,
+                FullName = cusauth.FirstName + " " + cusauth.LastName,
+                Email = cusauth.Email,
+                Phone1 = cusauth.Phone
+            };
+            var newAccessToken = AuthService.JWTAuthentication(corpmodel);
+            var newRefreshToken = AuthService.GenerateRefreshToken();
+            user.TokenCode = newAccessToken.Token;
+            user.RefreshToken = newRefreshToken;
+            UnitOfWork.TokenBlackRepo.UpdateTokenBlack(user);
+            UnitOfWork.Complete();
+
+            return Ok(new LoginResponsedata
+            {
+                Responsecode = ResponseCode.SUCCESS,
+                ResponseDescription = Message.Success,
+                UserId = cusauth.Id,
+                CustomerIdentity = cusauth.Username,
+                Phone = cusauth.Phone,
+                SecurityQuestion = "",
+                access_token = newAccessToken.Token.Trim(),
+                refresh_token = newRefreshToken.Trim(),
+                RegStage = cusauth.RegStage,
+                Status = cusauth.Status,
+                RoleId = cusauth.UserRoles
+            });
+        }
+
+        [HttpPost("revoke")]
+        public IActionResult Revoke()
+        {
+            if (!IsAuthenticated)
+            {
+                return StatusCode(401, "User is not authenticated");
+            }
+            var userId = User.Identity.Name;
+            var user = UnitOfWork.TokenBlackRepo.GetTokenByUserId(Guid.Parse(userId));
+            if (user == null) return BadRequest();
+            user.RefreshTokenExpiryTime = null;
+            user.IsBlack = 1;
+            user.TokenCode = null;
+            user.RefreshToken = null;
+            UnitOfWork.TokenBlackRepo.UpdateTokenBlack(user);
+            UnitOfWork.Complete();
+            return NoContent();
+        }
+
         [HttpPost("LogOut")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult<bool> LogOut()
@@ -1069,72 +1085,5 @@ namespace CIB.BankAdmin.Controllers
             }
         }
 
-        [HttpPost("refresh")]
-        public IActionResult Refresh(Token token)
-        {
-            if (token is null) return BadRequest("Invalid client request");
-            string accessToken = token.access_token;
-            string refreshToken = token.refresh_token;
-            var principal = AuthService.GetPrincipalFromExpiredToken(accessToken);
-            if (principal is null) return BadRequest("Invalid token");
-            IEnumerable<Claim> claim = principal.Claims;
-            // var userId = ; //this is mapped to the Name claim by default
-
-            var usernameClaim = claim.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier);
-
-            var user = UnitOfWork.TokenBlackRepo.GetTokenByUserId(Guid.Parse(usernameClaim.Value));
-            if (user is null || user.RefreshToken != refreshToken || user.RefreshTokenExpiryTime <= DateTime.Now) return BadRequest("Invalid client request");
-
-            var cusauth = UnitOfWork.BankProfileRepo.GetByIdAsync(Guid.Parse(usernameClaim.Value));
-            if (cusauth is null) return BadRequest("Invalid client request");
-            var corpmodel = new CorporateUserModel
-            {
-                UserId = cusauth.Id.ToString(),
-                Username = cusauth.Username,
-                FullName = cusauth.FirstName + " " + cusauth.LastName,
-                Email = cusauth.Email,
-                Phone1 = cusauth.Phone
-            };
-            var newAccessToken = AuthService.JWTAuthentication(corpmodel);
-            var newRefreshToken = AuthService.GenerateRefreshToken();
-            user.TokenCode = newAccessToken.Token;
-            user.RefreshToken = newRefreshToken;
-            UnitOfWork.TokenBlackRepo.UpdateTokenBlack(user);
-            UnitOfWork.Complete();
-
-            return Ok(new LoginResponsedata
-            {
-                Responsecode = ResponseCode.SUCCESS,
-                ResponseDescription = Message.Success,
-                UserId = cusauth.Id,
-                CustomerIdentity = cusauth.Username,
-                Phone = cusauth.Phone,
-                SecurityQuestion = "",
-                access_token = newAccessToken.Token.Trim(),
-                refresh_token = newRefreshToken.Trim(),
-                //IndemnitySigned = isIndemnitySigned, 
-                RegStage = cusauth.RegStage,
-                Status = cusauth.Status,
-                RoleId = cusauth.UserRoles
-            });
-        }
-        [HttpPost("revoke")]
-        public IActionResult Revoke()
-        {
-            if (!IsAuthenticated)
-            {
-                return StatusCode(401, "User is not authenticated");
-            }
-            var userId = User.Identity.Name;
-            var user = UnitOfWork.TokenBlackRepo.GetTokenByUserId(Guid.Parse(userId));
-            if (user == null) return BadRequest();
-            user.RefreshTokenExpiryTime = null;
-            user.IsBlack = 1;
-            user.TokenCode = null;
-            user.RefreshToken = null;
-            UnitOfWork.TokenBlackRepo.UpdateTokenBlack(user);
-            UnitOfWork.Complete();
-            return NoContent();
-        }
     }
 }

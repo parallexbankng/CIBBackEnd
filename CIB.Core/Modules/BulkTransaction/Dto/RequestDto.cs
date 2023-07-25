@@ -7,8 +7,8 @@ using Microsoft.AspNetCore.Http;
 
 namespace CIB.Core.Modules.BulkTransaction.Dto
 {
-    public class VerifyBulkTransactionDto
-    {
+   public class VerifyBulkTransactionDto
+  {
         public string SourceAccountNumber { get; set; }
         public string Narration { get; set; }
         //public string Amount { get; set; }

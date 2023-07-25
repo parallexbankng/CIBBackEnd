@@ -31,8 +31,7 @@ public class NameEnquiryResponse
   public string? KYCLevel { get; set; }
 }
 
-public class RequeryTransactionResponse 
-{
+public class RequeryTransactionResponse {
   public string? ResponseCode { get; set; }
   public string? ResponseMessage { get; set; }
   public string? TransactionReference {get;set;}

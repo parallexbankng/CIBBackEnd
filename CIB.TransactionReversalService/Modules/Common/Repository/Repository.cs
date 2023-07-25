@@ -6,34 +6,34 @@ namespace CIB.TransactionReversalService.Modules.Common.Repository;
 
    public class Repository<T> : IRepository<T> where T : class
   {
-    protected readonly ParallexCIBContext Context;
+     protected readonly ParallexCIBContext _context;
     protected Repository(ParallexCIBContext context)
     {
-        Context = context;
+        _context = context;
     }
 
     public void Add(T entity)
     {
-        Context.Set<T>().Add(entity);
+        _context.Set<T>().Add(entity);
     }
 
     public void AddRange(IEnumerable<T> T)
     {
-        Context.Set<T>().AddRange(T);
+        _context.Set<T>().AddRange(T);
     }
 
     public async Task<T> GetByIdAsync(Guid id)
     {
-        return await Context.Set<T>().FindAsync(id);
+        return await _context.Set<T>().FindAsync(id);
     }
 
     public Task<List<T>> ListAllAsync()
     {
-        return Task.FromResult(Context.Set<T>().ToList());
+        return Task.FromResult(_context.Set<T>().ToList());
     }
 
     public void RemoveRange(IEnumerable<T> T)
     {
-        Context.Set<T>().RemoveRange(T);
+        _context.Set<T>().RemoveRange(T);
     }
   }

@@ -79,26 +79,24 @@ namespace CIB.BankAdmin
         options.OperationFilter<FileUploadFilter>();
       });
       services.AddHttpClient<IEmailService, EmailService>();
-      services.AddHttpClient("finnacleClient",c => {
-        c.BaseAddress = new Uri(Configuration.GetValue<string>("TestApiUrl:baseUrl"));
+      services.AddHttpClient("finnacleClient", c =>
+      {
+        c.BaseAddress = new Uri(Configuration.GetValue<string>("prodApiUrl:baseUrl"));
         c.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         c.DefaultRequestHeaders.Add("client-id", Encryption.DecryptStrings($"{Configuration["RequestKey:client-id"]}"));
         c.DefaultRequestHeaders.Add("client-key", Encryption.DecryptStrings($"{Configuration["RequestKey:client-key"]}"));
       });
-      services.AddHttpClient("tokenClient",c => {
-        c.BaseAddress = new Uri(Configuration.GetValue<string>("TestApiUrl:baseUrl"));
-        c.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-      });
-      services.AddHttpClient("adClient",c => {
-        c.BaseAddress = new Uri(Configuration.GetValue<string>("AdAuthenticationBaseUrl"));
+      services.AddHttpClient("tokenClient", c =>
+      {
+        c.BaseAddress = new Uri(Configuration.GetValue<string>("prodApiUrl:baseUrl"));
         c.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
       });
       services.TryAddSingleton<IActionContextAccessor, ActionContextAccessor>();
       services.AddTransient<IApiService, ApiService>();
       services.AddTransient<IToken2faService, Token2faService>();
-      services.AddTransient<INotificationService, NotificationService>();
-      services.AddTransient<IAuthenticationService,AuthenticationService>();
       services.AddTransient<IFileService, FileService>();
+      services.AddTransient<INotificationService, NotificationService>();
+      services.AddTransient<IAuthenticationService, AuthenticationService>();
       services.AddAutoMapper(Assembly.GetExecutingAssembly());
     }
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -111,14 +109,6 @@ namespace CIB.BankAdmin
       }
       app.UseHttpsRedirection();
       app.UseAuthentication();
-     
-      // app.MapGet("antiforgery/token", (IAntiforgery forgeryService, HttpContext context) =>
-      // {
-      //     var tokens = forgeryService.GetAndStoreTokens(context);
-      //     context.Response.Cookies.Append("XSRF-TOKEN", tokens.RequestToken!,new CookieOptions { HttpOnly = false });
-
-      //     return Results.Ok();
-      // }).RequireAuthorization();
       app.UseRouting();
       app.UseCors(Cors);
       app.UseAuthorization();

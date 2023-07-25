@@ -9,7 +9,6 @@ using CIB.Core.Common.Response;
 using CIB.Core.Entities;
 using CIB.Core.Enums;
 using CIB.Core.Modules.WorkflowHierarchy.Dto;
-using CIB.Core.Services.Authentication;
 using CIB.Core.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -22,7 +21,7 @@ namespace CIB.CorporateAdmin.Controllers
     public class WorkflowHierarchyController : BaseAPIController
     {
         private readonly ILogger<WorkflowHierarchyController> _logger;
-        public WorkflowHierarchyController(ILogger<WorkflowHierarchyController> logger,IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor accessor,IAuthenticationService authService):base(unitOfWork,mapper,accessor,authService)
+        public WorkflowHierarchyController(ILogger<WorkflowHierarchyController> logger,IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor accessor) : base( unitOfWork,mapper, accessor)
         {
             _logger = logger;
         }

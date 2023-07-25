@@ -1,3 +1,4 @@
+
 using CIB.TransactionReversalService.Entities;
 using CIB.TransactionReversalService.Modules.Common.Interface;
 
@@ -23,6 +24,3 @@ public record AccountInfo
   public string? UserName { get; set; }
   public string? BankCode { get; set; }
 }
-
-
-

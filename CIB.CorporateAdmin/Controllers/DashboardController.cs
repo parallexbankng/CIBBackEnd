@@ -6,7 +6,6 @@ using CIB.Core.Common.Dto;
 using CIB.Core.Common.Interface;
 using CIB.Core.Enums;
 using CIB.Core.Services.Api;
-using CIB.Core.Services.Authentication;
 using CIB.Core.Utils;
 using CIB.CorporateAdmin.Dto;
 using Microsoft.AspNetCore.Http;
@@ -21,7 +20,7 @@ namespace CIB.CorporateAdmin.Controllers
     {
         private readonly IApiService _apiService;
         private readonly ILogger<CorporateRoleController> _logger;
-        public DashboardController(ILogger<CorporateRoleController> logger,IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor accessor,IApiService apiService,IAuthenticationService authService):base(unitOfWork,mapper,accessor,authService)
+        public DashboardController(ILogger<CorporateRoleController> logger,IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor accessor,IApiService apiService) : base( unitOfWork,mapper,accessor)
         {
             _apiService = apiService;
             _logger = logger;

@@ -25,11 +25,7 @@ namespace CIB.Core.Enums
         /// <summary>
         /// Own Transfer
         /// </summary>
-        Own_Transfer,
-         /// <summary>
-        /// OnLending
-        /// </summary>
-        OnLending
+        Own_Transfer
     }
 
     public enum TransactionStatus

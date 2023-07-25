@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="ExcelDataReader" Version="3.6.0" />
@@ -21,17 +21,11 @@
     <None Remove="Security.Cryptography" />
     <None Remove="AutoMapper.Extensions.Microsoft.DependencyInjection" />
     <None Remove="AutoMapper" />
-    <None Remove="Modules\OnLending\ExtensionHistory\" />
-    <None Remove="Modules\OnLending\ExtensionHistory\Dto\" />
-    <None Remove="Modules\OnLending\Transaction\" />
-    <None Remove="Modules\OnLending\Transaction\Dto\" />
-    <None Remove="Modules\OnLending\Enums\" />
+    <None Remove="Templates\htmlTemplate\" />
+    <None Remove="Templates\htmlTemplate\images\" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Modules\OnLending\ExtensionHistory\" />
-    <Folder Include="Modules\OnLending\ExtensionHistory\Dto\" />
-    <Folder Include="Modules\OnLending\Transaction\" />
-    <Folder Include="Modules\OnLending\Transaction\Dto\" />
-    <Folder Include="Modules\OnLending\Enums\" />
+    <Folder Include="Templates\htmlTemplate\" />
+    <Folder Include="Templates\htmlTemplate\images\" />
   </ItemGroup>
 </Project>

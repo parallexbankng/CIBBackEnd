@@ -18,7 +18,7 @@ namespace CIB.IntraBankTransactionService.Services.Request;
     public string? Narration { get; set; }
   }
 
-   public class RequeryTransaction
+  public class RequeryTransaction
   {
     public string? UserName { get; set; }
     public string? TransactionReference {get;set;}
@@ -26,5 +26,5 @@ namespace CIB.IntraBankTransactionService.Services.Request;
     public string? BeneficiaryBankCode { get; set; }
     public string? AccountToDebit { get; set; }
     public decimal? Amount { get; set; }
-  } 
+  }
 

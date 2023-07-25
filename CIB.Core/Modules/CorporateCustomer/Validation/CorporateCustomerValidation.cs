@@ -49,6 +49,7 @@ namespace CIB.Core.Modules.CorporateCustomer.Mapper
                 .NotEmpty().WithMessage("{PropertyName} is required.")
                 .NotNull();
             RuleFor(p => p.Email1)
+                .NotEmpty().WithMessage("{PropertyName} is required.")
                 .Matches(new ReqEx().EmailValidation).WithMessage("{PropertyName} Email is not valid.")
                 .NotNull();
             RuleFor(p => p.AuthorizationType)
@@ -122,10 +123,6 @@ namespace CIB.Core.Modules.CorporateCustomer.Mapper
                 .NotEmpty().WithMessage("{PropertyName} is required.")
                 .Matches(new ReqEx().NumberOnly).WithMessage("{PropertyName} is not a valid Account Number.")
                 .NotNull();
-            RuleFor(p => p.Email.Trim())
-                .NotEmpty().WithMessage("{PropertyName} is required.")
-                .Matches(new ReqEx().EmailValidation).WithMessage("{PropertyName} Email is not valid.")
-                .NotNull(); 
             RuleFor(p => p.AuthorizationType)
                 .NotEmpty().WithMessage("{PropertyName} is required.")
                 .NotNull();
@@ -134,15 +131,19 @@ namespace CIB.Core.Modules.CorporateCustomer.Mapper
                 .NotNull();
             RuleFor(p => p.PhoneNumber.Trim())
                 .NotEmpty().WithMessage("{PropertyName} is required.")
-                .Matches(new ReqEx().NumberOnly).WithMessage("{PropertyName} is not valid.")
+                .Matches(new ReqEx().NumberOnly).WithMessage("{PropertyName} PhoneNumber is not valid.")
+                .NotNull();
+            RuleFor(p => p.Email.Trim())
+                .NotEmpty().WithMessage("{PropertyName} is required.")
+                .Matches(new ReqEx().EmailValidation).WithMessage("{PropertyName} Email is not valid.")
                 .NotNull();
             RuleFor(p => p.FirstName.Trim())
                 .NotEmpty().WithMessage("{PropertyName} is required.")
-                .Matches(new ReqEx().AlphabetOnly).WithMessage("{PropertyName} is not valid.")
+                .Matches(new ReqEx().AlphabetOnly).WithMessage("{PropertyName} FirstName is not valid.")
                 .NotNull();
             RuleFor(p => p.LastName.Trim())
                 .NotEmpty().WithMessage("{PropertyName} is required.")
-                .Matches(new ReqEx().AlphabetOnly).WithMessage("{PropertyName} is not valid.")
+                .Matches(new ReqEx().AlphabetOnly).WithMessage("{PropertyName} LastName is not valid.")
                 .NotNull();
             RuleFor(p => p.MinAccountLimit)
                 .NotEmpty().WithMessage("{PropertyName} is required.")

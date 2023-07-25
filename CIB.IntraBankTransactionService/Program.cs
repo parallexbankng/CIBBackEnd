@@ -42,11 +42,11 @@ namespace CIB.IntraBankTransactionService
         .UseWindowsService()
         .ConfigureServices((hostContext, services) => {
           IConfiguration configuration = hostContext.Configuration;
-          var con = Encryption.DecryptStrings(configuration.GetConnectionString("parallaxCIBCon"));
+          var con = Encryption.DecryptStrings(configuration.GetConnectionString("ParallexCIBCon"));
           services.AddDbContext<ParallexCIBContext>(options => options.UseSqlServer(con));
           services.AddScoped<IUnitOfWork, UnitOfWork>();
           services.AddHttpClient("tokenClient",c => {
-            c.BaseAddress = new Uri(configuration.GetValue<string>("TestApiUrl:baseUrl"));
+            c.BaseAddress = new Uri(configuration.GetValue<string>("prodApiUrl:baseUrl"));
             c.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
           });
           services.AddSingleton<IIntraBankJob, IntraBankJob>();
@@ -58,5 +58,6 @@ namespace CIB.IntraBankTransactionService
           logging.AddNLog(hostingContext.Configuration.GetSection("Logging")); 
           logging.SetMinimumLevel(LogLevel.Information);
         });
+
   }
 }

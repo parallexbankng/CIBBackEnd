@@ -18,7 +18,5 @@ namespace CIB.Core.Modules.CorporateCustomer
         TblCorporateCustomer GetCustomerByCustomerId(string customerId);
         CorporateUserStatus CheckDuplicate(TblCorporateCustomer profile, bool IsUpdate = false);
         void UpdateCorporateCustomer(TblCorporateCustomer update);
-        IEnumerable<ChangeSignatoryDto> Search(string CompanyName, string Signatory); 
-        IEnumerable<ChangeSignatoryDto> GetCorporateCustomerWhoChangeSigntory(); 
     }
 }

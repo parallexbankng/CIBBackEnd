@@ -18,6 +18,7 @@ namespace CIB.Core.Services.Api
     Task<IntraBankTransferResponse> IntraBankTransfer(IntraBankPostDto transaction);
     Task<BulkIntraBankTransactionResponse> IntraBankBulkTransfer(BulkIntrabankTransactionModel transaction);
     Task<IntraBankTransferResponse> InterBankTransfer(InterBankPostDto transaction);
+    Task<CustomerDataResponseDto> QueryTransferTransaction(string accountNumber);
     Task<StatementOfAccountResponseDto> GenerateStatement(StatementOfAccountRequestDto accountRequestDto);
     Task<BankListResponseData> GetBanks();
     Task<AuthTokenResponse> GetAuthToken();

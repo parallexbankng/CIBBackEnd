@@ -13,7 +13,5 @@ namespace CIB.Core.Entities
         public Guid? CustAutId { get; set; }
         public DateTime? DateGenerated { get; set; }
         public int? IsBlack { get; set; }
-        public DateTime? RefreshTokenExpiryTime { get; set; }
-        public string RefreshToken { get; set; }
     }
 }

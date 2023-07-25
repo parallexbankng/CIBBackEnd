@@ -54,7 +54,6 @@ namespace CIB.Core.Entities
         public decimal? TotalVat { get; set; }
         public decimal? IntraBankTotalAmount { get; set; }
         public decimal? InterBankTotalAmount { get; set; }
-        public string SessionId { get; set; }
-
+        public string? SessionId { get; set; }
     }
 }

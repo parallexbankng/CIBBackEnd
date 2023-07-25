@@ -7,7 +7,7 @@ using CIB.Core.Entities;
 
 namespace CIB.Core.Modules.CorporateRole
 {
-    public interface ICorporateRoleRepository : IRepository<TblCorporateRole>
+    public interface ICorporateRoleRepository :IRepository<TblCorporateRole>
     {
         string GetCorporateRoleName(string roleId);
         IEnumerable<TblCorporateRole> GetAllCorporateRolesByCorporateId(Guid corporateCustomerId);

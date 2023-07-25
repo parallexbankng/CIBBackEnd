@@ -30,7 +30,6 @@ namespace CIB.Core.Modules.Authentication.Dto
         public string Phone { get; set; }
         public string BVN { get; set; }
         public string access_token { get; set; }
-        public string refresh_token { get; set; }
         public string token_type { get; set; }
         public string expires_in { get; set; }
         public string SecurityQuestion { get; set; }
@@ -45,17 +44,9 @@ namespace CIB.Core.Modules.Authentication.Dto
         public string CompanyName { get; set; }
         public int? RegStage { get; set; }
         public int? Status { get; set; }
+        public string refresh_token {get;set;}
         public Guid? CorporateCustomerId { get; set; }
     }
-    public class LoginResponseDto
-    {
-        public string Responsecode { get; set; }
-        public string ResponseDescription { get; set; }
-        public string access_token { get; set; }
-        public string refresh_token { get; set; }
-        public string Data {get;set;}
-    }
-
     public class LoginDto 
     {
         public string responsecode { get; set; }

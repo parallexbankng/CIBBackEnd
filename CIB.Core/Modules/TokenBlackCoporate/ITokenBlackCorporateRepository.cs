@@ -12,6 +12,5 @@ namespace CIB.Core.Modules.TokenBlackCoporate
         void UpdateTokenBlackCorporate(TblTokenBlackCorp update);
         List<TblTokenBlackCorp> GetBlackTokenById(Guid Id);
         bool IsTokenStillValid(Guid UserId, string Token);
-        TblTokenBlackCorp GetTokenByUserId(Guid userId);
     }
 }

@@ -1,24 +1,12 @@
-
-using CIB.Core.Common.Repository;
-using CIB.Core.Entities;
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace CIB.Core.Modules.Branch
 {
-    public class BranchRepository : Repository<TblBankBranch>, IBranchRepository
+    public class BranchRepository
     {
-        public BranchRepository(ParallexCIBContext context) : base(context)
-        {
-
-        }
-        public ParallexCIBContext context
-        {
-            get { return _context as ParallexCIBContext; }
-        }
-
-        public TblBankBranch GetBranchById(long Id)
-        {
-            return _context.TblBankBranches.Where(ctx => ctx.Id == Id).FirstOrDefault();
-        }
-  }
+        
+    }
 }

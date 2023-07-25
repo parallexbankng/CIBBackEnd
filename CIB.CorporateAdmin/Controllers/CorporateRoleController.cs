@@ -8,7 +8,6 @@ using CIB.Core.Common.Interface;
 using CIB.Core.Common.Response;
 using CIB.Core.Modules.Authentication.Dto;
 using CIB.Core.Modules.CorporateRole.Dto;
-using CIB.Core.Services.Authentication;
 using CIB.Core.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -21,7 +20,7 @@ namespace CIB.CorporateAdmin.Controllers
     public class CorporateRoleController : BaseAPIController
     {
         private readonly ILogger<CorporateRoleController> _logger;
-        public CorporateRoleController(ILogger<CorporateRoleController> logger,IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor accessor,IAuthenticationService authService):base(unitOfWork,mapper,accessor,authService)
+        public CorporateRoleController(ILogger<CorporateRoleController> logger,IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor accessor) : base( unitOfWork,mapper,accessor)
         {
             _logger = logger;
         }

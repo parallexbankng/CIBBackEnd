@@ -3,11 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
+using CIB.BankAdmin.Utils;
 using CIB.Core.Common;
 using CIB.Core.Common.Dto;
 using CIB.Core.Common.Interface;
@@ -21,8 +17,15 @@ using CIB.Core.Services.Api.Dto;
 using CIB.Core.Services.Authentication;
 using CIB.Core.Services.Email;
 using CIB.Core.Services.File;
+using CIB.Core.Services.Notification;
 using CIB.Core.Templates;
 using CIB.Core.Utils;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+
 namespace CIB.BankAdmin.Controllers
 {
     [ApiController]
@@ -31,18 +34,19 @@ namespace CIB.BankAdmin.Controllers
     {
         private readonly IApiService _apiService;
         private readonly ILogger<ManageAccountController> _logger;
+        protected readonly INotificationService notify;
         private readonly IFileService _fileService;
-        private readonly IEmailService _emailService;
         private readonly IConfiguration _config;
-        public ManageAccountController(IConfiguration config,IEmailService emailService,IFileService fileService,ILogger<ManageAccountController> _logger,IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor accessor,IApiService apiService,IAuthenticationService authService):base(mapper,unitOfWork,accessor,authService)
+        private readonly IEmailService _emailService;
+        public ManageAccountController(IEmailService emailService,IConfiguration config,IFileService fileService,INotificationService notify,ILogger<ManageAccountController> _logger,IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor accessor,IApiService apiService,IAuthenticationService authService):base(mapper,unitOfWork,accessor,authService)
         {
             this._apiService = apiService;
             this._logger = _logger;
+            this.notify = notify;
             this._fileService = fileService;
-            this._emailService = emailService;
             this._config = config;
+            this._emailService = emailService;
         }
-       
         [HttpGet("CustomerNameInquiry")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         public async Task<ActionResult<ResponseDTO<CustomerDataResponseDto>>> CustomerNameInquiry(string accountNumber)
@@ -75,14 +79,11 @@ namespace CIB.BankAdmin.Controllers
             }
             catch (Exception ex)
             {
-                // _logger.LogError("SERVER ERROR {0}, {1}, {2}",Formater.JsonType(ex.StackTrace), Formater.JsonType(ex.Source), Formater.JsonType(ex.Message));
-                // return BadRequest(new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: Message.ServerError, responseStatus:false));
-
                 _logger.LogError("SERVER ERROR {0}, {1}, {2}",Formater.JsonType(ex.StackTrace), Formater.JsonType(ex.Source), Formater.JsonType(ex.Message));
-                return ex.InnerException != null ? BadRequest(new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: ex.InnerException.Message, responseStatus:false)) : StatusCode(500, new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: ex.InnerException != null ? ex.InnerException.Message : ex.Message, responseStatus:false));
+                return BadRequest(new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: Message.ServerError, responseStatus:false));
             }
         }
-       
+        
         [HttpGet("GetAuthorizationTypes")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         public ActionResult<ListResponseDTO<AuthorizationTypeModel>> GetAuthorizationTypes()
@@ -111,11 +112,14 @@ namespace CIB.BankAdmin.Controllers
             }
             catch (Exception ex)
             {
-                 _logger.LogError("SERVER ERROR {0}, {1}, {2}",Formater.JsonType(ex.StackTrace), Formater.JsonType(ex.Source), Formater.JsonType(ex.Message));
-                return ex.InnerException != null ? BadRequest(new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: ex.InnerException.Message, responseStatus:false)) : StatusCode(500, new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: ex.InnerException != null ? ex.InnerException.Message : ex.Message, responseStatus:false));
+                if (ex.InnerException != null)
+                {
+                    _logger.LogError("SERVER ERROR {0}, {1}, {2}",Formater.JsonType(ex.StackTrace), Formater.JsonType(ex.Source), Formater.JsonType(ex.Message));
+                //return BadRequest(ex.InnerException.Message);
+                }
+                return BadRequest(new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: Message.ServerError, responseStatus:false));
             }
         }
-        
         [HttpPost("ValidateCorporateCustomer")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         public ActionResult<bool> ValidateCorporateCustomerModel(GenericRequestDto model)
@@ -136,20 +140,20 @@ namespace CIB.BankAdmin.Controllers
                     return BadRequest("UnAuthorized Access");
                 }
 
-                if(string.IsNullOrEmpty(model.Data))
+                if (string.IsNullOrEmpty(model.Data))
                 {
                     return BadRequest("invalid request");
                 }
 
                 var requestData = JsonConvert.DeserializeObject<ValidateCorporateCustomerRequestDto>(Encryption.DecryptStrings(model.Data));
-                if(requestData == null)
+                if (requestData == null)
                 {
                     return BadRequest("invalid request data");
                 }
 
                 var payload = new ValidateCorporateCustomerRequestDto
                 {
-                    CompanyName =   requestData.CompanyName,
+                    CompanyName = requestData.CompanyName,
                     Email = requestData.Email,
                     CustomerId = requestData.CustomerId,
                     DefaultAccountNumber = requestData.DefaultAccountNumber,
@@ -165,7 +169,8 @@ namespace CIB.BankAdmin.Controllers
                 var results =  validator.Validate(payload);
                 if (!results.IsValid)
                 {
-                    return UnprocessableEntity(new ValidatorResponse(_data: new { }, _success: false, _validationResult: results.Errors));
+					LogFormater<ManageAccountController>.Error(_logger, "ValidateCorporateCustomer", $"VALIDATION ERROR : {results}", JsonConvert.SerializeObject(payload), JsonConvert.SerializeObject(BankProfile.Username));
+					return UnprocessableEntity(new ValidatorResponse(_data: new { }, _success: false, _validationResult: results.Errors));
                 }
                 var entity = UnitOfWork.CorporateCustomerRepo.GetCorporateCustomerByCustomerID(payload.CustomerId);
                 //check if corporate Id exist
@@ -183,11 +188,16 @@ namespace CIB.BankAdmin.Controllers
             }
             catch (Exception ex)
             {
-                 _logger.LogError("SERVER ERROR {0}, {1}, {2}",Formater.JsonType(ex.StackTrace), Formater.JsonType(ex.Source), Formater.JsonType(ex.Message));
-                return ex.InnerException != null ? BadRequest(new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: ex.InnerException.Message, responseStatus:false)) : StatusCode(500, new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: ex.InnerException != null ? ex.InnerException.Message : ex.Message, responseStatus:false));
+                if (ex.InnerException != null)
+                {
+                    _logger.LogError("SERVER ERROR {0}, {1}, {2}",Formater.JsonType(ex.StackTrace), Formater.JsonType(ex.Source), Formater.JsonType(ex.Message));
+                //return BadRequest(ex.InnerException.Message);
+                }
+				_logger.LogError("SERVER ERROR {0}, {1}, {2}", Formater.JsonType(ex.StackTrace), Formater.JsonType(ex.Source), Formater.JsonType(ex.Message));
+				return BadRequest(new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: Message.ServerError, responseStatus:false));
             }
         }
-       
+        
         [HttpPost("ValidateAccountLimit")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         public ActionResult<bool> ValidateAccountLimitModel(GenericRequestDto model)
@@ -204,19 +214,18 @@ namespace CIB.BankAdmin.Controllers
                     return StatusCode(400, errormsg);
                 }
 
-                // if (!UnitOfWork.UserRoleAccessRepo.AccessesExist(UserRoleId, Permission.OnboardCorporateCustomer))
-                // {
-                //     return BadRequest("UnAuthorized Access");
-                // }
+                if (!UnitOfWork.UserRoleAccessRepo.AccessesExist(UserRoleId, Permission.OnboardCorporateCustomer))
+                {
+                    return BadRequest("UnAuthorized Access");
+                }
 
-                if(string.IsNullOrEmpty(model.Data))
+                if (string.IsNullOrEmpty(model.Data))
                 {
                     return BadRequest("invalid request");
                 }
-                var itme = Encryption.DecryptStrings(model.Data);
 
-                var requestData = JsonConvert.DeserializeObject<AccountLimitRequest>(itme);
-                if(requestData == null)
+                var requestData = JsonConvert.DeserializeObject<AccountLimitRequest>(Encryption.DecryptStrings(model.Data));
+                if (requestData == null)
                 {
                     return BadRequest("invalid request data");
                 }
@@ -238,47 +247,58 @@ namespace CIB.BankAdmin.Controllers
                 {
                     if (payload.MinAccountLimit < 0)
                     {
-                        return BadRequest("Minimum account limit is invalid");
+						LogFormater<ManageAccountController>.Error(_logger, "ValidateAccountLimit", $"Minimum account limit is invalid : {payload.MinAccountLimit}", JsonConvert.SerializeObject(payload), JsonConvert.SerializeObject(BankProfile.Username));
+						return BadRequest("Minimum account limit is invalid");
                     }
 
                     if (payload.MaxAccountLimit == 0)
                     {
-                        return BadRequest("Maximum account limit must be greater than 0");
+						LogFormater<ManageAccountController>.Error(_logger, "ValidateAccountLimit", $"Maximum account limit must be greater than 0 : {payload.MaxAccountLimit}", JsonConvert.SerializeObject(payload), JsonConvert.SerializeObject(BankProfile.Username));
+						return BadRequest("Maximum account limit must be greater than 0");
                     }
 
                     if (payload.MinAccountLimit > payload.MaxAccountLimit)
                     {
-                        return BadRequest("Minimum account limit must not be greater than Maximum account limit");
+						LogFormater<ManageAccountController>.Error(_logger, "ValidateAccountLimit", $"Minimum account limit must not be greater than Maximum account limit : {payload.MinAccountLimit}-{payload.MaxAccountLimit}", JsonConvert.SerializeObject(payload), JsonConvert.SerializeObject(BankProfile.Username));
+						return BadRequest("Minimum account limit must not be greater than Maximum account limit");
                     }
                 }
                 if(payload.MaxAccountLimit > payload.SingleTransDailyLimit)
                 {
-                    return BadRequest("Maximum Limit per Transaction can not be greater than accumulative single daily Limit");
+					LogFormater<ManageAccountController>.Error(_logger, "ValidateAccountLimit", $"Maximum Limit per Transaction can not be greater than accumulative single daily Limit : {payload.MaxAccountLimit} - {payload.SingleTransDailyLimit}", JsonConvert.SerializeObject(payload), JsonConvert.SerializeObject(BankProfile.Username));
+					return BadRequest("Maximum Limit per Transaction can not be greater than accumulative single daily Limit");
                 }
 
                 if(payload.MinAccountLimit < 1)
                 {
-                    return BadRequest("MinAccountLimit can not be less than 1");
+					LogFormater<ManageAccountController>.Error(_logger, "ValidateAccountLimit", $"MinAccountLimit can not be less than 1 : {payload.MinAccountLimit}", JsonConvert.SerializeObject(payload), JsonConvert.SerializeObject(BankProfile.Username));
+					return BadRequest("MinAccountLimit can not be less than 1");
                 }
 
                 if(payload.MinAccountLimit > payload.MaxAccountLimit)
                 {
-                    return BadRequest("MinAccountLimit can not be greater MaxAccountLimit");
+					LogFormater<ManageAccountController>.Error(_logger, "ValidateAccountLimit", $"MinAccountLimit can not be greater MaxAccountLimit : {payload.MinAccountLimit} > {payload.MaxAccountLimit}", JsonConvert.SerializeObject(payload), JsonConvert.SerializeObject(BankProfile.Username));
+					return BadRequest("MinAccountLimit can not be greater MaxAccountLimit");
                 }
 
                 if(payload.MaxAccountLimit > payload.BulkTransDailyLimit)
                 {
-                    return BadRequest("Maximum Limit per Transaction can not be greater than accumulative bulk daily Limit");
+					LogFormater<ManageAccountController>.Error(_logger, "ValidateAccountLimit", $"Maximum Limit per Transaction can not be greater than accumulative bulk daily Limit : {payload.MaxAccountLimit} > {payload.BulkTransDailyLimit}", JsonConvert.SerializeObject(payload), JsonConvert.SerializeObject(BankProfile.Username));
+					return BadRequest("Maximum Limit per Transaction can not be greater than accumulative bulk daily Limit");
                 }
                 return Ok(true);
             }
             catch (Exception ex)
             {
-                 _logger.LogError("SERVER ERROR {0}, {1}, {2}",Formater.JsonType(ex.StackTrace), Formater.JsonType(ex.Source), Formater.JsonType(ex.Message));
-                return ex.InnerException != null ? BadRequest(new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: ex.InnerException.Message, responseStatus:false)) : StatusCode(500, new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: ex.InnerException != null ? ex.InnerException.Message : ex.Message, responseStatus:false));
+                if (ex.InnerException != null)
+                {
+                    _logger.LogError("SERVER ERROR {0}, {1}, {2}",Formater.JsonType(ex.StackTrace), Formater.JsonType(ex.Source), Formater.JsonType(ex.Message));
+                //return BadRequest(ex.InnerException.Message);
+                }
+                return BadRequest(new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: Message.ServerError, responseStatus:false));
             }
         }
-       
+
         [HttpPost("OnboardCorporateCustomer")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         public ActionResult<bool> OnboardCorporateCustomer(GenericRequestDto model)
@@ -294,21 +314,23 @@ namespace CIB.BankAdmin.Controllers
                 {
                     return StatusCode(400, errormsg);
                 }
-                if(string.IsNullOrEmpty(model.Data))
+
+                if (!UnitOfWork.UserRoleAccessRepo.AccessesExist(UserRoleId, Permission.OnboardCorporateCustomer))
+                {
+                    return BadRequest("UnAuthorized Access");
+                }
+
+                if (string.IsNullOrEmpty(model.Data))
                 {
                     return BadRequest("invalid request");
                 }
 
                 var requestData = JsonConvert.DeserializeObject<OnboardCorporateCustomer>(Encryption.DecryptStrings(model.Data));
-                if(requestData == null)
+                if (requestData == null)
                 {
                     return BadRequest("invalid request data");
                 }
 
-                // if (!UnitOfWork.UserRoleAccessRepo.AccessesExist(UserRoleId, Permission.OnboardCorporateCustomer))
-                // {
-                //     return BadRequest("UnAuthorized Access");
-                // }
                 var payload = new OnboardCorporateCustomer
                 {
                     CompanyName = requestData.CompanyName,
@@ -316,9 +338,9 @@ namespace CIB.BankAdmin.Controllers
                     CustomerId = requestData.CustomerId,
                     DefaultAccountNumber = requestData.DefaultAccountNumber,
                     DefaultAccountName = requestData.DefaultAccountName,
-                    AuthorizationType =requestData.AuthorizationType,
+                    AuthorizationType = requestData.AuthorizationType,
                     CorporateCustomerId = requestData.CorporateCustomerId,
-                    CorporateRoleId =requestData.CorporateRoleId,
+                    CorporateRoleId = requestData.CorporateRoleId,
                     Username = requestData.Username,
                     CorporateEmail = requestData.CorporateEmail,
                     FirstName = requestData.FirstName,
@@ -329,7 +351,6 @@ namespace CIB.BankAdmin.Controllers
                     SingleTransDailyLimit = requestData.SingleTransDailyLimit,
                     BulkTransDailyLimit = requestData.BulkTransDailyLimit,
                     LastName = requestData.LastName,
-                    Title = requestData.Title,
                     PhoneNumber = requestData.PhoneNumber,
                     IsApprovalByLimit = requestData.IsApprovalByLimit,
                     ClientStaffIPAddress = Encryption.DecryptStrings(model.ClientStaffIPAddress),
@@ -341,61 +362,72 @@ namespace CIB.BankAdmin.Controllers
                 var corporateCustomer = UnitOfWork.CorporateCustomerRepo.GetCorporateCustomerByCustomerID(payload.CustomerId);
                 if (corporateCustomer != null)
                 {
-                    return BadRequest("Customer with the same customer Id already exist");
+					LogFormater<ManageAccountController>.Error(_logger, "OnboardCorporateCustomer", $"Customer with the same customer Id already exist : {JsonConvert.SerializeObject(payload.CustomerId)}", JsonConvert.SerializeObject(payload), JsonConvert.SerializeObject(BankProfile.Username));
+					return BadRequest("Customer with the same customer Id already exist");
                 }
 
                 if (payload.AuthorizationType == nameof(AuthorizationType.Multiple_Signatory))
                 {
                     if (payload.ApprovalLimit <= 0)
                     {
-                        return BadRequest("Approval Limit is required");
+						LogFormater<ManageAccountController>.Error(_logger, "OnboardCorporateCustomer", $"Approval Limit is required : {payload.ApprovalLimit}", JsonConvert.SerializeObject(payload), JsonConvert.SerializeObject(BankProfile.Username));
+						return BadRequest("Approval Limit is required");
                     }
                 }
                 else
                 {
                    if (payload.ApprovalLimit <= 0)
                     {
-                        return BadRequest("Approval Limit is required");
+						LogFormater<ManageAccountController>.Error(_logger, "OnboardCorporateCustomer", $"Approval Limit is required : {payload.ApprovalLimit}", JsonConvert.SerializeObject(payload), JsonConvert.SerializeObject(BankProfile.Username));
+						return BadRequest("Approval Limit is required");
                     }
                     if (payload.MinAccountLimit < 0)
                     {
-                        return BadRequest("Minimum account limit is invalid");
+						LogFormater<ManageAccountController>.Error(_logger, "OnboardCorporateCustomer", $"Minimum account limit is invalid : {payload.MinAccountLimit}", JsonConvert.SerializeObject(payload), JsonConvert.SerializeObject(BankProfile.Username));
+						return BadRequest("Minimum account limit is invalid");
                     }
 
                     if (payload.MaxAccountLimit == 0)
                     {
-                        return BadRequest("Maximum account limit must be greater than 0");
+						LogFormater<ManageAccountController>.Error(_logger, "OnboardCorporateCustomer", $"Maximum account limit must be greater than 0 : {payload.MaxAccountLimit}", JsonConvert.SerializeObject(payload), JsonConvert.SerializeObject(BankProfile.Username));
+						return BadRequest("Maximum account limit must be greater than 0");
                     }
 
                     if (payload.MinAccountLimit > payload.MaxAccountLimit)
                     {
-                        return BadRequest("Minimum account limit must not be greater than Maximum account limit");
+						LogFormater<ManageAccountController>.Error(_logger, "OnboardCorporateCustomer", $"Minimum account limit must not be greater than Maximum account limit : {payload.MinAccountLimit} > {payload.MaxAccountLimit}", JsonConvert.SerializeObject(payload), JsonConvert.SerializeObject(BankProfile.Username));
+						return BadRequest("Minimum account limit must not be greater than Maximum account limit");
                     }
                 }
                 if(payload.MaxAccountLimit > payload.SingleTransDailyLimit)
                 {
-                    return BadRequest("Maximum Limit per Transaction can not be greater than accumulative single daily Limit");
+					LogFormater<ManageAccountController>.Error(_logger, "OnboardCorporateCustomer", $"Maximum Limit per Transaction can not be greater than accumulative single daily Limit : {payload.MaxAccountLimit} > {payload.SingleTransDailyLimit}", JsonConvert.SerializeObject(payload), JsonConvert.SerializeObject(BankProfile.Username));
+					return BadRequest("Maximum Limit per Transaction can not be greater than accumulative single daily Limit");
                 }
 
                 if(payload.MinAccountLimit < 1)
                 {
-                    return BadRequest("MinAccountLimit can not be less than 1");
+					LogFormater<ManageAccountController>.Error(_logger, "OnboardCorporateCustomer", $"MinAccountLimit can not be less than 1 : {payload.MinAccountLimit}", JsonConvert.SerializeObject(payload), JsonConvert.SerializeObject(BankProfile.Username));
+					return BadRequest("MinAccountLimit can not be less than 1");
                 }
 
                 if(payload.MaxAccountLimit > payload.BulkTransDailyLimit)
                 {
-                    return BadRequest("Maximum Limit per Transaction can not be greater than accumulative bulk daily Limit");
+					LogFormater<ManageAccountController>.Error(_logger, "OnboardCorporateCustomer", $"Maximum Limit per Transaction can not be greater than accumulative bulk daily Limit : {payload.MaxAccountLimit} > {payload.BulkTransDailyLimit}", JsonConvert.SerializeObject(payload), JsonConvert.SerializeObject(BankProfile.Username));
+					return BadRequest("Maximum Limit per Transaction can not be greater than accumulative bulk daily Limit");
                 }
                  if(payload.MinAccountLimit > payload.MaxAccountLimit)
                 {
-                    return BadRequest("MinAccountLimit can not be greater MaxAccountLimit");
+					LogFormater<ManageAccountController>.Error(_logger, "OnboardCorporateCustomer", $"MinAccountLimit can not be greater MaxAccountLimit : {payload.MinAccountLimit} > {payload.MaxAccountLimit}", JsonConvert.SerializeObject(payload), JsonConvert.SerializeObject(BankProfile.Username));
+					return BadRequest("MinAccountLimit can not be greater MaxAccountLimit");
                 }
 
                 var validator = new OnboardCorporateCustomerValidation();
                 var results =  validator.Validate(payload);
                 if (!results.IsValid)
                 {
-                    return UnprocessableEntity(new ValidatorResponse(_data: new Object(), _success: false, _validationResult: results.Errors));
+					LogFormater<ManageAccountController>.Error(_logger, "OnboardCorporateCustomer", $"VALIDATION ERROR : {results}", JsonConvert.SerializeObject(payload), JsonConvert.SerializeObject(BankProfile.Username));
+					return UnprocessableEntity(new ValidatorResponse(_data: new Object(), _success: false, _validationResult: results.Errors));
                 }
                 var tblRole = UnitOfWork.CorporateRoleRepo.GetByIdAsync((Guid)payload.CorporateRoleId);
                 if (tblRole == null)
@@ -441,7 +473,6 @@ namespace CIB.BankAdmin.Controllers
                 {
                     Id = Guid.NewGuid(),
                     AuthorizationType = payload.AuthorizationType,
-                    Title = payload.Title,
                     CompanyName = payload.CompanyName,
                     CorporateRoleId = payload.CorporateRoleId,
                     CustomerId = payload.CustomerId,
@@ -489,7 +520,7 @@ namespace CIB.BankAdmin.Controllers
                 return BadRequest(new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: Message.ServerError, responseStatus:false));
             }
         }
-        
+   
         [HttpPost("BulkOnboardCorporateCustomer")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         public async Task<ActionResult<bool>> BulkOnboardCorporateCustomer([FromForm] BulkOnboardCorporateCustomerRequestDto model)
@@ -558,7 +589,7 @@ namespace CIB.BankAdmin.Controllers
                                     CompanyAddress = accountInfo.Address,
                                     CustomerId = row.CustomerId,
                                     DefaultAccountName = accountInfo.AccountName,
-                                    DefaultAccountNumber = row.DefaultAccountNumber,
+                                    DefaultAccountNumber = accountInfo.AccountNumber,
                                     Email1 = row.Email,
                                     CorporateEmail = accountInfo.Email,
                                     Phone1 = accountInfo.MobileNo,
@@ -569,7 +600,6 @@ namespace CIB.BankAdmin.Controllers
                                     SingleTransDailyLimit = row.SingleTransDailyLimit,
                                     DateAdded = DateTime.Now,
                                 };
-
                                 var fullName = row.MiddleName == null ? row.FirstName.Trim().ToLower() + " "+ row.LastName.Trim().ToLower() : row.FirstName.Trim().ToLower() + " " +row.MiddleName.Trim().ToLower() +" "+ row.LastName.Trim().ToLower();
                                 var password =  Encryption.EncriptPassword(PasswordValidator.GeneratePassword());
                                 var corporateProfile = new TblCorporateProfile
@@ -622,7 +652,6 @@ namespace CIB.BankAdmin.Controllers
                             duplicate.Add(row);
                         }
                     }
-                
                 });
                 UnitOfWork.AuditTrialRepo.AddRange(audit);
                 UnitOfWork.CorporateCustomerRepo.AddRange(corporateCustomer);
@@ -648,139 +677,5 @@ namespace CIB.BankAdmin.Controllers
             }
         }
    
-        [HttpPost("ChangeCorporateCustomerSignatory")]
-        [ProducesResponseType(StatusCodes.Status201Created)]
-        public ActionResult<bool> ChangeCorporateCustomerSignatory(GenericRequestDto model)
-        {
-            try
-            {
-                if (!IsAuthenticated)
-                {
-                    return StatusCode(401, "User is not authenticated");
-                }
-
-                if (!IsUserActive(out string errormsg))
-                {
-                    return StatusCode(400, errormsg);
-                }
-
-                if(string.IsNullOrEmpty(model.Data))
-                {
-                    return BadRequest("invalid request");
-                }
-
-                var requestData = JsonConvert.DeserializeObject<ChangeCorporateCustomerSignatoryDto>(Encryption.DecryptStrings(model.Data));
-                if(requestData == null)
-                {
-                    return BadRequest("invalid request data");
-                }
-
-                if (!UnitOfWork.UserRoleAccessRepo.AccessesExist(UserRoleId, Permission.OnboardCorporateCustomer))
-                {
-                    return BadRequest("UnAuthorized Access");
-                }
-
-                var payload = new ChangeCorporateCustomerSignatoryDto
-                {
-                    CorporateRole = requestData.CorporateRole,
-                    CorporateCustomerId = requestData.CorporateCustomerId,
-                    AuthorizationType = requestData.AuthorizationType,
-                    ProfileId = requestData.ProfileId,
-                    ClientStaffIPAddress = requestData.ClientStaffIPAddress,
-                    IPAddress = requestData.IPAddress,
-                    MACAddress = requestData.MACAddress,
-                    HostName = requestData.HostName
-                };
-            
-                var corporateCustomer = UnitOfWork.CorporateCustomerRepo.GetByIdAsync((Guid)payload?.CorporateCustomerId);
-                if (corporateCustomer == null)
-                {
-                    return BadRequest("invalid corporate customer id ");
-                }
-
-                if(corporateCustomer.AuthorizationType == payload.AuthorizationType)
-                {
-                    return BadRequest("Corporate Customer Authorization Type already exist");
-                }
-               
-                if(corporateCustomer.AuthorizationType == nameof(AuthorizationType.Multiple_Signatory) && payload.AuthorizationType == nameof(AuthorizationType.Single_Signatory))
-                {
-                    if(string.IsNullOrEmpty(payload.ProfileId.ToString()))
-                    {
-                        return BadRequest("Sole Signatory for corporate customer is not selected");
-                    }
-                    var corporateProfile = UnitOfWork.CorporateProfileRepo.GetByIdAsync((Guid)payload?.ProfileId);
-                    if(corporateProfile == null) 
-                    {
-                        return BadRequest("invalid Sole Signatory Id");
-                    }
-
-                    if(corporateProfile.CorporateCustomerId != corporateCustomer.Id)
-                    {
-                        return BadRequest("Selected Sole Signatory doesnot belong to this corporate customer");
-                    }
-                }
-
-                var tempCustomer = new TblTempCorporateCustomer
-                {
-                    Id = Guid.NewGuid(),
-                    CorporateCustomerId = payload?.CorporateCustomerId,
-                    AuthorizationType = payload?.AuthorizationType,
-                    CompanyName = corporateCustomer.CompanyName,
-                    CorporateProfileId = payload.ProfileId != null ?  payload.ProfileId : null,
-                    CorporateRoleId = payload?.AuthorizationType == nameof(AuthorizationType.Multiple_Signatory) ? (Guid)payload?.CorporateRole : null,
-                    CustomerId = corporateCustomer.CustomerId,
-                    Status = (int) ProfileStatus.Modified,
-                    PreviousStatus = (int) corporateCustomer.Status,
-                    IsTreated = (int) ProfileStatus.Pending,
-                    InitiatorId = BankProfile.Id,
-                    InitiatorUsername = UserName,
-                    DateRequested = DateTime.Now,
-                    Action = nameof(TempTableAction.Change_Account_Signatory).Replace("_", " ")
-                };
-                corporateCustomer.Status = (int) ProfileStatus.Modified;
-                UnitOfWork.TemCorporateCustomerRepo.Add(tempCustomer);
-                UnitOfWork.CorporateCustomerRepo.UpdateCorporateCustomer(corporateCustomer);
-                UnitOfWork.Complete();
-                return Ok(true);
-            }
-            catch (Exception ex)
-            {
-                 _logger.LogError("SERVER ERROR {0}, {1}, {2}",Formater.JsonType(ex.StackTrace), Formater.JsonType(ex.Source), Formater.JsonType(ex.Message));
-                return ex.InnerException != null ? BadRequest(new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: ex.InnerException.Message, responseStatus:false)) : StatusCode(500, new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: ex.InnerException != null ? ex.InnerException.Message : ex.Message, responseStatus:false));
-            }
-        }
-       
-        [HttpGet("CorporateCustomerSignatoryChange")]
-        [ProducesResponseType(StatusCodes.Status201Created)]
-        public ActionResult<bool> CorporateCustomerSignatoryChange(string CompanyName = null, string AuthorizationType = null)
-        {
-            try
-            {
-                string? companyName = "";
-                string? authurizationType = "";
-                if (!string.IsNullOrEmpty(AuthorizationType))
-                {
-                    authurizationType = Encryption.DecryptStrings(AuthorizationType);
-                }
-                if (!string.IsNullOrEmpty(CompanyName))
-                {
-                    companyName = Encryption.DecryptStrings(CompanyName);
-                }
-               
-                if(!string.IsNullOrEmpty(authurizationType) || !string.IsNullOrEmpty(companyName))
-                {
-                    var filterCustomer = _unitOfWork.CorporateCustomerRepo.Search(companyName, authurizationType)?.ToList();
-                    return Ok(filterCustomer);
-                }
-                var allCustomers= _unitOfWork.CorporateCustomerRepo.GetCorporateCustomerWhoChangeSigntory()?.ToList();
-                return Ok(allCustomers);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError("SERVER ERROR {0}, {1}, {2}",Formater.JsonType(ex.StackTrace), Formater.JsonType(ex.Source), Formater.JsonType(ex.Message));
-                return ex.InnerException != null ? BadRequest(new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: ex.InnerException.Message, responseStatus:false)) : StatusCode(500, new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: ex.InnerException != null ? ex.InnerException.Message : ex.Message, responseStatus:false));
-            }
-        }
-    }
+   }
 }

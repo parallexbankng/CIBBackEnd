@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -14,8 +15,6 @@ using CIB.Core.Modules.BankAdminProfile.Dto;
 using CIB.Core.Modules.SecurityQuestion.Dto;
 using CIB.Core.Services._2FA;
 using CIB.Core.Services.Api;
-using CIB.Core.Services.Authentication;
-using CIB.Core.Services.Authentication.Dto;
 using CIB.Core.Services.Email;
 using CIB.Core.Templates;
 using CIB.Core.Utils;
@@ -39,7 +38,7 @@ namespace CIB.CorporateAdmin.Controllers
     protected readonly IApiService _apiService;
     protected readonly IToken2faService _2faService;
     private readonly ILogger<AccountController> _logger;
-    public AccountController(ILogger<AccountController> logger, IConfiguration config, IUnitOfWork unitOfWork, IMapper mapper, IEmailService emailService, IApiService apiService, IHttpContextAccessor accessor, IToken2faService _2faService, IAuthenticationService authService) : base(unitOfWork, mapper, accessor, authService)
+    public AccountController(ILogger<AccountController> logger, IConfiguration config, IUnitOfWork unitOfWork, IMapper mapper, IEmailService emailService, IApiService apiService, IHttpContextAccessor accessor, IToken2faService _2faService) : base(unitOfWork, mapper, accessor)
     {
       _config = config;
       _emailService = emailService;
@@ -73,47 +72,64 @@ namespace CIB.CorporateAdmin.Controllers
           ClientStaffIPAddress = Encryption.DecryptStrings(login.ClientStaffIPAddress)
         };
         // VALIDATION
-        var validator = new CorporateLoginValidation();
-        var results = validator.Validate(payLoad);
-        if (!results.IsValid)
+
+        if (string.IsNullOrEmpty(payLoad.Username))
         {
-          // _logger.LogInformation("Invalid Request Data {0}",JsonConvert.SerializeObject(results));
-          LogFormater<AccountController>.Error(_logger, "Login", "Invalid Request Data", JsonConvert.SerializeObject(results), "");
-          return UnprocessableEntity(new ValidatorResponse(_data: new Object(), _success: false, _validationResult: results.Errors));
+          return BadRequest("User name is require");
+        }
+        if (string.IsNullOrEmpty(payLoad.Password))
+        {
+          return BadRequest("Password is require");
         }
 
-        // var userName = $"{payLoad.Username}{payLoad.CustomerID}";
-        // var validOTP = await _2faService.TokenAuth(userName, payLoad.OTP);
-        // if(validOTP.ResponseCode != "00"){
-        //     _logger.LogError("Invalid Request Data {0},{1}",JsonConvert.SerializeObject(validOTP), JsonConvert.SerializeObject(userName));
-        //     return BadRequest(validOTP.ResponseMessage);
+        if (string.IsNullOrEmpty(payLoad.CustomerID))
+        {
+          return BadRequest("Customer ID is require");
+        }
+        if (string.IsNullOrEmpty(payLoad.OTP))
+        {
+          return BadRequest("OTP is require");
+        }
+        // var validator = new CustomerValidation();
+        // var results = validator.Validate(payLoad);
+        // if (!results.IsValid)
+        // {
+        //     _logger.LogError("Invalid Request Data {0}",JsonConvert.SerializeObject(results));
+        //     return UnprocessableEntity(new ValidatorResponse(_data: new Object(), _success: false,_validationResult: results.Errors));
         // }
-        payLoad.OTP = "";
+
+        var userName = $"{payLoad.Username}{payLoad.CustomerID}";
+        var validOTP = await _2faService.TokenAuth(userName, payLoad.OTP);
+        if (validOTP.ResponseCode != "00")
+        {
+          LogFormater<AccountController>.Error(_logger, "Login", validOTP.ResponseMessage, JsonConvert.SerializeObject(userName), "");
+          return BadRequest(validOTP.ResponseMessage);
+        }
+
         var mycorpr = UnitOfWork.CustomerAuthenticationRepo.VerifyCorporateProfileByCustomerId(payLoad.CustomerID);
         if (mycorpr == null)
         {
-          LogFormater<AccountController>.Error(_logger, "Login", "Invalid CustomerId", JsonConvert.SerializeObject(payLoad.CustomerID), "");
+          LogFormater<AccountController>.Error(_logger, "Login", "Invalid CustomerID", JsonConvert.SerializeObject(payLoad.CustomerID), "");
           return BadRequest(new LoginResponsedata { Responsecode = "121", ResponseDescription = "Invalid CustomerId", UserpasswordChanged = 0, CustomerIdentity = "" });
         }
         if (mycorpr.Status == (int)ProfileStatus.Deactivated)
         {
-          LogFormater<AccountController>.Error(_logger, "Login", "Your Organization's profile has been temporarily deactivated", JsonConvert.SerializeObject(payLoad.CustomerID), "");
+          LogFormater<AccountController>.Error(_logger, "Login", "Your Organization's profile has been temporarily deactivated", JsonConvert.SerializeObject(userName), "");
           return BadRequest(new LoginResponsedata { Responsecode = "121", ResponseDescription = "Your Organization's profile has been temporarily deactivated", UserpasswordChanged = 0, CustomerIdentity = "" });
         }
 
         var cusauth = UnitOfWork.CustomerAuthenticationRepo.VerifyCorporateProfileUserName(payLoad, mycorpr.Id);
         if (cusauth == null)
         {
-          payLoad.Password = "";
-          LogFormater<AccountController>.Error(_logger, "Login", "Invalid UserName or Password", JsonConvert.SerializeObject(payLoad), "");
+
+          LogFormater<AccountController>.Error(_logger, "Login", "you are not profile on this application, Please Contact Bank Admin", JsonConvert.SerializeObject(userName), "");
           return BadRequest(new LoginResponsedata { Responsecode = "11", ResponseDescription = "Invalid UserName", UserpasswordChanged = 0, CustomerIdentity = "" });
         }
         var corpcust = UnitOfWork.CorporateCustomerRepo.Find(ctx => ctx.Id == cusauth.CorporateCustomerId);
-
+        payLoad.OTP = "";
         //  generobj.WriteError("6a GET HERE AT  " + DateTime.Now.ToString());
         if (cusauth.NoOfWrongAttempts == 3 || cusauth.NoOfWrongAttempts > 3)
         {
-          payLoad.Password = "";
           cusauth.ReasonsForDeactivation = "Multiple incorrect login attempt";
           cusauth.Status = -1;
           var auditt = new TblAuditTrail
@@ -133,16 +149,17 @@ namespace CIB.CorporateAdmin.Controllers
             Description = "Login Attempt Failure. Multiple incorrect login",
             TimeStamp = DateTime.Now
           };
+          payLoad.Password = "";
           UnitOfWork.AuditTrialRepo.Add(auditt);
           UnitOfWork.CorporateProfileRepo.UpdateCorporateProfile(cusauth);
           UnitOfWork.Complete();
-          LogFormater<AccountController>.Error(_logger, "Login", "Sorry, your profile has been deactivated, please contact our support team", JsonConvert.SerializeObject(payLoad), "");
+          LogFormater<AccountController>.Error(_logger, "Login", "you are not profile on this application, Please Contact Bank Admin", JsonConvert.SerializeObject(userName), "");
           return BadRequest(new LoginResponsedata { Responsecode = "11", ResponseDescription = "Sorry, your profile has been deactivated, please contact our support team", UserpasswordChanged = 0, CustomerIdentity = "" });
         }
 
-        if (corpcust.CustomerId.Trim().ToLower() != payLoad.CustomerID.Trim().ToLower())
+
+        if (corpcust.CustomerId != payLoad.CustomerID)
         {
-          payLoad.Password = "";
           int wrontloginatempt = cusauth.NoOfWrongAttempts ?? 0;
           cusauth.NoOfWrongAttempts = wrontloginatempt + 1;
           cusauth.LastLoginAttempt = DateTime.Now;
@@ -166,7 +183,7 @@ namespace CIB.CorporateAdmin.Controllers
           UnitOfWork.AuditTrialRepo.Add(auditt);
           UnitOfWork.CorporateProfileRepo.UpdateCorporateProfile(cusauth);
           UnitOfWork.Complete();
-          LogFormater<AccountController>.Error(_logger, "Login", "Invalid login attempt", JsonConvert.SerializeObject(payLoad), "");
+          payLoad.Password = "";
           return BadRequest(new LoginResponsedata { Responsecode = "11", ResponseDescription = "Invalid login attempt", UserpasswordChanged = 0, CustomerIdentity = "" });
         }
 
@@ -198,7 +215,7 @@ namespace CIB.CorporateAdmin.Controllers
           UnitOfWork.CorporateProfileRepo.UpdateCorporateProfile(cusauth);
           UnitOfWork.Complete();
           payLoad.Password = "";
-          LogFormater<AccountController>.Error(_logger, "Login", "Invalid User Name Or Password", JsonConvert.SerializeObject(payLoad), "");
+          _logger.LogError("Invalid login attempt. Invalid Password {0}", JsonConvert.SerializeObject(payLoad));
           return BadRequest(new LoginResponsedata { Responsecode = "11", ResponseDescription = "Invalid User Name Or Password", UserpasswordChanged = 0, CustomerIdentity = "" });
         }
 
@@ -224,7 +241,7 @@ namespace CIB.CorporateAdmin.Controllers
           };
           UnitOfWork.AuditTrialRepo.Add(auditt);
           payLoad.Password = "";
-          LogFormater<AccountController>.Error(_logger, "Login", "Sorry, your profile has been deactivated, please contact our support team", JsonConvert.SerializeObject(payLoad), "");
+          LogFormater<AccountController>.Error(_logger, "Login", "Sorry, your profile has been deactivated, please contact our support team ", JsonConvert.SerializeObject(userName), "");
           return BadRequest(new LoginResponsedata { Responsecode = "13", ResponseDescription = "Sorry, your profile has been deactivated, please contact our support team", UserpasswordChanged = 0, CustomerIdentity = "" });
         }
 
@@ -251,7 +268,7 @@ namespace CIB.CorporateAdmin.Controllers
           UnitOfWork.AuditTrialRepo.Add(audittrail);
           UnitOfWork.Complete();
           payLoad.Password = "";
-          LogFormater<AccountController>.Error(_logger, "Login", "Sorry, first time login has been detected. You need to change your default password.", JsonConvert.SerializeObject(payLoad), "");
+          LogFormater<AccountController>.Error(_logger, "Login", "Sorry, first time login has been detected. You need to change your default password.", JsonConvert.SerializeObject(userName), "");
           return Ok(new LoginResponsedata { Responsecode = "14", ResponseDescription = "Sorry, first time login has been detected. You need to change your default password.", UserpasswordChanged = 0, CustomerIdentity = "" });
         }
 
@@ -277,7 +294,7 @@ namespace CIB.CorporateAdmin.Controllers
           };
           UnitOfWork.AuditTrialRepo.Add(auditt);
           payLoad.Password = "";
-          LogFormater<AccountController>.Error(_logger, "Login", "Sorry, we noticed a password reset was initiated.  You need to change your password before you can login.", JsonConvert.SerializeObject(payLoad), "");
+          LogFormater<AccountController>.Error(_logger, "Login", "Sorry, we noticed a password reset was initiated.  You need to change your password before you can login.", JsonConvert.SerializeObject(userName), "");
           return Ok(new LoginResponsedata { Responsecode = "15", ResponseDescription = "Sorry, we noticed a password reset was initiated.  You need to change your password before you can login.", UserpasswordChanged = 0, CustomerIdentity = "" });
         }
 
@@ -303,36 +320,10 @@ namespace CIB.CorporateAdmin.Controllers
           };
           UnitOfWork.AuditTrialRepo.Add(auditt);
           payLoad.Password = "";
-          LogFormater<AccountController>.Error(_logger, "Login", "Sorry, we noticed you are yet to setup your security question.  You need to setup a security question and answer before you can login.", JsonConvert.SerializeObject(payLoad), "");
+          LogFormater<AccountController>.Error(_logger, "Login", "Sorry, we noticed you are yet to setup your security question.  You need to setup a security question and answer before you can login.", JsonConvert.SerializeObject(userName), "");
+
           return Ok(new LoginResponsedata { Responsecode = "16", ResponseDescription = "Sorry, we noticed you are yet to setup your security question.  You need to setup a security question and answer before you can login.", UserpasswordChanged = cusauth.Passwordchanged ?? 0, CustomerIdentity = "" });
         }
-
-        //check if password has expired (30 days)
-        // if (cusauth.PasswordExpiryDate != null && cusauth.PasswordExpiryDate.Value < DateTime.Now.AddDays(-30))
-        // {
-        //     var auditTrail = new TblAuditTrail
-        //     {
-        //         Id = Guid.NewGuid(),
-        //         ActionCarriedOut = nameof(AuditTrailAction.Login),
-        //         Ipaddress = payLoad.ClientStaffIPAddress,
-        //         ClientStaffIpaddress = payLoad.ClientStaffIPAddress,
-        //         Macaddress = payLoad.MACAddress,
-        //         HostName = payLoad.HostName,
-        //         NewFieldValue = $"First Name: {cusauth.FirstName}, Last Name: {cusauth.LastName}, Username: {cusauth.Username}, Email Address:  {cusauth.Email}, " +
-        //         $"Middle Name: {cusauth.MiddleName}, Phone Number: {cusauth.Phone1}",
-        //         PreviousFieldValue = "",
-        //         TransactionId = "",
-        //         UserId = cusauth.Id,
-        //         Username = cusauth.Username,
-        //         Description = "Login Attempt Failure. Password expired",
-        //         TimeStamp = DateTime.Now
-        //     };
-        //     UnitOfWork.AuditTrialRepo.Add(auditTrail);
-        //     UnitOfWork.Complete();
-        //     payLoad.Password = "";
-        //     _logger.LogInformation("Sorry, we noticed your password has expired. You need to set a new password before you can login. {0}", JsonConvert.SerializeObject(payLoad));
-        //     return BadRequest(new LoginResponsedata { Responsecode = "14", ResponseDescription = "Sorry, we noticed your password has expired. You need to set a new password before you can login.", UserpasswordChanged = cusauth.Passwordchanged ?? 0, CustomerIdentity = "" });
-        // }
 
         //check if last activity (90 days)
         if (cusauth.LastActivity != null && cusauth.LastActivity.Value < DateTime.Now.AddDays(-90))
@@ -360,7 +351,7 @@ namespace CIB.CorporateAdmin.Controllers
           UnitOfWork.CorporateProfileRepo.UpdateCorporateProfile(cusauth);
           UnitOfWork.Complete();
           payLoad.Password = "";
-          LogFormater<AccountController>.Error(_logger, "Login", "Sorry, we noticed your account has been inactive for about 90 days and has been suspended. Please contact your bank admin. ", JsonConvert.SerializeObject(payLoad), "");
+          LogFormater<AccountController>.Error(_logger, "Login", "Sorry, we noticed your account has been inactive for about 90 days and has been suspended. Please contact your bank admin.", JsonConvert.SerializeObject(userName), "");
           return BadRequest(new LoginResponsedata { Responsecode = "18", ResponseDescription = "Sorry, we noticed your account has been inactive for about 90 days and has been suspended. Please contact your bank admin.", UserpasswordChanged = cusauth.Passwordchanged ?? 0, CustomerIdentity = "" });
         }
 
@@ -393,7 +384,6 @@ namespace CIB.CorporateAdmin.Controllers
         string daterage = startstrign + " " + endstartstng;
         var corpmodel = new CorporateUserModel
         {
-          UserId = cusauth.Id.ToString(),
           Username = cusauth.Username,
           FullName = cusauth.FirstName + " " + cusauth.LastName,
           Email = cusauth.Email,
@@ -402,7 +392,9 @@ namespace CIB.CorporateAdmin.Controllers
           CorporateCustomerId = corpcust.Id.ToString(),
         };
 
-        var tokenString = AuthService.JWTAuthentication(corpmodel);
+        var tokenString = TokenGenerator.GenerateJSONWebToken(corpmodel, _config);
+        string Tokenstring = tokenString;
+
         var loginlog = new TblLoginLogCorp
         {
           Id = Guid.NewGuid(),
@@ -411,7 +403,6 @@ namespace CIB.CorporateAdmin.Controllers
           NotificationStatus = 0,
           Channel = "Web"
         };
-        tokenString.RefreshToken = AuthService.GenerateRefreshToken();
 
         //_context.SaveChanges();
 
@@ -419,10 +410,8 @@ namespace CIB.CorporateAdmin.Controllers
         {
           Id = Guid.NewGuid(),
           CustAutId = cusauth.Id,
-          TokenCode = tokenString.Token.Trim(),
-          RefreshToken = tokenString.RefreshToken.Trim(),
+          TokenCode = Tokenstring.Trim(),
           DateGenerated = DateTime.Now,
-          RefreshTokenExpiryTime = DateTime.Now.AddHours(24),
           IsBlack = 0
         };
 
@@ -455,7 +444,7 @@ namespace CIB.CorporateAdmin.Controllers
         UnitOfWork.CorporateProfileRepo.UpdateCorporateProfile(cusauth);
         UnitOfWork.Complete();
         payLoad.Password = "";
-        LogFormater<AccountController>.Info(_logger, "Login", "Login Attempt Successful", JsonConvert.SerializeObject(payLoad), "");
+        LogFormater<AccountController>.Info(_logger, "Login", "Login Attempt Successful", JsonConvert.SerializeObject(userName), "");
 
         string myCompanyName = corpcust.CompanyName;
         int isIndemnitySigned = cusauth.IndemnitySigned ?? 0;
@@ -477,8 +466,7 @@ namespace CIB.CorporateAdmin.Controllers
           Phone = cusauth.Phone1,
           SecurityQuestion = "",
           LastLoginDate = lastlogindate,
-          access_token = tokenString.Token.Trim(),
-          refresh_token = tokenString.RefreshToken.Trim().ToString(),
+          access_token = Tokenstring,
           IndemnitySigned = isIndemnitySigned,
           CustomerID = corpcust.CustomerId,
           CompanyName = myCompanyName,
@@ -960,7 +948,6 @@ namespace CIB.CorporateAdmin.Controllers
         }
 
         entity.RegStage = 2;
-        entity.NoOfWrongAttempts = 0;
         entity.SecurityAnswer = model.Answer;
         entity.SecurityQuestion = tblSecurityQuestion.Question;
         entity.SecurityAnswer2 = model.Answer2;
@@ -983,6 +970,7 @@ namespace CIB.CorporateAdmin.Controllers
           Username = entity.Username,
           Description = "Security Question Setting Successful"
         };
+        entity.NoOfWrongAttempts = 0;
         UnitOfWork.AuditTrialRepo.Add(auditTrail);
         UnitOfWork.CorporateProfileRepo.UpdateCorporateProfile(entity);
         UnitOfWork.Complete();
@@ -1070,10 +1058,10 @@ namespace CIB.CorporateAdmin.Controllers
           }
         }
 
-        if (entity.Passwordchanged == 1 && entity.ResetInitiated != 1)
-        {
-          return BadRequest("First time login or password reset initiation is not detected"); ;
-        }
+        // if (entity.Passwordchanged == 1 && entity.ResetInitiated != 1)
+        // {
+        //     return BadRequest("First time login or password reset initiation is not detected"); ;
+        // }
 
         string decryptPassword = Encryption.DecriptPassword(entity.Password);
 
@@ -1159,6 +1147,7 @@ namespace CIB.CorporateAdmin.Controllers
           Username = entity.Username,
           Description = "First time password change success. New password created"
         };
+        entity.NoOfWrongAttempts = 0;
         UnitOfWork.AuditTrialRepo.Add(auditTrail);
         UnitOfWork.CorporateProfileRepo.UpdateCorporateProfile(entity);
         UnitOfWork.Complete();
@@ -1222,6 +1211,7 @@ namespace CIB.CorporateAdmin.Controllers
           HostName = Encryption.DecryptStrings(model.HostName)
         };
 
+
         if (CorporateProfile == null)
         {
           return BadRequest("Invalid corporate id");
@@ -1277,7 +1267,7 @@ namespace CIB.CorporateAdmin.Controllers
           Macaddress = payLoad.MACAddress,
           HostName = payLoad.HostName,
           NewFieldValue = $"First Name: {entity.FirstName}, Last Name: {entity.LastName}, Username: {entity.Username}, Email Address:  {entity.Email}, " +
-        $"Middle Name: {entity.MiddleName}, Phone Number: {entity.Phone1}",
+                          $"Middle Name: {entity.MiddleName}, Phone Number: {entity.Phone1}",
           PreviousFieldValue = "",
           TransactionId = "",
           UserId = entity.Id,
@@ -1327,27 +1317,23 @@ namespace CIB.CorporateAdmin.Controllers
         }
         var removeToken = new List<TblTokenBlackCorp>();
         var tokenBlack = UnitOfWork.TokenBlackCorporateRepo.GetBlackTokenById(CorporateProfile.Id);
-        if (tokenBlack.Count != 0)
-        {
-          foreach (var mykn in tokenBlack)
-          {
-            mykn.IsBlack = 1;
-            removeToken.Add(mykn);
-          }
-        }
 
-        if (removeToken.Count == 0)
+        if (!tokenBlack.Any())
         {
           return Ok(true);
         }
-        var userId = User.Identity.Name;
-        var user = UnitOfWork.TokenBlackCorporateRepo.GetTokenByUserId(Guid.Parse(userId));
-        if (user == null) return BadRequest();
-        user.RefreshTokenExpiryTime = null;
-        user.IsBlack = 1;
-        user.TokenCode = null;
-        user.RefreshToken = null;
-        UnitOfWork.TokenBlackCorporateRepo.UpdateTokenBlackCorporate(user);
+
+        foreach (var mykn in tokenBlack)
+        {
+          mykn.IsBlack = 1;
+          removeToken.Add(mykn);
+        }
+
+        if (!removeToken.Any())
+        {
+          return Ok(true);
+        }
+
         UnitOfWork.TokenBlackCorporateRepo.RemoveRange(removeToken);
         UnitOfWork.Complete();
         return Ok(true);
@@ -1386,78 +1372,5 @@ namespace CIB.CorporateAdmin.Controllers
       }
       return true;
     }
-
-    [HttpPost("refresh")]
-    public IActionResult Refresh(Token token)
-    {
-      if (token is null) return BadRequest("Invalid client request");
-      string accessToken = token.access_token;
-      string refreshToken = token.refresh_token;
-      var principal = AuthService.GetPrincipalFromExpiredToken(accessToken);
-      if (principal is null) return BadRequest("Invalid token");
-      var userId = principal.Identity.Name; //this is mapped to the Name claim by default
-      var user = UnitOfWork.TokenBlackCorporateRepo.GetTokenByUserId(Guid.Parse(userId));
-      if (user is null || user.RefreshToken != refreshToken || user.RefreshTokenExpiryTime <= DateTime.Now) return BadRequest("Invalid client request");
-
-      var cusauth = UnitOfWork.CorporateProfileRepo.GetByIdAsync(Guid.Parse(userId));
-      if (cusauth is null) return BadRequest("Invalid client request");
-      var mycorpr = UnitOfWork.CorporateCustomerRepo.GetByIdAsync((Guid)cusauth.CorporateCustomerId);
-      if (mycorpr is null) return BadRequest("Invalid client request");
-      var corpmodel = new CorporateUserModel
-      {
-        UserId = cusauth.Id.ToString(),
-        Username = cusauth.Username,
-        FullName = cusauth.FirstName + " " + cusauth.LastName,
-        Email = cusauth.Email,
-        Phone1 = cusauth.Phone1,
-        CustomerID = mycorpr.CustomerId,
-        CorporateCustomerId = mycorpr.Id.ToString(),
-      };
-      var newAccessToken = AuthService.GenerateAccessToken(corpmodel);
-      var newRefreshToken = AuthService.GenerateRefreshToken();
-      user.TokenCode = newAccessToken;
-      user.RefreshToken = newRefreshToken;
-      UnitOfWork.TokenBlackCorporateRepo.UpdateTokenBlackCorporate(user);
-      UnitOfWork.Complete();
-
-      return Ok(new LoginResponsedata()
-      {
-        Responsecode = "00",
-        ResponseDescription = "success",
-        UserId = cusauth.Id,
-        CustomerIdentity = cusauth.Username,
-        Phone = cusauth.Phone1,
-        SecurityQuestion = "",
-        access_token = newAccessToken,
-        refresh_token = newRefreshToken,
-        CustomerID = mycorpr.CustomerId,
-        CompanyName = mycorpr.CompanyName,
-        Status = cusauth.Status,
-        RegStage = cusauth.RegStage,
-        RoleId = cusauth.CorporateRole.ToString(),
-        CorporateCustomerId = cusauth.CorporateCustomerId,
-        AuthorizationType = mycorpr.AuthorizationType
-      });
-    }
-    [HttpPost("revoke")]
-    public IActionResult Revoke()
-    {
-      if (!IsAuthenticated)
-      {
-        return StatusCode(401, "User is not authenticated");
-      }
-      var userId = User.Identity.Name;
-      var user = UnitOfWork.TokenBlackCorporateRepo.GetTokenByUserId(Guid.Parse(userId));
-      if (user == null) return BadRequest();
-      user.RefreshTokenExpiryTime = null;
-      user.IsBlack = 1;
-      user.TokenCode = null;
-      user.RefreshToken = null;
-      UnitOfWork.TokenBlackCorporateRepo.UpdateTokenBlackCorporate(user);
-      UnitOfWork.Complete();
-      return NoContent();
-    }
   }
-
-
 }

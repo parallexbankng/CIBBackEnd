@@ -35,10 +35,10 @@ namespace CIB.BankAdmin
       {
         webBuilder.UseStartup<Startup>()
         .ConfigureLogging((hostingContext,logging) =>
-          {
-            logging.AddNLog(hostingContext.Configuration.GetSection("Logging")); 
-            logging.SetMinimumLevel(LogLevel.Information);
-          });
+              {
+                  logging.AddNLog(hostingContext.Configuration.GetSection("Logging")); 
+                  logging.SetMinimumLevel(LogLevel.Information);
+              });
       });
   }
 }

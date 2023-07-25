@@ -10,20 +10,7 @@ namespace CIB.Core.Enums
         /// <summary>
         /// Multiple Signatory
         /// </summary>
-        Multiple_Signatory,
-
-        /// <summary>
-        /// Either to Sign 
-        /// </summary>
-        Either_to_Sign
-    }
-
-    public enum SpecialFeature
-    {
-        /// <summary>
-        /// OnLending
-        /// </summary>
-        OnLending
+        Multiple_Signatory
     }
     public enum AuthorizationStatus
     {

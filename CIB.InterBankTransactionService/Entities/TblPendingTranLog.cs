@@ -33,5 +33,7 @@ namespace CIB.InterBankTransactionService.Entities
         public string TransactionLocation { get; set; }
         public string TransactionReference { get; set; }
         public Guid? BatchId { get; set; }
+        public decimal? Vat { get; set; }
+        public decimal? Fee { get; set; }
     }
 }

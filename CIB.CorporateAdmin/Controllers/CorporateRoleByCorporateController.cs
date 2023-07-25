@@ -12,7 +12,6 @@ using CIB.Core.Modules.Authentication.Dto;
 using CIB.Core.Modules.CorporateRole.Dto;
 using CIB.Core.Modules.CorporateRole.Validation;
 using CIB.Core.Modules.UserAccess.Dto;
-using CIB.Core.Services.Authentication;
 using CIB.Core.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -25,9 +24,48 @@ namespace CIB.CorporateAdmin.Controllers
     public class CorporateRoleByCorporateController : BaseAPIController
     {
         private readonly ILogger<CorporateRoleByCorporateController> _logger;
-        public CorporateRoleByCorporateController(ILogger<CorporateRoleByCorporateController> logger,IUnitOfWork unitOfWork,IMapper mapper,IHttpContextAccessor accessor,IAuthenticationService authService):base(unitOfWork,mapper,accessor,authService)
+        public CorporateRoleByCorporateController(ILogger<CorporateRoleByCorporateController> logger,IUnitOfWork unitOfWork,IMapper mapper,IHttpContextAccessor accessor) : base(unitOfWork,mapper,accessor)
         {
             _logger = logger;
+        }
+
+        [HttpGet("GetCorporateRoles")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public async Task<ActionResult<ListResponseDTO<TblCorporateRole>>> TestGetCorporateRoles()
+        {
+            // if (!IsAuthenticated)
+            // {
+            //     return StatusCode(401, "User is not authenticated");
+            // }
+
+            // if (!IsUserActive(out string errormsg))
+            // {
+            //     return StatusCode(400, errormsg);
+            // }
+
+            // if (!UnitOfWork.CorporateUserRoleAccessRepo.AccessesExist(UserRoleId, Permission.ViewCorporateRole))
+            // {
+            //     return BadRequest("UnAuthorized Access");
+            // }
+
+            // if (!IsUserActive(out string errorMessage))
+            // {
+            //     return StatusCode(400, errorMessage);
+            // }
+
+            // var tblCorporateProfile = CorporateProfile;
+            // if(tblCorporateProfile.CorporateCustomerId == null)
+            // {
+            //     return BadRequest("UnAuthorized Access");
+            // }
+
+            var CorporateRoles = await UnitOfWork.CorporateRoleRepo.ListAllAsync();
+            if (CorporateRoles == null || CorporateRoles?.Count == 0)
+            {
+                return StatusCode(204);
+            }
+            return Ok(new ListResponseDTO<TblCorporateRole>(_data:CorporateRoles.ToList(),success:true, _message:Message.Success) );
         }
 
         [HttpGet("GetRoles")]
@@ -659,7 +697,7 @@ namespace CIB.CorporateAdmin.Controllers
 
                     if (theUserAccess == null)
                     {
-                        return BadRequest($"No user access with the id {accessId} exist");
+                    return BadRequest($"No user access with the id {accessId} exist");
                     }
                     var _tblRoleUserAccess = UnitOfWork.CorporateUserRoleAccessRepo.GetCorporateRoleUserAccesses(roleId.ToString(), accessId.ToString());
                     if (_tblRoleUserAccess != null)

@@ -35,18 +35,6 @@ using CIB.Core.Modules.Workflow;
 using CIB.Core.Modules.WorkflowHierarchy;
 using CIB.Core.Modules.TempWorkflow;
 using CIB.Core.Modules.NipsFeeCharge;
-using CIB.Core.Modules.Branch;
-using CIB.Core.Modules.Cheque;
-using CIB.Core.Modules.CorporateSalarySchedule;
-using CIB.Core.Modules.CorporateSalarySchedule._ScheduleBeneficiary;
-using CIB.Core.Modules.CorporateSalarySchedule._CorporateEmployee;
-using CIB.Core.Modules.TempCorporateSalarySchedule._TempCorporateEmployee;
-using CIB.Core.Modules.TempCorporateSalarySchedule;
-using CIB.Core.Modules.OnLending.Beneficiary;
-using CIB.Core.Modules.OnLending.CreditLog;
-using CIB.Core.Modules.OnLending.TransferLog;
-using CIB.Core.Modules.OnLending.ExtensionHistory;
-using CIB.Core.Modules.OnLending.Transaction;
 
 namespace CIB.Core.Common.Repository
 {
@@ -91,20 +79,7 @@ namespace CIB.Core.Common.Repository
       TempWorkflowRepo = new TemWorkflowRepository(_dbContext);
       TempWorkflowHierarchyRepo = new TempWorkflowHierarchyRepository(_dbContext);
       NipsFeeChargeRepo = new NispFeeChargeRepository(_dbContext);
-      BranchRepo = new BranchRepository(_dbContext);
-      ChequeRequestRepo = new ChequeRequestRepository(_dbContext);
-      TempChequeRequestRepo = new TempChequeRequestRepository(_dbContext);
-      CorporateSalaryScheduleRepo = new CorporateSalaryScheduleRepository(_dbContext);
-      ScheduleBeneficairyRepo = new ScheduleBeneficairyRepository(_dbContext);
-      CorporateEmployeeRepo = new CorporateEmployeeRepository(_dbContext);
-      TempCorporateEmployeeRepo = new TempCorporateEmployeeRepository(_dbContext);
-      TempCorporateSalaryScheduleRepo = new TempCorporateSalaryScheduleRepository(_dbContext);
-      OnlendingBeneficiaryRepo = new OnlendingBeneficiaryRepository(_dbContext);
-      OnlendingCreditLogRepositoryRepo = new OnlendingCreditLogRepository(_dbContext);
-      OnlendingTransferLogRepo = new OnlendingTransferLogRepository(_dbContext);
-      OnlendingExtensionHistoryRepo = new ExtensionHistoryRepository(_dbContext);
-      OnlendingTransactionRepo = new OnlendingTransactionRepository(_dbContext);
-		}
+    }
     public IBankProfileRepository BankProfileRepo { get; protected set; }
     public ITemBankAdminProfileRepository TemBankAdminProfileRepo { get; protected set; }
     public ITemCorporateCustomerRespository TemCorporateCustomerRepo { get; protected set; }
@@ -140,25 +115,10 @@ namespace CIB.Core.Common.Repository
     public ITempWorkflowRepository TempWorkflowRepo { get; protected set; }
     public ITempWorkflowHierarchyRepository TempWorkflowHierarchyRepo { get; protected set; }
     public INipsFeeChargeRepository NipsFeeChargeRepo {get;protected set;}
-    public IBranchRepository BranchRepo {get;protected set;}
-    public IChequeRequestRepository ChequeRequestRepo{get;protected set;}
-    public ITempChequeRequestRepository TempChequeRequestRepo{get;protected set;}
-    public ICorporateSalaryScheduleRepository CorporateSalaryScheduleRepo {get;protected set;}
-    public IScheduleBeneficairyRepository ScheduleBeneficairyRepo {get;protected set;}
-    public ICorporateEmployeeRepository CorporateEmployeeRepo {get;protected set;}
-    public ITempCorporateEmployeeRepository TempCorporateEmployeeRepo {get;protected set;}
-    public ITempCorporateSalaryScheduleRepository TempCorporateSalaryScheduleRepo {get;protected set;}
-    public IOnlendingBeneficiaryRepository OnlendingBeneficiaryRepo {get;protected set;}
 
-    public IOnlendingCreditLogRepository OnlendingCreditLogRepositoryRepo {get;protected set;}
+    
 
-    public IOnlendingTransferLogRepository OnlendingTransferLogRepo {get;protected set;}
-
-		public IExtensionHistoryRepository OnlendingExtensionHistoryRepo { get; protected set; }
-
-		public IOnlendingTransactionRepository OnlendingTransactionRepo { get; protected set; }
-
-		public int Complete()
+    public int Complete()
     {
       return _dbContext.SaveChanges();
     }

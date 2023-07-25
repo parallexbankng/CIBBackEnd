@@ -8,7 +8,6 @@ namespace CIB.Core.Modules.CorporateProfile.Dto
 {
   public class CreateProfile:BaseDto
   {
-    public string? Title {get;set;}
     public string CorporateCustomerId { get; set; }
     public string CorporateRoleId { get; set; }
     public string Username { get; set; }
@@ -25,7 +24,6 @@ namespace CIB.Core.Modules.CorporateProfile.Dto
   {
     public Guid? CorporateCustomerId { get; set; }
     public Guid? CorporateRoleId { get; set; }
-    public string? Title {get;set;}
     public string Username { get; set; }
     public string Phone { get; set; }
     public string Email { get; set; }
@@ -41,7 +39,6 @@ namespace CIB.Core.Modules.CorporateProfile.Dto
     public string Id { get; set; }
     public string CorporateCustomerId { get; set; }
     public string CorporateRoleId { get; set; }
-     public string? Title {get;set;}
     public string Username { get; set; }
     public string Phone { get; set; }
     public string Email { get; set; }
@@ -58,7 +55,6 @@ namespace CIB.Core.Modules.CorporateProfile.Dto
     public Guid Id { get; set; }
     public Guid? CorporateCustomerId { get; set; }
     public Guid? CorporateRoleId { get; set; }
-     public string? Title {get;set;}
     public string Username { get; set; }
     public string Phone { get; set; }
     public string Email { get; set; }

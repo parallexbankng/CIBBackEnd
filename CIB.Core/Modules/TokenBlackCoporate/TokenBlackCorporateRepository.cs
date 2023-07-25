@@ -37,10 +37,5 @@ namespace CIB.Core.Modules.TokenBlackCoporate
       {
         _context.Update(update).Property(x=>x.Sn).IsModified = false;
       }
-
-      public TblTokenBlackCorp GetTokenByUserId(Guid userId)
-      {
-        return _context.TblTokenBlackCorps.Where(ctx => ctx.CustAutId == userId && ctx.IsBlack == 0).FirstOrDefault();
-      }
-  }
+}
 }

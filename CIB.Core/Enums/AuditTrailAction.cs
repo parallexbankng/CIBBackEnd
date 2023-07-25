@@ -7,9 +7,9 @@ namespace CIB.Core.Enums
         /// </summary>
         Login,
         /// <summary>
-        /// Password Change
+        /// Logout
         /// </summary>
-        Password_Change,
+        Logout,
         /// <summary>
         /// Password Reset
         /// </summary>
@@ -56,10 +56,6 @@ namespace CIB.Core.Enums
         /// </summary>
         Onboard,
         /// <summary>
-        /// Bulk_Customer_Onboard
-        /// </summary>
-        Bulk_Customer_Onboard,
-        /// <summary>
         /// Set Security Question
         /// </summary>
         Set_Security_Question,
@@ -79,24 +75,15 @@ namespace CIB.Core.Enums
         /// Bulk Bank Transfer
         /// </summary>
         Bulk_Bank_Transfer,
-
-        /// <summary>
-        /// Bulk Bank Transfer
-        /// </summary>
-        Salary_Payment,
         /// <summary>
         /// Bulk Bank Transfer
         /// </summary>
         Bulk_Bank_Transfer_With_Duplicate,
-		    /// <summary>
-		    /// Initia_lending
-		    /// </summary>
-		    initiate_Onlending_Transaction,
-		    /// <summary>
-		    /// Onlending_Disburment
-		    /// </summary>
-		    Onlending_Disburment,
-	  }
+         /// <summary>
+        /// Bulk Customer Onboard
+        /// </summary>
+        Bulk_Customer_Onboard
+    }
 
     public enum TempTableAction
     {
@@ -145,15 +132,6 @@ namespace CIB.Core.Enums
         /// Update_Phone_Number
         /// </summary>
         Update_Phone_Number,
-
-        /// <summary>
-        /// Update_Account_Signatory
-        /// </summary>
-        Change_Account_Signatory,
-        /// <summary>
-        /// Add_OnLending_Feature
-        /// </summary>
-        Add_OnLending_Feature,
         /// <summary>
         /// Enable_Log_Out
         /// </summary>

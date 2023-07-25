@@ -31,8 +31,6 @@ namespace CIB.Core.Entities
         public int? ElectricityTokenSmsretryCount { get; set; }
         public string AuthType { get; set; }
         public Guid? CorporateCustomerId { get; set; }
-        public string ResponseCode { get; set; }
-        public string ResponseDescription { get; set; }
-        public string SessionId { get; set; }
+        public string? SessionId { get; set; }
     }
 }

@@ -35,6 +35,5 @@ namespace CIB.Core.Entities
         public int? RegStage { get; set; }
         public decimal? ApprovalLimit { get; set; }
         public int? PreviousStatus { get; set; }
-        public string Title { get; set; }
     }
 }

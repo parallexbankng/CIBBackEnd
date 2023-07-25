@@ -122,12 +122,16 @@ namespace CIB.Core.Modules.Transaction
                 Date = pend.TranDate
             }).ToList();
             return itemj;
-            
         }
 
         public IEnumerable<TblTransaction> GetCorporateTransactionReport(Guid CorporateCustomerId)
         {
             return _context.TblTransactions.Where(ctx => ctx.CorporateCustomerId == CorporateCustomerId).OrderByDescending(ctx => ctx.Sn).ToList();
         }
+
+    // public List<TblTransaction> GetCorporateTransactions(Guid CorporateCustomerId)
+    // {
+    //     return _context.TblTransactions.Where(x => x.CorporateCustomerId == CorporateCustomerId).OrderByDescending(ctx => ctx.Sn).ToList();
+    // }
   }
 }

@@ -10,7 +10,6 @@ using CIB.Core.Entities;
 using CIB.Core.Enums;
 using CIB.Core.Modules.Workflow.Dto;
 using CIB.Core.Modules.Workflow.Validation;
-using CIB.Core.Services.Authentication;
 using CIB.Core.Services.Notification;
 using CIB.Core.Utils;
 using Microsoft.AspNetCore.Http;
@@ -25,7 +24,7 @@ namespace CIB.CorporateAdmin.Controllers
     {
         private readonly ILogger<WorkFlowController> _logger;
         protected readonly INotificationService notify;
-        public WorkFlowController(INotificationService notify,ILogger<WorkFlowController> logger,IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor accessor,IAuthenticationService authService):base(unitOfWork,mapper,accessor,authService)
+        public WorkFlowController(INotificationService notify,ILogger<WorkFlowController> logger,IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor accessor) : base(unitOfWork,mapper, accessor)
         {
             _logger = logger;
             this.notify = notify;
@@ -277,6 +276,25 @@ namespace CIB.CorporateAdmin.Controllers
                     return BadRequest("There is an on going modification on this workflow");
                 }
 
+
+                // if(entity.InitiatorId != CorporateProfile.Id)
+                // {
+                //     return BadRequest("This update is no");
+                // }
+
+                // entity.Name = payload.Name;
+                // entity.Description = payload.Description;
+                // entity.CorporateCustomerId = payload.CorporateCustomerId;
+                // entity.NoOfAuthorizers = payload.NoOfAuthorizers;
+                // entity.ApprovalLimit = payload.ApprovalLimit;
+
+                //var mapWorkFlow
+                // var checkDuplicateRequest = UnitOfWork.WorkFlowRepo.CheckDuplicate(entity,true);
+                // if(checkDuplicateRequest.IsDuplicate)
+                // {
+                //     return BadRequest("There is already and exist work flow with the same name");
+                // }
+
                 var checkDuplicate = UnitOfWork.TempWorkflowRepo.CheckTempWorkflowDuplicate(payload.Name, entity.CorporateCustomerId);
                 if(checkDuplicate != null)
                 {
@@ -285,6 +303,16 @@ namespace CIB.CorporateAdmin.Controllers
 
                 var mapTempWorkFlow = Mapper.Map<TblTempWorkflow>(entity);
 
+                //    var checTempkWorkflow = UnitOfWork.TempWorkflowRepo.CheckDuplicate(mapTempWorkFlow);
+                // if(checTempkWorkflow.IsDuplicate)
+                // {
+                //    return BadRequest(checTempkWorkflow.Message);     
+                // }
+
+               
+                
+                //entity.Status = (int)ProfileStatus.Modified;
+                // //mapTempWorkFlow.Action = nameof(TempTableAction.Create).Replace("_", " ");
                 
                 var auditTrail = new TblAuditTrail
                 {
@@ -669,7 +697,6 @@ namespace CIB.CorporateAdmin.Controllers
                 };
                 
                 //update status
-       
                 entity.Status = (int) ProfileStatus.Pending;
                 profile.Status = (int) ProfileStatus.Pending;
                 UnitOfWork.TempWorkflowRepo.UpdateTempWorkflow(entity);

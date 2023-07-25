@@ -26,7 +26,7 @@ public class ApiService : IApiService
     var httpClient = _client.CreateClient("tokenClient");
     httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _token.Token);
     var data = JsonConvert.SerializeObject(transaction);
-    var url = _config.GetValue<string>("TestApiUrl:intraBankTransfer");
+    var url = _config.GetValue<string>("prodApiUrl:intraBankTransfer");
     var payLoad = new StringContent(data, Encoding.UTF8, "application/json");
     var response = await httpClient.PostAsync(url, payLoad).Result.Content.ReadAsStringAsync();
     return JsonConvert.DeserializeObject<TransferResponse>(response);
@@ -39,7 +39,7 @@ public class ApiService : IApiService
       username = Encryption.DecryptStrings(_config.GetValue<string>("DefaultAuth:username")),
       Password = Encryption.DecryptStrings(_config.GetValue<string>("DefaultAuth:password")),
     });
-    var url = _config.GetValue<string>("TestApiUrl:auth");
+    var url = _config.GetValue<string>("prodApiUrl:auth");
     var request = new HttpRequestMessage(HttpMethod.Post, url);
     request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
     request.Content  = new StringContent(data, Encoding.UTF8);
@@ -57,7 +57,7 @@ public class ApiService : IApiService
         return new CustomerDataResponseDto();
       }
       var httpClient = _client.CreateClient("tokenClient");
-      var url = _config.GetValue<string>("TestApiUrl:accountInfo");
+      var url = _config.GetValue<string>("prodApiUrl:accountInfo");
       var response = await httpClient.GetAsync(url+$"?accountNumber={accountNumber}&bankId=01").Result.Content.ReadAsStringAsync();
       return JsonConvert.DeserializeObject<CustomerDataResponseDto>(response);
     }

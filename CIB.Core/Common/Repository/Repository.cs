@@ -56,10 +56,5 @@ namespace CIB.Core.Common.Repository
         {
             _context.Update(entity);
         }
-
-       public  void Remove(T entity)
-        {
-            _context.Set<T>().Remove(entity);
-        }
-  }
+    }
 }

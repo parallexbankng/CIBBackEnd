@@ -93,43 +93,6 @@ namespace CIB.Core.Utils
         public static string CanRequestWorkflowApprovalByCorporateAdmin = "Update Workflow";
         public static string CanApproveWorkflowByCorporateAdmin = "Can Approve Workflow By Corporate Admin";
         public static string CanDeclineWorkflowByCorporateAdmin = "Can Decline Workflow By Corporate Admin";
-
-        public static string CanCreateStaff = "Can Create Staff";
-        public static string CanViewStaff = "Can View Staff";
-        public static string CanApproveStaff = "Can Approve Staff";
-        public static string CanDeactivateStaff = "Can Deactivate Staff";
-        public static string CanReactivateStaff = "Can Reactivate Staff";
-        public static string CanDeclineStaff = "Can Decline Staff";
-        public static string CanRequestStaffApproval = "Request Staff Approval ";
-        public static string CanCreateSchedule = "Can Create Schedule";
-        public static string CanViewSchedule = "Can View Schedule";
-        public static string CanInitiateSchedule = "Can Initiate Schedule";
-        public static string CanApprovedSchedule = "Can Approved Schedule";
-        public static string CanDeclineSchedule = "Can Decline Schedule";
-        public static string CanDeactivateSchedule = "Can Deactivate Schedule";
-        public static string CanReactivateSchedule = "Can Reactivate Schedule";
-        public static string CanRequestScheduleApproval = "Can Request Schedule Approval";
-
-
-        public static string CanCreateBeneficiary = "Can Create Schedule Beneficiary";
-        public static string CanViewBeneficiary = "Can View Schedule Beneficiary";
-        public static string CanRemoveBeneficiary = "Can Remove Schedule Beneficiary";
-        public static string CanApprovedBeneficiary = "Can Approved Schedule Beneficiary";
-        public static string CanDeclineBeneficiary = "Can Decline Schedule Beneficiary";
-        public static string CanDeactivateBeneficiary = "Can Deactivate Schedule Beneficiary";
-        public static string CanRequestBeneficiaryApproval = "Can Request Schedule Beneficiary Approval";
-
-        public static string CanInitiateOnlendingPaymentDisbursement = "Can Initiate Onlending Payment Disbursement";
-        public static string CanApproveOnlendingPaymentDisbursement = "Can Approve Onlending Payment Disbursement";
-        public static string CanExtendOnlendingRepaymentData = "Can Extend Onlending Repayment Date";
-        public static string CanDeclineOnlendingRepaymentDateExtension = "Can Decline Onlending Repayment Date Extension";
-        public static string CanApproveOnlendingRepaymentDateExtension = "Can Approve Onlending Repayment Date Extension";
-        public static string CanRequestForApprovalOnlendingRepaymentDateExtension = "Can Request For Approval Onlending Repayment Date Extension";
-        public static string CanCreateOnlendingbeneficiary = "Can Create Onlending beneficiary";
-        public static string CanApproveOnlendingbeneficiary = "Can Approve Onlending beneficiary";
-        public static string CanRequestForApprovalofOnlendingbeneficiary = "Can Request For Approval of Onlending beneficiary";
-        public static string CanDeclineOnlendingBeneficiary = "Can Decline Onlending beneficiary";
-        public static string CanInitiateOnlendingLiquidation = "Can Initiate Onlending Liquidation";
         public static string ViewAuditTrail = "View Audit Trail";
     }
 }

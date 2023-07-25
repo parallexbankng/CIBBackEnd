@@ -33,73 +33,47 @@ using CIB.Core.Modules.PasswordHistory;
 using CIB.Core.Modules.TempWorkFlow;
 using CIB.Core.Modules.TempWorkflowHierarchy;
 using CIB.Core.Modules.NipsFeeCharge;
-using CIB.Core.Modules.Branch;
-using CIB.Core.Modules.Cheque;
-using CIB.Core.Modules.CorporateSalarySchedule;
-using CIB.Core.Modules.CorporateSalarySchedule._ScheduleBeneficiary;
-using CIB.Core.Modules.CorporateSalarySchedule._CorporateEmployee;
-using CIB.Core.Modules.TempCorporateSalarySchedule._TempCorporateEmployee;
-using CIB.Core.Modules.TempCorporateSalarySchedule;
-using CIB.Core.Entities;
-using CIB.Core.Modules.OnLending.Beneficiary;
-using CIB.Core.Modules.OnLending.CreditLog;
-using CIB.Core.Modules.OnLending.TransferLog;
-using CIB.Core.Modules.OnLending.Transaction;
-using CIB.Core.Modules.OnLending.ExtensionHistory;
 
 namespace CIB.Core.Common.Interface
 {
-  public interface IUnitOfWork : IDisposable
-  {
-    IBankProfileRepository BankProfileRepo { get; }
-    ITemBankAdminProfileRepository TemBankAdminProfileRepo { get; }
-    ITemCorporateCustomerRespository TemCorporateCustomerRepo { get; }
-    ITemCorporateProfileRepository TemCorporateProfileRepo { get; }
-    IUserAccessRepository UserAccessRepo { get; }
-    IUserRoleAccessRepository UserRoleAccessRepo { get; }
-    ICorporateProfileRepository CorporateProfileRepo { get; }
-    ICorporateCustomerRepository CorporateCustomerRepo { get; }
-    ICorporateUserRoleAccess CorporateUserRoleAccessRepo { get; }
-    IBankAuthenticationRepository BankAuthenticationRepo { get; }
-    ICustomerAuthenticationRepository CustomerAuthenticationRepo { get; }
-    IRoleRepository RoleRepo { get; }
-    ICorporateRoleRepository CorporateRoleRepo { get; }
-    IPasswordResetRepository PasswordResetRepo { get; }
-    IAuditTrialRepository AuditTrialRepo { get; }
-    ISecurityQuestionRespository SecurityQuestionRepo { get; }
-    IWorkFlowRepository WorkFlowRepo { get; }
-    IWorkflowHierarchyRepository WorkFlowHierarchyRepo { get; }
-    ITokenBlackCorporateRepository TokenBlackCorporateRepo { get; }
-    ITokenBlackRepository TokenBlackRepo { get; }
-    ILoginLogCorporateRepository LoginLogCorporate { get; }
-    IPendingCreditLogRepository PendingCreditLogRepo { get; }
-    IPendingTranLogRepository PendingTranLogRepo { get; }
-    ITransactionRepository TransactionRepo { get; }
-    ICorporateApprovalHistoryRepository CorporateApprovalHistoryRepo { get; }
-    INipBulkCreditLogRepository NipBulkCreditLogRepo { get; }
-    INipBulkTransferLogRespository NipBulkTransferLogRepo { get; }
-    IInterBankBeneficiaryRepository InterBankBeneficiaryRepo { get; }
-    IIntraBankBeneficiaryRepository IntraBankBeneficiaryRepo { get; }
-    ICorporateBulkApprovalHistoryRepository CorporateBulkApprovalHistoryRepo { get; }
-    ITransactionHistoryRepository TransactionHistoryRepo { get; }
-    IPasswordHistoryRepository PasswordHistoryRepo { get; }
-    ITempWorkflowRepository TempWorkflowRepo { get; }
-    ITempWorkflowHierarchyRepository TempWorkflowHierarchyRepo { get; }
-    INipsFeeChargeRepository NipsFeeChargeRepo { get; }
-    IBranchRepository BranchRepo { get; }
-    IChequeRequestRepository ChequeRequestRepo { get; }
-    ITempChequeRequestRepository TempChequeRequestRepo { get; }
-    ICorporateSalaryScheduleRepository CorporateSalaryScheduleRepo { get; }
-    IScheduleBeneficairyRepository ScheduleBeneficairyRepo { get; }
-    ICorporateEmployeeRepository CorporateEmployeeRepo { get; }
-    ITempCorporateEmployeeRepository TempCorporateEmployeeRepo { get; }
-    ITempCorporateSalaryScheduleRepository TempCorporateSalaryScheduleRepo { get; }
-    IOnlendingBeneficiaryRepository OnlendingBeneficiaryRepo { get; }
-    IOnlendingCreditLogRepository OnlendingCreditLogRepositoryRepo { get; }
-    IOnlendingTransferLogRepository OnlendingTransferLogRepo { get; }
-    IExtensionHistoryRepository OnlendingExtensionHistoryRepo { get; }
-    IOnlendingTransactionRepository OnlendingTransactionRepo { get; }
-    int Complete();
-    new void Dispose();
+    public interface IUnitOfWork : IDisposable
+    {
+        IBankProfileRepository BankProfileRepo { get; }
+        ITemBankAdminProfileRepository TemBankAdminProfileRepo { get; }
+        ITemCorporateCustomerRespository TemCorporateCustomerRepo { get; }
+        ITemCorporateProfileRepository TemCorporateProfileRepo { get; }
+        IUserAccessRepository UserAccessRepo { get; }
+        IUserRoleAccessRepository UserRoleAccessRepo { get; }
+        ICorporateProfileRepository CorporateProfileRepo { get; }
+        ICorporateCustomerRepository CorporateCustomerRepo { get; }
+        ICorporateUserRoleAccess CorporateUserRoleAccessRepo { get; }
+        IBankAuthenticationRepository BankAuthenticationRepo { get; }
+        ICustomerAuthenticationRepository CustomerAuthenticationRepo { get; }
+        IRoleRepository RoleRepo { get; }
+        ICorporateRoleRepository CorporateRoleRepo { get; }
+        IPasswordResetRepository PasswordResetRepo { get; }
+        IAuditTrialRepository AuditTrialRepo { get; }
+        ISecurityQuestionRespository SecurityQuestionRepo { get; }
+        IWorkFlowRepository WorkFlowRepo { get; }
+        IWorkflowHierarchyRepository WorkFlowHierarchyRepo { get; }
+        ITokenBlackCorporateRepository  TokenBlackCorporateRepo{ get; }
+        ITokenBlackRepository  TokenBlackRepo{ get; }
+        ILoginLogCorporateRepository LoginLogCorporate { get; }
+        IPendingCreditLogRepository PendingCreditLogRepo { get; }
+        IPendingTranLogRepository PendingTranLogRepo { get; }
+        ITransactionRepository TransactionRepo { get; }
+        ICorporateApprovalHistoryRepository CorporateApprovalHistoryRepo { get; }
+        INipBulkCreditLogRepository NipBulkCreditLogRepo { get; }
+        INipBulkTransferLogRespository NipBulkTransferLogRepo { get;  }
+        IInterBankBeneficiaryRepository InterBankBeneficiaryRepo { get; }
+        IIntraBankBeneficiaryRepository IntraBankBeneficiaryRepo { get; }
+        ICorporateBulkApprovalHistoryRepository CorporateBulkApprovalHistoryRepo { get; }
+        ITransactionHistoryRepository TransactionHistoryRepo { get; }
+        IPasswordHistoryRepository PasswordHistoryRepo { get; }
+        ITempWorkflowRepository TempWorkflowRepo{get;}
+        ITempWorkflowHierarchyRepository  TempWorkflowHierarchyRepo {get;}
+        INipsFeeChargeRepository  NipsFeeChargeRepo {get;}
+        int Complete();
+        new void Dispose();
   }
 }

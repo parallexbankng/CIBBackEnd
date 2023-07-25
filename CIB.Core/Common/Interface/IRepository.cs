@@ -13,7 +13,6 @@ namespace CIB.Core.Common.Interface
         T Find(Expression<Func<T, bool>> predicate);
         void AddRange(IEnumerable<T> T);
         void RemoveRange(IEnumerable<T> T);
-        void Remove(T entity);
         void Add(T entity);
         void Update(T entity);
     }

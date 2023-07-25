@@ -6,9 +6,9 @@ public class Worker : BackgroundService
 {
   private readonly ILogger<Worker> _logger;
   private readonly IInterBankJob _postInterBankTransaction;
-  private readonly PeriodicTimer _timer = new(TimeSpan.FromMilliseconds(8000));
+  private readonly PeriodicTimer _timer = new(TimeSpan.FromMilliseconds(6000));
 
-  public Worker(ILogger<Worker> logger,IInterBankJob postInterBankTransaction)
+  public Worker(ILogger<Worker> logger, IInterBankJob postInterBankTransaction)
   {
     _logger = logger;
     this._postInterBankTransaction = postInterBankTransaction;

@@ -11,7 +11,6 @@ using CIB.Core.Entities;
 using CIB.Core.Enums;
 using CIB.Core.Modules.Workflow.Dto;
 using CIB.Core.Modules.Workflow.Validation;
-using CIB.Core.Services.Authentication;
 using CIB.Core.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -24,7 +23,7 @@ namespace CIB.CorporateAdmin.Controllers
     public class WorkflowByCorporateController : BaseAPIController
     {
         private readonly ILogger<WorkflowByCorporateController> _logger;
-        public WorkflowByCorporateController(ILogger<WorkflowByCorporateController> logger,IUnitOfWork unitOfWork, IMapper mapper,IHttpContextAccessor accessor,IAuthenticationService authService):base(unitOfWork,mapper,accessor,authService)
+        public WorkflowByCorporateController(ILogger<WorkflowByCorporateController> logger,IUnitOfWork unitOfWork, IMapper mapper,IHttpContextAccessor accessor) : base(unitOfWork,mapper,accessor)
         {
             _logger = logger;
         }

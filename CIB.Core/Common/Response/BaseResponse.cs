@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using FluentValidation.Results;
 
 namespace CIB.Core.Common.Response
@@ -28,7 +30,20 @@ namespace CIB.Core.Common.Response
         public bool Success { get; set; }
         public List<T> Data { get; set; }
     }
-   
+    public class ErrorResponseDTO<T>
+    {
+        public ErrorResponseDTO(List<T> _data,List<object> errors, bool success, string _message)
+        {
+            Message = _message;
+            Data = _data;
+            Success = success;
+            Errors = errors;
+        }
+        public string Message { get; set; }
+        public bool Success { get; set; }
+        public List<object> Errors { get; set; }
+        public List<T> Data { get; set; }
+    }
     public class ValidatorResponse
     {
         public ValidatorResponse(object _data, bool _success, List<ValidationFailure> _validationResult)
