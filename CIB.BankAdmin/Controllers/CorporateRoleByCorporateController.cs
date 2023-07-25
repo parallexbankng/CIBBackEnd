@@ -7,6 +7,7 @@ using CIB.Core.Common.Interface;
 using CIB.Core.Common.Response;
 using CIB.Core.Entities;
 using CIB.Core.Modules.BankAdminProfile.Dto;
+using CIB.Core.Services.Authentication;
 using CIB.Core.Services.Email;
 using CIB.Core.Services.Notification;
 using CIB.Core.Utils;
@@ -23,7 +24,7 @@ namespace CIB.BankAdmin.Controllers
         protected readonly IEmailService _emailService;
         private readonly ILogger<CorporateRoleByCorporateController> _logger;
       
-        public CorporateRoleByCorporateController(ILogger<CorporateRoleByCorporateController> _logger,IUnitOfWork unitOfWork,IEmailService emailService, IMapper mapper, IHttpContextAccessor accessor) : base(mapper, unitOfWork, accessor)
+        public CorporateRoleByCorporateController(ILogger<CorporateRoleByCorporateController> _logger,IUnitOfWork unitOfWork,IEmailService emailService, IMapper mapper, IHttpContextAccessor accessor,IAuthenticationService authService):base(mapper,unitOfWork,accessor,authService)
         {
             this._emailService = emailService;
             this._logger = _logger;

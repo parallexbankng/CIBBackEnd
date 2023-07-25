@@ -8,6 +8,7 @@ using CIB.Core.Entities;
 using CIB.Core.Enums;
 using CIB.Core.Modules.BankAdminProfile.Dto;
 using CIB.Core.Modules.BankAdminProfile.Validation;
+using CIB.Core.Services.Authentication;
 using CIB.Core.Services.Email;
 using CIB.Core.Services.Notification;
 using CIB.Core.Templates;
@@ -15,6 +16,7 @@ using CIB.Core.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace CIB.BankAdmin.Controllers
 {
@@ -25,7 +27,7 @@ namespace CIB.BankAdmin.Controllers
     private readonly IEmailService _emailService;
     private readonly ILogger<BankProfileController> _logger;
     protected readonly INotificationService notify;
-    public BankProfileController(INotificationService notify,ILogger<BankProfileController> _logger,IUnitOfWork unitOfWork, AutoMapper.IMapper mapper, IHttpContextAccessor accessor,IEmailService emailService) : base(mapper, unitOfWork, accessor)
+    public BankProfileController(INotificationService notify,ILogger<BankProfileController> _logger,IUnitOfWork unitOfWork, AutoMapper.IMapper mapper, IHttpContextAccessor accessor,IEmailService emailService,IAuthenticationService authService):base(mapper,unitOfWork,accessor,authService)
     {
       this._emailService = emailService;
       this._logger = _logger;
@@ -72,8 +74,8 @@ namespace CIB.BankAdmin.Controllers
     [HttpPost("CreateProfile")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
-    public ActionResult<ResponseDTO<BankAdminProfileResponse>> CreateBankAdminProfile(CreateBankAdminProfileDTO model)
-    {
+    public ActionResult<ResponseDTO<BankAdminProfileResponse>> CreateBankAdminProfile(GenericRequestDto model)
+    {      
       try
       {
         if (!IsAuthenticated)
@@ -91,15 +93,26 @@ namespace CIB.BankAdmin.Controllers
           return BadRequest("UnAuthorized Access");
         }
 
+        if (string.IsNullOrEmpty(model.Data))
+        {
+            return BadRequest("invalid request");
+        }
+
+        var requestData = JsonConvert.DeserializeObject<CreateBankAdminProfileDTO>(Encryption.DecryptStrings(model.Data));
+        if (requestData == null)
+        {
+            return BadRequest("invalid request data");
+        }
+
         var payload = new CreateBankAdminProfileDTO
         {
-          Username = Encryption.DecryptStrings(model.Username),
-          PhoneNumber = Encryption.DecryptStrings(model.PhoneNumber),
-          Email = Encryption.DecryptStrings(model.Email),
-          FirstName = Encryption.DecryptStrings(model.FirstName),
-          MiddleName = Encryption.DecryptStrings(model.MiddleName),
-          LastName = Encryption.DecryptStrings(model.LastName),
-          UserRoleId = Encryption.DecryptStrings(model.UserRoleId),
+          Username = requestData.Username,
+          PhoneNumber = requestData.PhoneNumber,
+          Email = requestData.Email,
+          FirstName = requestData.FirstName,
+          MiddleName = requestData.MiddleName,
+          LastName = requestData.LastName,
+          UserRoleId = requestData.UserRoleId,
           ClientStaffIPAddress = Encryption.DecryptStrings(model.ClientStaffIPAddress),
           HostName = Encryption.DecryptStrings(model.HostName),
           IPAddress = Encryption.DecryptStrings(model.IPAddress)
@@ -157,8 +170,7 @@ namespace CIB.BankAdmin.Controllers
         mapTempProfile.DateRequested = DateTime.Now;
         mapTempProfile.Action = nameof(TempTableAction.Create).Replace("_", " ");
         mapTempProfile.UserRoles = payload.UserRoleId;
-
-
+        
         var tempResult = UnitOfWork.TemBankAdminProfileRepo.CheckDuplicate(mapProfile);
         if(tempResult.IsDuplicate)
         {
@@ -218,9 +230,9 @@ namespace CIB.BankAdmin.Controllers
       }
     }
     
-    [HttpPut("UpdateProfile")]
+    [HttpPost("UpdateProfile")]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    public ActionResult<ResponseDTO<BankAdminProfileResponse>> UpdateBankAdminProfile(UpdateBankAdminProfile model)
+    public ActionResult<ResponseDTO<BankAdminProfileResponse>> UpdateBankAdminProfile(GenericRequestDto model)
     {
       try
         {
@@ -238,16 +250,28 @@ namespace CIB.BankAdmin.Controllers
           {
             return BadRequest("UnAuthorized Access");
           }
+          if(string.IsNullOrEmpty(model.Data))
+          {
+              return BadRequest("invalid request");
+          }
+
+          var requestData = JsonConvert.DeserializeObject<UpdateBankAdminProfileDTO>(Encryption.DecryptStrings(model.Data));
+          if(requestData == null)
+          {
+              return BadRequest("invalid request data");
+          }
+
+
           var payload = new UpdateBankAdminProfileDTO
           {
-            Id = Encryption.DecryptGuid(model.Id),
-            Username = Encryption.DecryptStrings(model.Username),
-            PhoneNumber = Encryption.DecryptStrings(model.PhoneNumber),
-            Email = Encryption.DecryptStrings(model.Email),
-            FirstName = Encryption.DecryptStrings(model.FirstName),
-            MiddleName = Encryption.DecryptStrings(model.MiddleName),
-            LastName = Encryption.DecryptStrings(model.LastName),
-            UserRoleId = Encryption.DecryptStrings(model.UserRoleId),
+            Id = requestData.Id,
+            Username = requestData.Username,
+            PhoneNumber = requestData.PhoneNumber,
+            Email = requestData.Email,
+            FirstName = requestData.FirstName,
+            MiddleName = requestData.MiddleName,
+            LastName = requestData.LastName,
+            UserRoleId = requestData.UserRoleId,
             IPAddress = Encryption.DecryptStrings(model.IPAddress),
             HostName = Encryption.DecryptStrings(model.HostName),
             ClientStaffIPAddress = Encryption.DecryptStrings(model.ClientStaffIPAddress),
@@ -360,9 +384,9 @@ namespace CIB.BankAdmin.Controllers
         }
     }
     
-    [HttpPut("RequestProfileApproval")]
+    [HttpPost("RequestProfileApproval")]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    public ActionResult<ResponseDTO<BankAdminProfileResponse>> RequestProfileApproval(SimpleActionDto model)
+    public ActionResult<ResponseDTO<BankAdminProfileResponse>> RequestProfileApproval(GenericRequestDto model)
     {
       try
         {
@@ -379,10 +403,23 @@ namespace CIB.BankAdmin.Controllers
           {
             return BadRequest("UnAuthorized Access");
           }
+          
+          if(string.IsNullOrEmpty(model.Data))
+          {
+              return BadRequest("invalid request");
+          }
+
+          var requestData = JsonConvert.DeserializeObject<SimpleAction>(Encryption.DecryptStrings(model.Data));
+          if(requestData == null)
+          {
+              return BadRequest("invalid request data");
+          }
+
+
           var payload = new SimpleAction
           {
-            Id = Encryption.DecryptGuid(model.Id),
-            Reason = Encryption.DecryptStrings(model.Reason),
+            Id = requestData.Id,
+            Reason = requestData.Reason,
             IPAddress = Encryption.DecryptStrings(model.IPAddress),
             HostName = Encryption.DecryptStrings(model.HostName),
             ClientStaffIPAddress = Encryption.DecryptStrings(model.ClientStaffIPAddress),
@@ -423,9 +460,9 @@ namespace CIB.BankAdmin.Controllers
       }
     }
     
-    [HttpPut("ApproveProfile")]
+    [HttpPost("ApproveProfile")]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    public ActionResult<ResponseDTO<BankAdminProfileResponse>> ApproveProfile(SimpleActionDto model)
+    public ActionResult<ResponseDTO<BankAdminProfileResponse>> ApproveProfile(GenericRequestDto model)
     {
       try
         {
@@ -444,9 +481,20 @@ namespace CIB.BankAdmin.Controllers
             return BadRequest("UnAuthorized Access");
           }
 
+          if(string.IsNullOrEmpty(model.Data))
+          {
+              return BadRequest("invalid request");
+          }
+
+          var requestData = JsonConvert.DeserializeObject<SimpleAction>(Encryption.DecryptStrings(model.Data));
+          if(requestData == null)
+          {
+              return BadRequest("invalid request data");
+          }
+
           var payload = new SimpleAction
           {
-            Id = Encryption.DecryptGuid(model.Id),
+            Id = requestData.Id,
             IPAddress = Encryption.DecryptStrings(model.IPAddress),
             HostName = Encryption.DecryptStrings(model.HostName),
             ClientStaffIPAddress = Encryption.DecryptStrings(model.ClientStaffIPAddress),
@@ -477,37 +525,6 @@ namespace CIB.BankAdmin.Controllers
           {
             return BadRequest("Invalid Profile Id");
           }
-
-
-          // var status = (ProfileStatus)entity.Status;
-          // var auditTrail = new TblAuditTrail
-          // {
-          //   Id = Guid.NewGuid(),
-          //   ActionCarriedOut = nameof(AuditTrailAction.Approve).Replace("_", " "),
-          //   Ipaddress = payload.IPAddress,
-          //   Macaddress = payload.MACAddress,
-          //   HostName = payload.HostName,
-          //   ClientStaffIpaddress = payload.ClientStaffIPAddress,
-          //   NewFieldValue =  $"Profile Status: {nameof(ProfileStatus.Active)}, Username: {entity.Username}First Name: {entity.FirstName}, Last Name: {entity.LastName}",
-          //   PreviousFieldValue = $"Profile Status: {status},Username: {entity.Username},First Name: {entity.FirstName}, Last Name: {entity.LastName}",
-          //   TransactionId = "",
-          //   UserId = BankProfile.Id,
-          //   Username = UserName,
-          //   Description = "Approved Bank User Profile",
-          //   TimeStamp = DateTime.Now
-          // };
-          // //update status
-          // entity.Status = (int)ProfileStatus.Active;
-          // int? regStage = entity.RegStage;
-          // if (regStage == 0)
-          // {
-          //   string fullName = entity.LastName + " " + entity.MiddleName + " " + entity.FirstName;
-          //   _emailService.SendEmail(EmailTemplate.LoginCredentialAdminMail(entity.Email, fullName, entity.Username, "", ""));
-          // }
-          // entity.RegStage = 1;
-          // UnitOfWork.BankProfileRepo.UpdateBankProfile(entity);
-          // UnitOfWork.AuditTrialRepo.Add(auditTrail);
-          // UnitOfWork.Complete();
           var mapResponse = Mapper.Map<BankAdminProfileResponse>(profile);
           return Ok(new ResponseDTO<BankAdminProfileResponse>(_data:mapResponse,success:true, _message:Message.Success));
         }
@@ -518,9 +535,9 @@ namespace CIB.BankAdmin.Controllers
         }
     }
     
-    [HttpPut("ReActivateProfile")]
+    [HttpPost("ReActivateProfile")]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    public ActionResult<ResponseDTO<BankAdminProfileResponse>> ReActivateProfile(SimpleActionDto model)
+    public ActionResult<ResponseDTO<BankAdminProfileResponse>> ReActivateProfile(GenericRequestDto model)
     {
       try
       {
@@ -539,18 +556,29 @@ namespace CIB.BankAdmin.Controllers
           return BadRequest("UnAuthorized Access");
         }
 
-        if(string.IsNullOrEmpty(model.Id))
+        if(string.IsNullOrEmpty(model.Data))
         {
-          return BadRequest("Invalid format");
+            return BadRequest("invalid request");
+        }
+
+        var requestData = JsonConvert.DeserializeObject<DeclineBankAdminProfileDTO>(Encryption.DecryptStrings(model.Data));
+        if(requestData == null)
+        {
+            return BadRequest("invalid request data");
         }
         var payload = new SimpleAction
         {
-          Id = Encryption.DecryptGuid(model.Id),
+          Id = requestData.Id,
           IPAddress = Encryption.DecryptStrings(model.IPAddress),
           HostName = Encryption.DecryptStrings(model.HostName),
           ClientStaffIPAddress = Encryption.DecryptStrings(model.ClientStaffIPAddress),
           MACAddress = Encryption.DecryptStrings(model.MACAddress)
         };
+
+        if(string.IsNullOrEmpty(payload.Id.ToString()))
+        {
+          return BadRequest("Invalid format");
+        }
         var entity = UnitOfWork.BankProfileRepo.GetByIdAsync(payload.Id);
         if (entity == null)
         {
@@ -619,9 +647,9 @@ namespace CIB.BankAdmin.Controllers
       }
     }
 
-    [HttpPut("DeclineProfile")]
+    [HttpPost("DeclineProfile")]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    public ActionResult<ResponseDTO<BankAdminProfileResponse>> DeclineProfile(AppAction model)
+    public ActionResult<ResponseDTO<BankAdminProfileResponse>> DeclineProfile(GenericRequestDto model)
     {
       try
       {
@@ -640,10 +668,21 @@ namespace CIB.BankAdmin.Controllers
           return BadRequest("UnAuthorized Access");
         }
 
+        if(string.IsNullOrEmpty(model.Data))
+        {
+            return BadRequest("invalid request");
+        }
+
+        var requestData = JsonConvert.DeserializeObject<DeclineBankAdminProfileDTO>(Encryption.DecryptStrings(model.Data));
+        if(requestData == null)
+        {
+            return BadRequest("invalid request data");
+        }
+
         var payload = new DeclineBankAdminProfileDTO
         {
-          Id = Encryption.DecryptGuid(model.Id),
-          Reason = Encryption.DecryptStrings(model.Reason),
+          Id = requestData.Id,
+          Reason = requestData.Reason,
           IPAddress = Encryption.DecryptStrings(model.IPAddress),
           HostName = Encryption.DecryptStrings(model.HostName),
           ClientStaffIPAddress = Encryption.DecryptStrings(model.ClientStaffIPAddress),
@@ -710,9 +749,9 @@ namespace CIB.BankAdmin.Controllers
       }
     }
 
-    [HttpPut("DeactivateProfile")]
+    [HttpPost("DeactivateProfile")]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    public ActionResult<ResponseDTO<BankAdminProfileResponse>> DeactivateProfile(AppAction model)
+    public ActionResult<ResponseDTO<BankAdminProfileResponse>> DeactivateProfile(GenericRequestDto model)
     {
       try
       {
@@ -730,10 +769,21 @@ namespace CIB.BankAdmin.Controllers
           return BadRequest("UnAuthorized Access");
         }
 
+        if(string.IsNullOrEmpty(model.Data))
+        {
+            return BadRequest("invalid request");
+        }
+
+        var requestData = JsonConvert.DeserializeObject<DeactivateBankAdminProfileDTO>(Encryption.DecryptStrings(model.Data));
+        if(requestData == null)
+        {
+            return BadRequest("invalid request data");
+        }
+
         var payload = new DeactivateBankAdminProfileDTO
         {
-          Id = Encryption.DecryptGuid(model.Id),
-          Reason = Encryption.DecryptStrings(model.Reason),
+          Id = requestData.Id,
+          Reason = requestData.Reason,
           IPAddress = Encryption.DecryptStrings(model.IPAddress),
           HostName = Encryption.DecryptStrings(model.HostName),
           ClientStaffIPAddress = Encryption.DecryptStrings(model.ClientStaffIPAddress),
@@ -807,9 +857,9 @@ namespace CIB.BankAdmin.Controllers
       }
     }
 
-    [HttpPut("UpdateProfileUserRole")]
+    [HttpPost("UpdateProfileUserRole")]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    public ActionResult<ResponseDTO<BankAdminProfileResponse>> UpdateProfileUserRole(UpdateBankAdminProfileUserRole model)
+    public ActionResult<ResponseDTO<BankAdminProfileResponse>> UpdateProfileUserRole(GenericRequestDto model)
     {
         try
         {
@@ -828,6 +878,17 @@ namespace CIB.BankAdmin.Controllers
               return BadRequest("UnAuthorized Access");
           }
 
+          if(string.IsNullOrEmpty(model.Data))
+          {
+              return BadRequest("invalid request");
+          }
+
+          var requestData = JsonConvert.DeserializeObject<UpdateBankAdminProfileUserRoleDTO>(Encryption.DecryptStrings(model.Data));
+          if(requestData == null)
+          {
+              return BadRequest("invalid request data");
+          }
+
           string errormsg = string.Empty;
 
           if (!IsUserActive(out errormsg))
@@ -836,8 +897,8 @@ namespace CIB.BankAdmin.Controllers
           }
           var payload = new UpdateBankAdminProfileUserRoleDTO
           {
-            Id = Encryption.DecryptGuid(model.Id),
-            RoleId = Encryption.DecryptGuid(model.RoleId),
+            Id = requestData.Id,
+            RoleId = requestData.RoleId,
             IPAddress = Encryption.DecryptStrings(model.IPAddress),
             HostName = Encryption.DecryptStrings(model.HostName),
             ClientStaffIPAddress = Encryption.DecryptStrings(model.ClientStaffIPAddress),
@@ -928,9 +989,9 @@ namespace CIB.BankAdmin.Controllers
         }
     }
 
-    [HttpPut("EnableProfileLoggedOut")]
+    [HttpPost("EnableProfileLoggedOut")]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    public ActionResult<ResponseDTO<BankAdminProfileResponse>> EnableProfileLoggedOut(SimpleActionDto model)
+    public ActionResult<ResponseDTO<BankAdminProfileResponse>> EnableProfileLoggedOut(GenericRequestDto model)
     {
       try
         {
@@ -951,17 +1012,30 @@ namespace CIB.BankAdmin.Controllers
             return BadRequest("UnAuthorized Access");
           }
 
-          if(string.IsNullOrEmpty(model.Id)){
-            return BadRequest("Invalid format");
+          if(string.IsNullOrEmpty(model.Data))
+          {
+              return BadRequest("invalid request");
           }
+
+          var requestData = JsonConvert.DeserializeObject<SimpleAction>(Encryption.DecryptStrings(model.Data));
+          if(requestData == null)
+          {
+              return BadRequest("invalid request data");
+          }
+
+          
           var payload = new SimpleAction
           {
-            Id = Encryption.DecryptGuid(model.Id),
+            Id = requestData.Id,
             IPAddress = Encryption.DecryptStrings(model.IPAddress),
             HostName = Encryption.DecryptStrings(model.HostName),
             ClientStaffIPAddress = Encryption.DecryptStrings(model.ClientStaffIPAddress),
             MACAddress = Encryption.DecryptStrings(model.MACAddress)
           };
+
+          if(string.IsNullOrEmpty(payload.Id.ToString())){
+            return BadRequest("Invalid format");
+          }
 
           var entity = UnitOfWork.BankProfileRepo.GetByIdAsync(payload.Id);
           if (entity == null)
@@ -1048,6 +1122,7 @@ namespace CIB.BankAdmin.Controllers
             return BadRequest(new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: Message.ServerError, responseStatus:false));
         }
     }  
+   
     private bool ApprovedRequest(TblTempBankProfile profile, SimpleAction payload, out string errorMessage)
     {
       var tblRole = UnitOfWork.RoleRepo.GetByIdAsync(Guid.Parse(profile.UserRoles));
@@ -1707,7 +1782,8 @@ namespace CIB.BankAdmin.Controllers
         errorMessage = "invalid Request";
         return false;
       }
-  
-  
+
+
+
   }
 }

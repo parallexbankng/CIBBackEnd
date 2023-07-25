@@ -14,6 +14,7 @@ namespace CIB.Core.Modules.CorporateSalarySchedule._CorporateEmployee.Dto
         public string AccountName { get; set; }
         public string AccountNumber { get; set; }
         public string BankCode { get; set; }
+         public string BankName { get; set; }
         public string SalaryAmount { get; set; }
         public string GradeLevel { get; set; }
         public string Description { get; set; }

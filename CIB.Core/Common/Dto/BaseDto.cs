@@ -12,17 +12,17 @@ namespace CIB.Core.Common
             Id = Guid.NewGuid();
         }
         public Guid Id { get; set; }
-        public string ClientStaffIPAddress { get; set; }
-        public string IPAddress { get; set; }
-        public string HostName { get; set; }
-        public string MACAddress { get; set; }
+        public string? ClientStaffIPAddress { get; set; }
+        public string? IPAddress { get; set; }
+        public string? HostName { get; set; }
+        public string? MACAddress { get; set; }
     }
     public class BaseUpdateDto
     {
-        public string ClientStaffIPAddress { get; set; }
-        public string IPAddress { get; set; }
-        public string HostName { get; set; }
-        public string MACAddress { get; set; }
+        public string? ClientStaffIPAddress { get; set; }
+        public string? IPAddress { get; set; }
+        public string? HostName { get; set; }
+        public string? MACAddress { get; set; }
     }
     public class AuthorizationTypeModel
     {
@@ -43,6 +43,23 @@ namespace CIB.Core.Common
     {
         public Guid Id { get; set; }
         public string Reason {get;set;}
+    }
+
+    public class BulkError
+    {
+        public string Message { get; set; }
+        public string ActionInfo {get;set;}
+        public Guid? Id {get;set;}
+    }
+    // public class UpdateAction: BaseUpdateDto
+    // {
+    //     public Guid Id { get; set; }
+    //     public string Beneficiaries {get;set;}
+    // }
+    public class UpdateActionDto: BaseUpdateDto
+    {
+        public string Id { get; set; }
+        public string Data {get;set;}
     }
     public class AppAction: BaseUpdateDto
     {
@@ -72,7 +89,8 @@ namespace CIB.Core.Common
         public string PhoneNumber {get;set;}
         public string Action {get;set;}
         public string RequestType {get;set;}
-         public string Amount {get;set;}
+        public string Amount {get;set;}
+        public string AuthorizationType {get;set;}
         public decimal? MinAccountLimit { get; set; }
         public decimal? MaxAccountLimit { get; set; }
         public decimal? BulkTransDailyLimit { get; set; }
@@ -81,7 +99,6 @@ namespace CIB.Core.Common
         public string Description {get;set;}
         public int? NoOfAuthorizers {get;set;}
         public decimal? ApprovalLimit { get; set; }
-
     }
 
     public class AuditTrailDetail
@@ -97,6 +114,17 @@ namespace CIB.Core.Common
         public string NewFieldValue {get;set;}
         public string PreviousFieldValue {get;set;}
         public string? TransactionId {get;set;}
+    }
+
+    public class ActionStatus
+    {
+        public string Message { get; set; }
+        public bool IsExist { get; set; }
+    }
+
+    public class GenericRequestDto:BaseDto
+    {
+        public string Data {get;set;}
     }
 
 }

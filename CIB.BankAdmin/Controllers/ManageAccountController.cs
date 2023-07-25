@@ -3,6 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using CIB.Core.Common;
 using CIB.Core.Common.Dto;
 using CIB.Core.Common.Interface;
@@ -13,16 +18,11 @@ using CIB.Core.Modules.CorporateCustomer.Dto;
 using CIB.Core.Modules.CorporateCustomer.Mapper;
 using CIB.Core.Services.Api;
 using CIB.Core.Services.Api.Dto;
+using CIB.Core.Services.Authentication;
 using CIB.Core.Services.Email;
 using CIB.Core.Services.File;
-using CIB.Core.Services.Notification;
 using CIB.Core.Templates;
 using CIB.Core.Utils;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-
 namespace CIB.BankAdmin.Controllers
 {
     [ApiController]
@@ -33,16 +33,16 @@ namespace CIB.BankAdmin.Controllers
         private readonly ILogger<ManageAccountController> _logger;
         private readonly IFileService _fileService;
         private readonly IEmailService _emailService;
-         private readonly IConfiguration _config;
-        public ManageAccountController(IConfiguration config,IEmailService emailService,IFileService fileService,ILogger<ManageAccountController> _logger,IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor accessor,IApiService apiService) : base(mapper, unitOfWork, accessor)
+        private readonly IConfiguration _config;
+        public ManageAccountController(IConfiguration config,IEmailService emailService,IFileService fileService,ILogger<ManageAccountController> _logger,IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor accessor,IApiService apiService,IAuthenticationService authService):base(mapper,unitOfWork,accessor,authService)
         {
             this._apiService = apiService;
             this._logger = _logger;
             this._fileService = fileService;
             this._emailService = emailService;
             this._config = config;
-        
         }
+       
         [HttpGet("CustomerNameInquiry")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         public async Task<ActionResult<ResponseDTO<CustomerDataResponseDto>>> CustomerNameInquiry(string accountNumber)
@@ -82,6 +82,7 @@ namespace CIB.BankAdmin.Controllers
                 return ex.InnerException != null ? BadRequest(new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: ex.InnerException.Message, responseStatus:false)) : StatusCode(500, new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: ex.InnerException != null ? ex.InnerException.Message : ex.Message, responseStatus:false));
             }
         }
+       
         [HttpGet("GetAuthorizationTypes")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         public ActionResult<ListResponseDTO<AuthorizationTypeModel>> GetAuthorizationTypes()
@@ -114,9 +115,10 @@ namespace CIB.BankAdmin.Controllers
                 return ex.InnerException != null ? BadRequest(new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: ex.InnerException.Message, responseStatus:false)) : StatusCode(500, new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: ex.InnerException != null ? ex.InnerException.Message : ex.Message, responseStatus:false));
             }
         }
+        
         [HttpPost("ValidateCorporateCustomer")]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public ActionResult<bool> ValidateCorporateCustomerModel(ValidateCorporateCustomerRequestDto model)
+        public ActionResult<bool> ValidateCorporateCustomerModel(GenericRequestDto model)
         {
             try
             {
@@ -134,14 +136,25 @@ namespace CIB.BankAdmin.Controllers
                     return BadRequest("UnAuthorized Access");
                 }
 
+                if(string.IsNullOrEmpty(model.Data))
+                {
+                    return BadRequest("invalid request");
+                }
+
+                var requestData = JsonConvert.DeserializeObject<ValidateCorporateCustomerRequestDto>(Encryption.DecryptStrings(model.Data));
+                if(requestData == null)
+                {
+                    return BadRequest("invalid request data");
+                }
+
                 var payload = new ValidateCorporateCustomerRequestDto
                 {
-                    CompanyName = Encryption.DecryptStrings(model.CompanyName),
-                    Email = Encryption.DecryptStrings(model.Email),
-                    CustomerId = Encryption.DecryptStrings(model.CustomerId),
-                    DefaultAccountNumber = Encryption.DecryptStrings(model.DefaultAccountNumber),
-                    DefaultAccountName = Encryption.DecryptStrings(model.DefaultAccountName),
-                    AuthorizationType = Encryption.DecryptStrings(model.AuthorizationType),
+                    CompanyName =   requestData.CompanyName,
+                    Email = requestData.Email,
+                    CustomerId = requestData.CustomerId,
+                    DefaultAccountNumber = requestData.DefaultAccountNumber,
+                    DefaultAccountName = requestData.DefaultAccountName,
+                    AuthorizationType = requestData.AuthorizationType,
                     ClientStaffIPAddress = Encryption.DecryptStrings(model.ClientStaffIPAddress),
                     IPAddress = Encryption.DecryptStrings(model.IPAddress),
                     MACAddress = Encryption.DecryptStrings(model.MACAddress),
@@ -175,10 +188,9 @@ namespace CIB.BankAdmin.Controllers
             }
         }
        
-        [HttpPut("ValidateAccountLimit")]
+        [HttpPost("ValidateAccountLimit")]
         [ProducesResponseType(StatusCodes.Status201Created)]
-       
-        public ActionResult<bool> ValidateAccountLimitModel(AccountLimitRequestDto model)
+        public ActionResult<bool> ValidateAccountLimitModel(GenericRequestDto model)
         {
             try
             {
@@ -192,19 +204,31 @@ namespace CIB.BankAdmin.Controllers
                     return StatusCode(400, errormsg);
                 }
 
-                if (!UnitOfWork.UserRoleAccessRepo.AccessesExist(UserRoleId, Permission.OnboardCorporateCustomer))
+                // if (!UnitOfWork.UserRoleAccessRepo.AccessesExist(UserRoleId, Permission.OnboardCorporateCustomer))
+                // {
+                //     return BadRequest("UnAuthorized Access");
+                // }
+
+                if(string.IsNullOrEmpty(model.Data))
                 {
-                    return BadRequest("UnAuthorized Access");
+                    return BadRequest("invalid request");
+                }
+                var itme = Encryption.DecryptStrings(model.Data);
+
+                var requestData = JsonConvert.DeserializeObject<AccountLimitRequest>(itme);
+                if(requestData == null)
+                {
+                    return BadRequest("invalid request data");
                 }
 
                 var payload = new AccountLimitRequest
                 {
-                    MaxAccountLimit = Encryption.DecryptDecimals(model.MaxAccountLimit),
-                    MinAccountLimit = Encryption.DecryptDecimals(model.MinAccountLimit),
-                    SingleTransDailyLimit = Encryption.DecryptDecimals(model.SingleTransDailyLimit),
-                    BulkTransDailyLimit = Encryption.DecryptDecimals(model.BulkTransDailyLimit),
-                    AuthorizationType = Encryption.DecryptStrings(model.AuthorizationType),
-                    IsApprovalByLimit = Encryption.DecryptBooleans(model.IsApprovalByLimit),
+                    MaxAccountLimit = requestData.MaxAccountLimit,
+                    MinAccountLimit = requestData.MinAccountLimit,
+                    SingleTransDailyLimit = requestData.SingleTransDailyLimit,
+                    BulkTransDailyLimit = requestData.BulkTransDailyLimit,
+                    AuthorizationType = requestData.AuthorizationType,
+                    IsApprovalByLimit = requestData.IsApprovalByLimit,
                     ClientStaffIPAddress = Encryption.DecryptStrings(model.ClientStaffIPAddress),
                     IPAddress = Encryption.DecryptStrings(model.IPAddress),
                     MACAddress = Encryption.DecryptStrings(model.MACAddress),
@@ -254,10 +278,10 @@ namespace CIB.BankAdmin.Controllers
                 return ex.InnerException != null ? BadRequest(new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: ex.InnerException.Message, responseStatus:false)) : StatusCode(500, new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: ex.InnerException != null ? ex.InnerException.Message : ex.Message, responseStatus:false));
             }
         }
-
+       
         [HttpPost("OnboardCorporateCustomer")]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public ActionResult<bool> OnboardCorporateCustomer(OnboardCorporateCustomerRequestDto model)
+        public ActionResult<bool> OnboardCorporateCustomer(GenericRequestDto model)
         {
             try
             {
@@ -270,34 +294,44 @@ namespace CIB.BankAdmin.Controllers
                 {
                     return StatusCode(400, errormsg);
                 }
-
-                if (!UnitOfWork.UserRoleAccessRepo.AccessesExist(UserRoleId, Permission.OnboardCorporateCustomer))
+                if(string.IsNullOrEmpty(model.Data))
                 {
-                    return BadRequest("UnAuthorized Access");
+                    return BadRequest("invalid request");
                 }
 
+                var requestData = JsonConvert.DeserializeObject<OnboardCorporateCustomer>(Encryption.DecryptStrings(model.Data));
+                if(requestData == null)
+                {
+                    return BadRequest("invalid request data");
+                }
+
+                // if (!UnitOfWork.UserRoleAccessRepo.AccessesExist(UserRoleId, Permission.OnboardCorporateCustomer))
+                // {
+                //     return BadRequest("UnAuthorized Access");
+                // }
                 var payload = new OnboardCorporateCustomer
                 {
-                    CompanyName = Encryption.DecryptStrings(model.CompanyName),
-                    Email = Encryption.DecryptStrings(model.Email),
-                    CustomerId = Encryption.DecryptStrings(model.CustomerId),
-                    DefaultAccountNumber = Encryption.DecryptStrings(model.DefaultAccountNumber),
-                    DefaultAccountName = Encryption.DecryptStrings(model.DefaultAccountName),
-                    AuthorizationType = Encryption.DecryptStrings(model.AuthorizationType),
-                    CorporateCustomerId = Encryption.DecryptGuid(model.CorporateCustomerId),
-                    CorporateRoleId = Encryption.DecryptGuid(model.CorporateRoleId),
-                    Username = Encryption.DecryptStrings(model.Username),
-                    CorporateEmail = Encryption.DecryptStrings(model.CorporateEmail),
-                    FirstName = Encryption.DecryptStrings(model.FirstName),
-                    MiddleName = Encryption.DecryptStrings(model.MiddleName),
-                    ApprovalLimit = Encryption.DecryptDecimals(model.ApprovalLimit),
-                    MinAccountLimit = Encryption.DecryptDecimals(model.MinAccountLimit),
-                    MaxAccountLimit = Encryption.DecryptDecimals(model.MaxAccountLimit),
-                    SingleTransDailyLimit = Encryption.DecryptDecimals(model.SingleTransDailyLimit),
-                    BulkTransDailyLimit = Encryption.DecryptDecimals(model.BulkTransDailyLimit),
-                    LastName = Encryption.DecryptStrings(model.LastName),
-                    PhoneNumber = Encryption.DecryptStrings(model.PhoneNumber),
-                    IsApprovalByLimit = Encryption.DecryptBooleans(model.IsApprovalByLimit),
+                    CompanyName = requestData.CompanyName,
+                    Email = requestData.Email,
+                    CustomerId = requestData.CustomerId,
+                    DefaultAccountNumber = requestData.DefaultAccountNumber,
+                    DefaultAccountName = requestData.DefaultAccountName,
+                    AuthorizationType =requestData.AuthorizationType,
+                    CorporateCustomerId = requestData.CorporateCustomerId,
+                    CorporateRoleId =requestData.CorporateRoleId,
+                    Username = requestData.Username,
+                    CorporateEmail = requestData.CorporateEmail,
+                    FirstName = requestData.FirstName,
+                    MiddleName = requestData.MiddleName,
+                    ApprovalLimit = requestData.ApprovalLimit,
+                    MinAccountLimit = requestData.MinAccountLimit,
+                    MaxAccountLimit = requestData.MaxAccountLimit,
+                    SingleTransDailyLimit = requestData.SingleTransDailyLimit,
+                    BulkTransDailyLimit = requestData.BulkTransDailyLimit,
+                    LastName = requestData.LastName,
+                    Title = requestData.Title,
+                    PhoneNumber = requestData.PhoneNumber,
+                    IsApprovalByLimit = requestData.IsApprovalByLimit,
                     ClientStaffIPAddress = Encryption.DecryptStrings(model.ClientStaffIPAddress),
                     IPAddress = Encryption.DecryptStrings(model.IPAddress),
                     MACAddress = Encryption.DecryptStrings(model.MACAddress),
@@ -407,6 +441,7 @@ namespace CIB.BankAdmin.Controllers
                 {
                     Id = Guid.NewGuid(),
                     AuthorizationType = payload.AuthorizationType,
+                    Title = payload.Title,
                     CompanyName = payload.CompanyName,
                     CorporateRoleId = payload.CorporateRoleId,
                     CustomerId = payload.CustomerId,
@@ -454,7 +489,7 @@ namespace CIB.BankAdmin.Controllers
                 return BadRequest(new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: Message.ServerError, responseStatus:false));
             }
         }
-   
+        
         [HttpPost("BulkOnboardCorporateCustomer")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         public async Task<ActionResult<bool>> BulkOnboardCorporateCustomer([FromForm] BulkOnboardCorporateCustomerRequestDto model)
@@ -515,25 +550,25 @@ namespace CIB.BankAdmin.Controllers
                             var task = Task.Run(() => 
                             {
                                 var corporateCustomer = new TblCorporateCustomer
-                            {
-                                Id = Guid.NewGuid(),
-                                Sn= 0,
-                                AuthorizationType = row.AuthorizationType,
-                                CompanyName = row.CompanyName,
-                                CompanyAddress = accountInfo.Address,
-                                CustomerId = row.CustomerId,
-                                DefaultAccountName = accountInfo.AccountName,
-                                DefaultAccountNumber = row.DefaultAccountNumber,
-                                Email1 = row.Email,
-                                CorporateEmail = accountInfo.Email,
-                                Phone1 = accountInfo.MobileNo,
-                                Status = (int) ProfileStatus.Modified,
-                                MaxAccountLimit = row.MaxAccountLimit,
-                                BulkTransDailyLimit = row.BulkTransDailyLimit,
-                                MinAccountLimit = row.MinAccountLimit,
-                                SingleTransDailyLimit = row.SingleTransDailyLimit,
-                                DateAdded = DateTime.Now,
-                            };
+                                {
+                                    Id = Guid.NewGuid(),
+                                    Sn= 0,
+                                    AuthorizationType = row.AuthorizationType,
+                                    CompanyName = row.CompanyName,
+                                    CompanyAddress = accountInfo.Address,
+                                    CustomerId = row.CustomerId,
+                                    DefaultAccountName = accountInfo.AccountName,
+                                    DefaultAccountNumber = row.DefaultAccountNumber,
+                                    Email1 = row.Email,
+                                    CorporateEmail = accountInfo.Email,
+                                    Phone1 = accountInfo.MobileNo,
+                                    Status = (int) ProfileStatus.Modified,
+                                    MaxAccountLimit = row.MaxAccountLimit,
+                                    BulkTransDailyLimit = row.BulkTransDailyLimit,
+                                    MinAccountLimit = row.MinAccountLimit,
+                                    SingleTransDailyLimit = row.SingleTransDailyLimit,
+                                    DateAdded = DateTime.Now,
+                                };
 
                                 var fullName = row.MiddleName == null ? row.FirstName.Trim().ToLower() + " "+ row.LastName.Trim().ToLower() : row.FirstName.Trim().ToLower() + " " +row.MiddleName.Trim().ToLower() +" "+ row.LastName.Trim().ToLower();
                                 var password =  Encryption.EncriptPassword(PasswordValidator.GeneratePassword());
@@ -613,9 +648,9 @@ namespace CIB.BankAdmin.Controllers
             }
         }
    
-        [HttpPut("ChangeCorporateCustomerSignatory")]
+        [HttpPost("ChangeCorporateCustomerSignatory")]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public ActionResult<bool> ChangeCorporateCustomerSignatory(AccountLimitRequestDto model)
+        public ActionResult<bool> ChangeCorporateCustomerSignatory(GenericRequestDto model)
         {
             try
             {
@@ -629,60 +664,84 @@ namespace CIB.BankAdmin.Controllers
                     return StatusCode(400, errormsg);
                 }
 
+                if(string.IsNullOrEmpty(model.Data))
+                {
+                    return BadRequest("invalid request");
+                }
+
+                var requestData = JsonConvert.DeserializeObject<ChangeCorporateCustomerSignatoryDto>(Encryption.DecryptStrings(model.Data));
+                if(requestData == null)
+                {
+                    return BadRequest("invalid request data");
+                }
+
                 if (!UnitOfWork.UserRoleAccessRepo.AccessesExist(UserRoleId, Permission.OnboardCorporateCustomer))
                 {
                     return BadRequest("UnAuthorized Access");
                 }
 
-                var payload = new AccountLimitRequest
+                var payload = new ChangeCorporateCustomerSignatoryDto
                 {
-                    MaxAccountLimit = Encryption.DecryptDecimals(model.MaxAccountLimit),
-                    MinAccountLimit = Encryption.DecryptDecimals(model.MinAccountLimit),
-                    SingleTransDailyLimit = Encryption.DecryptDecimals(model.SingleTransDailyLimit),
-                    BulkTransDailyLimit = Encryption.DecryptDecimals(model.BulkTransDailyLimit),
-                    AuthorizationType = Encryption.DecryptStrings(model.AuthorizationType),
-                    IsApprovalByLimit = Encryption.DecryptBooleans(model.IsApprovalByLimit),
-                    ClientStaffIPAddress = Encryption.DecryptStrings(model.ClientStaffIPAddress),
-                    IPAddress = Encryption.DecryptStrings(model.IPAddress),
-                    MACAddress = Encryption.DecryptStrings(model.MACAddress),
-                    HostName = Encryption.DecryptStrings(model.HostName)
+                    CorporateRole = requestData.CorporateRole,
+                    CorporateCustomerId = requestData.CorporateCustomerId,
+                    AuthorizationType = requestData.AuthorizationType,
+                    ProfileId = requestData.ProfileId,
+                    ClientStaffIPAddress = requestData.ClientStaffIPAddress,
+                    IPAddress = requestData.IPAddress,
+                    MACAddress = requestData.MACAddress,
+                    HostName = requestData.HostName
                 };
-                if (payload.AuthorizationType != nameof(AuthorizationType.Multiple_Signatory))
+            
+                var corporateCustomer = UnitOfWork.CorporateCustomerRepo.GetByIdAsync((Guid)payload?.CorporateCustomerId);
+                if (corporateCustomer == null)
                 {
-                    if (payload.MinAccountLimit < 0)
+                    return BadRequest("invalid corporate customer id ");
+                }
+
+                if(corporateCustomer.AuthorizationType == payload.AuthorizationType)
+                {
+                    return BadRequest("Corporate Customer Authorization Type already exist");
+                }
+               
+                if(corporateCustomer.AuthorizationType == nameof(AuthorizationType.Multiple_Signatory) && payload.AuthorizationType == nameof(AuthorizationType.Single_Signatory))
+                {
+                    if(string.IsNullOrEmpty(payload.ProfileId.ToString()))
                     {
-                        return BadRequest("Minimum account limit is invalid");
+                        return BadRequest("Sole Signatory for corporate customer is not selected");
+                    }
+                    var corporateProfile = UnitOfWork.CorporateProfileRepo.GetByIdAsync((Guid)payload?.ProfileId);
+                    if(corporateProfile == null) 
+                    {
+                        return BadRequest("invalid Sole Signatory Id");
                     }
 
-                    if (payload.MaxAccountLimit == 0)
+                    if(corporateProfile.CorporateCustomerId != corporateCustomer.Id)
                     {
-                        return BadRequest("Maximum account limit must be greater than 0");
-                    }
-
-                    if (payload.MinAccountLimit > payload.MaxAccountLimit)
-                    {
-                        return BadRequest("Minimum account limit must not be greater than Maximum account limit");
+                        return BadRequest("Selected Sole Signatory doesnot belong to this corporate customer");
                     }
                 }
-                if(payload.MaxAccountLimit > payload.SingleTransDailyLimit)
-                {
-                    return BadRequest("Maximum Limit per Transaction can not be greater than accumulative single daily Limit");
-                }
 
-                if(payload.MinAccountLimit < 1)
+                var tempCustomer = new TblTempCorporateCustomer
                 {
-                    return BadRequest("MinAccountLimit can not be less than 1");
-                }
-
-                if(payload.MinAccountLimit > payload.MaxAccountLimit)
-                {
-                    return BadRequest("MinAccountLimit can not be greater MaxAccountLimit");
-                }
-
-                if(payload.MaxAccountLimit > payload.BulkTransDailyLimit)
-                {
-                    return BadRequest("Maximum Limit per Transaction can not be greater than accumulative bulk daily Limit");
-                }
+                    Id = Guid.NewGuid(),
+                    CorporateCustomerId = payload?.CorporateCustomerId,
+                    AuthorizationType = payload?.AuthorizationType,
+                    CompanyName = corporateCustomer.CompanyName,
+                    CorporateProfileId = payload.ProfileId != null ?  payload.ProfileId : null,
+                    CorporateRoleId = payload?.AuthorizationType == nameof(AuthorizationType.Multiple_Signatory) ? (Guid)payload?.CorporateRole : null,
+                    CustomerId = corporateCustomer.CustomerId,
+                    Status = (int) ProfileStatus.Modified,
+                    PreviousStatus = (int) corporateCustomer.Status,
+                    IsTreated = (int) ProfileStatus.Pending,
+                    InitiatorId = BankProfile.Id,
+                    InitiatorUsername = UserName,
+                    DateRequested = DateTime.Now,
+                    Action = nameof(TempTableAction.Change_Account_Signatory).Replace("_", " ")
+                };
+                corporateCustomer.Status = (int) ProfileStatus.Modified;
+                UnitOfWork.TemCorporateCustomerRepo.Add(tempCustomer);
+                UnitOfWork.CorporateCustomerRepo.UpdateCorporateCustomer(corporateCustomer);
+                UnitOfWork.Complete();
                 return Ok(true);
             }
             catch (Exception ex)
@@ -692,7 +751,36 @@ namespace CIB.BankAdmin.Controllers
             }
         }
        
-
-   
-   }
+        [HttpGet("CorporateCustomerSignatoryChange")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        public ActionResult<bool> CorporateCustomerSignatoryChange(string CompanyName = null, string AuthorizationType = null)
+        {
+            try
+            {
+                string? companyName = "";
+                string? authurizationType = "";
+                if (!string.IsNullOrEmpty(AuthorizationType))
+                {
+                    authurizationType = Encryption.DecryptStrings(AuthorizationType);
+                }
+                if (!string.IsNullOrEmpty(CompanyName))
+                {
+                    companyName = Encryption.DecryptStrings(CompanyName);
+                }
+               
+                if(!string.IsNullOrEmpty(authurizationType) || !string.IsNullOrEmpty(companyName))
+                {
+                    var filterCustomer = _unitOfWork.CorporateCustomerRepo.Search(companyName, authurizationType)?.ToList();
+                    return Ok(filterCustomer);
+                }
+                var allCustomers= _unitOfWork.CorporateCustomerRepo.GetCorporateCustomerWhoChangeSigntory()?.ToList();
+                return Ok(allCustomers);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("SERVER ERROR {0}, {1}, {2}",Formater.JsonType(ex.StackTrace), Formater.JsonType(ex.Source), Formater.JsonType(ex.Message));
+                return ex.InnerException != null ? BadRequest(new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: ex.InnerException.Message, responseStatus:false)) : StatusCode(500, new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: ex.InnerException != null ? ex.InnerException.Message : ex.Message, responseStatus:false));
+            }
+        }
+    }
 }

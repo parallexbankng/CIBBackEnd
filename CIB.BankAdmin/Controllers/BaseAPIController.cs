@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using CIB.Core.Common.Interface;
 using CIB.Core.Entities;
+using CIB.Core.Services.Authentication;
 using CIB.Core.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -20,7 +21,9 @@ namespace CIB.BankAdmin.Controllers
         protected readonly IHttpContextAccessor _accessor;
         protected readonly IMapper _mapper;
         protected readonly IUnitOfWork _unitOfWork;
+         private readonly IAuthenticationService _authService;
         private string username;
+         private string userId;
         private string CustomerId;
 
         /// <summary>
@@ -29,11 +32,12 @@ namespace CIB.BankAdmin.Controllers
         /// <param name="mapper">A CIB UnitOfWork object</param>
         /// <param name="unitOfWork">A CIB UnitOfWork object</param>
         /// <param name="accessor"> Accessor </param>
-        public BaseAPIController(IMapper mapper,IUnitOfWork unitOfWork, IHttpContextAccessor accessor)
+        public BaseAPIController(IMapper mapper,IUnitOfWork unitOfWork, IHttpContextAccessor accessor,IAuthenticationService authService)
         {
             this._mapper = mapper;
             this._accessor = accessor;
             this._unitOfWork = unitOfWork;
+            this._authService = authService;
         }
 
         protected IUnitOfWork UnitOfWork
@@ -46,14 +50,22 @@ namespace CIB.BankAdmin.Controllers
             get { return _mapper; }
         }
 
+        protected IAuthenticationService AuthService
+        {
+            get
+            {
+                return _authService;
+            }
+        }
+
         protected TblBankProfile BankProfile
         {
             get
             {
                 if((bankProfile == null && CustomerId?.Length == 0) || CustomerId == null)
                 {
-                    if(UserName != null){
-                        bankProfile = UnitOfWork.BankProfileRepo.GetProfileByUserName(UserName.Trim());
+                    if(UserId != null){
+                        bankProfile = UnitOfWork.BankProfileRepo.GetByIdAsync(Guid.Parse(userId));
                         if(bankProfile != null)
                         {
                            // string token = HttpContext.GetToken();
@@ -67,8 +79,12 @@ namespace CIB.BankAdmin.Controllers
                             var token = items.Where(x => x.Key.ToString() == "token")?.FirstOrDefault().Value?.ToString();
                             if (!string.IsNullOrEmpty(token))
                             {
+                                var result = _authService.GetPrincipalFromExpiredToken(token);
+                                if(result is null){
+                                    return null;
+                                }
                                 bool isTokenStillValid = _unitOfWork.TokenBlackRepo.IsTokenStillValid(bankProfile.Id, token);
-                                bankProfile = isTokenStillValid ? bankProfile : null;
+                                bankProfile = isTokenStillValid == true ? bankProfile : null;
                             }
                             else
                             {
@@ -104,11 +120,40 @@ namespace CIB.BankAdmin.Controllers
                         {
                             return string.Empty;
                         }
-                        username = usernameClaim.Value;
-                        CustomerId = claim.FirstOrDefault(x => x.Type == "CustomerID").Value;
+                        username =  BankProfile?.Username;
+                        //CustomerId = claim.FirstOrDefault(x => x.Type == "CustomerID").Value;
                     }
                 }
                 return username;
+            }
+        }
+
+
+        protected string UserId
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(username))
+                {
+                    if (HttpContext.User == null)
+                    {
+                        return string.Empty;
+                    }
+                    var identity = HttpContext.User.Identity as ClaimsIdentity;
+                    // Gets list of claims.
+                    IEnumerable<Claim> claim = identity.Claims;
+                    if (claim != null)
+                    {
+                        var usernameClaim = claim.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier);
+                        if (usernameClaim == null)
+                        {
+                            return string.Empty;
+                        }
+                        userId =  usernameClaim.Value;
+                        //CustomerId = claim.FirstOrDefault(x => x.Type == "CustomerID").Value;
+                    }
+                }
+                return userId;
             }
         }
 

@@ -25,6 +25,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using CIB.Core.Common.Dto;
+using CIB.Core.Services.Authentication.Dto;
+using CIB.Core.Services.Authentication;
+using CIB.Core.Common;
+using System.Security.Claims;
+using System.Linq;
+using System.IO;
 
 namespace CIB.BankAdmin.Controllers
 {
@@ -37,12 +43,20 @@ namespace CIB.BankAdmin.Controllers
         protected readonly IApiService _apiService;
         protected readonly IToken2faService _2fa;
         private readonly ILogger<AccountController> _logger;
-        public AccountController(ILogger<AccountController> _logger,IConfiguration config, IUnitOfWork unitOfWork,IMapper mapper,IEmailService emailService,IApiService apiService,IHttpContextAccessor accessor,IToken2faService _2fa):base(mapper,unitOfWork,accessor)
+        public AccountController(
+            ILogger<AccountController> _logger,
+            IConfiguration config,
+            IUnitOfWork unitOfWork,
+            IMapper mapper,
+            IEmailService emailService,
+            IApiService apiService,
+            IHttpContextAccessor accessor,
+            IToken2faService _2fa, IAuthenticationService authService) : base(mapper, unitOfWork, accessor, authService)
         {
             _config = config;
             _emailService = emailService;
             _apiService = apiService;
-            this._2fa = _2fa; 
+            this._2fa = _2fa;
             this._logger = _logger;
         }
 
@@ -57,15 +71,25 @@ namespace CIB.BankAdmin.Controllers
         // <response code="400">If the item is null </response> 
         [AllowAnonymous]
         [HttpPost("Login")]
-        public async Task<ActionResult<LoginResponsedata>> BankUserLogin([FromBody] BankUserLoginParam login)
+        public async Task<ActionResult<LoginResponsedata>> BankUserLogin([FromBody] GenericRequestDto login)
         {
             try
             {
+                if (string.IsNullOrEmpty(login.Data))
+                {
+                    return BadRequest("invalid request");
+                }
+
+                var requestData = JsonConvert.DeserializeObject<UserData>(Encryption.DecryptStrings(login.Data));
+                if (requestData == null)
+                {
+                    return BadRequest("invalid request data");
+                }
                 var payLoad = new BankUserLoginParam
                 {
-                    Username = Encryption.DecryptStrings(login.Username),
-                    Password =  Uri.EscapeDataString(Encryption.DecryptStrings(login.Password)),
-                    Token = Encryption.DecryptStrings(login.Token),
+                    Username = requestData.Username,
+                    Password = requestData.Password,
+                    Token = requestData.Token,
                     ClientStaffIPAddress = Encryption.DecryptStrings(login.ClientStaffIPAddress),
                     IPAddress = Encryption.DecryptStrings(login.IPAddress),
                     MACAddress = Encryption.DecryptStrings(login.MACAddress),
@@ -77,17 +101,26 @@ namespace CIB.BankAdmin.Controllers
                 if (!results.IsValid)
                 {
                     _logger.LogInformation("Invalid Request Data {0}", results);
-                    return UnprocessableEntity(new ValidatorResponse(_data: new Object (), _success: false,  _validationResult: results.Errors));
+                    return UnprocessableEntity(new ValidatorResponse(_data: new Object(), _success: false, _validationResult: results.Errors));
                 }
-                
+
                 //TODO REQUEST ACTIVE DIRECTOR API
-                if(payLoad.Token != "0000")
+                if (payLoad.Token != "0000")
                 {
-                    var authResult = await _apiService.ADLogin(payLoad.Username, login.Password);
-                    payLoad.Password = "";
-                    if(!authResult.IsAuthenticated)
+                    var userName = $"{payLoad.Username}";
+                    var validOTP = await _2fa.TokenAuth(userName, payLoad.Token);
+                    if (validOTP.ResponseCode != "00")
                     {
-                        _logger.LogInformation("AD Authentication Failed {0}",JsonConvert.SerializeObject(authResult));
+                        _logger.LogError("2FA API ERROR {0}", $"{validOTP.ResponseMessage}");
+                        return BadRequest(validOTP.ResponseMessage);
+                    }
+
+                    var authResult = await _apiService.ADLogin(payLoad.Username, payLoad.Password);
+                    payLoad.Password = "";
+                    payLoad.Token = "";
+                    if (!authResult.IsAuthenticated)
+                    {
+                        _logger.LogInformation("AD Authentication Failed {0}", JsonConvert.SerializeObject(authResult));
                         var bankUser = UnitOfWork.BankAuthenticationRepo.BankUserLogin(payLoad);
                         if (bankUser == null)
                         {
@@ -96,6 +129,7 @@ namespace CIB.BankAdmin.Controllers
                         }
                         if (bankUser.NoOfWrongAttempts == 3 || bankUser.NoOfWrongAttempts > 3)
                         {
+
                             bankUser.ReasonsForDeactivation = "Multiple incorrect login attempt";
                             bankUser.Status = -1;
                             var auditt = new TblAuditTrail
@@ -148,22 +182,24 @@ namespace CIB.BankAdmin.Controllers
                         return BadRequest(new LoginResponsedata { Responsecode = "11", ResponseDescription = "Invalid login attempt", UserpasswordChanged = 0, CustomerIdentity = "" });
                     }
                 }
-               
+
                 var cusauth = UnitOfWork.BankAuthenticationRepo.BankUserLogin(payLoad);
                 if (cusauth == null)
                 {
                     payLoad.Password = "";
+                    payLoad.Token = "";
                     _logger.LogInformation("you are not profile on this application, Please Contact Bank Admin {0}", JsonConvert.SerializeObject(payLoad));
                     return BadRequest(new LoginResponsedata { Responsecode = ResponseCode.NOT_PROFILE, ResponseDescription = "you are not profile on this application, Please Contact Bank Admin", UserpasswordChanged = 0, CustomerIdentity = "" });
                 }
 
                 //TODO: To be taken out before sent to the bank
-                if(payLoad.Token.Equals("0000"))
+                if (payLoad.Token.Equals("0000"))
                 {
                     string emppass = Encryption.OpenSSLDecrypt(cusauth.Password, Encryption.GetEncrptionKey());
                     if (emppass != payLoad.Password)
                     {
                         payLoad.Password = "";
+                        payLoad.Token = "";
                         int wrontloginatempt = cusauth.NoOfWrongAttempts ?? 0;
                         cusauth.NoOfWrongAttempts = wrontloginatempt + 1;
                         cusauth.LastLoginAttempt = DateTime.Now;
@@ -187,13 +223,12 @@ namespace CIB.BankAdmin.Controllers
                         UnitOfWork.AuditTrialRepo.Add(auditt);
                         UnitOfWork.BankProfileRepo.UpdateBankProfile(cusauth);
                         UnitOfWork.Complete();
-                        payLoad.Password ="";
+                        payLoad.Password = "";
                         _logger.LogInformation("Invalid login attempt {0}", JsonConvert.SerializeObject(payLoad));
                         return BadRequest(new LoginResponsedata { Responsecode = ResponseCode.INVALID_ATTEMPT, ResponseDescription = "Invalid login attempt", UserpasswordChanged = 0, CustomerIdentity = "" });
                     }
                 }
-               
-                // generobj.WriteError("8a GET HERE AT  " + DateTime.Now.ToString());
+
                 if (cusauth.Status == (int)ProfileStatus.Deactivated)
                 {
                     payLoad.Password = "";
@@ -245,9 +280,9 @@ namespace CIB.BankAdmin.Controllers
                     UnitOfWork.BankProfileRepo.UpdateBankProfile(cusauth);
                     UnitOfWork.Complete();
                     _logger.LogInformation("Login Attempt Failure. Multiple incorrect login {0}", JsonConvert.SerializeObject(payLoad));
-                    return BadRequest(new LoginResponsedata { Responsecode = ResponseCode.DEACTIVATED_PROFILE , ResponseDescription = "Sorry, your profile has been deactivated, please contact our support team", UserpasswordChanged = 0, CustomerIdentity = "" });
+                    return BadRequest(new LoginResponsedata { Responsecode = ResponseCode.DEACTIVATED_PROFILE, ResponseDescription = "Sorry, your profile has been deactivated, please contact our support team", UserpasswordChanged = 0, CustomerIdentity = "" });
                 }
-                  
+
                 //check if last activity (90 days)
                 if (cusauth.LastActivity != null && cusauth.LastActivity.Value < DateTime.Now.AddDays(-90))
                 {
@@ -274,7 +309,7 @@ namespace CIB.BankAdmin.Controllers
                     UnitOfWork.AuditTrialRepo.Add(audit);
                     UnitOfWork.Complete();
                     _logger.LogInformation("we noticed your account has been inactive for about 90 days and has been suspended. Please contact your bank admin. {0}", JsonConvert.SerializeObject(payLoad));
-                    return BadRequest(new LoginResponsedata { Responsecode =  ResponseCode.INACTIVE_ACCOUNT, ResponseDescription = "Sorry, we noticed your account has been inactive for about 90 days and has been suspended. Please contact your bank admin.", UserpasswordChanged = cusauth.Passwordchanged ?? 0, CustomerIdentity = "" });
+                    return BadRequest(new LoginResponsedata { Responsecode = ResponseCode.INACTIVE_ACCOUNT, ResponseDescription = "Sorry, we noticed your account has been inactive for about 90 days and has been suspended. Please contact your bank admin.", UserpasswordChanged = cusauth.Passwordchanged ?? 0, CustomerIdentity = "" });
                 }
                 // if(payLoad.Token != "0000" || payLoad.Token !="12345")
                 // {
@@ -290,6 +325,7 @@ namespace CIB.BankAdmin.Controllers
                     mykn.IsBlack = 1;
                     UnitOfWork.TokenBlackRepo.UpdateTokenBlack(mykn);
                 }
+                payLoad.Password = "";
                 //UnitOfWork.TokenBlackCorporateRepo.RemoveRange((IEnumerable<TblTokenBlackCorp>)tokenBlack);
                 string lastlogindate;
                 if (cusauth.LastLogin == null)
@@ -306,12 +342,14 @@ namespace CIB.BankAdmin.Controllers
                 int passswchanged = cusauth.Passwordchanged ?? 0;
                 var corpmodel = new CorporateUserModel
                 {
+                    UserId = cusauth.Id.ToString(),
                     Username = cusauth.Username,
                     FullName = cusauth.FirstName,
                     Email = cusauth.Email,
                     Phone1 = cusauth.Phone
                 };
-                var Tokenstring = TokenGenerator.GenerateJSONWebToken(corpmodel,_config);
+                //var Tokenstring = TokenGenerator.GenerateJSONWebToken(corpmodel,_config);
+                var tokenstring = AuthService.JWTAuthentication(corpmodel);
                 var loginlog = new TblLoginLogCorp
                 {
                     Id = Guid.NewGuid(),
@@ -320,12 +358,16 @@ namespace CIB.BankAdmin.Controllers
                     NotificationStatus = 0,
                     Channel = "Web"
                 };
+
+                tokenstring.RefreshToken = AuthService.GenerateRefreshToken();
                 var tknblack = new TblTokenBlack
                 {
                     Id = Guid.NewGuid(),
                     CustAutId = cusauth.Id,
-                    TokenCode = Tokenstring.Trim(),
+                    TokenCode = tokenstring.Token.Trim(),
                     DateGenerated = DateTime.Now,
+                    RefreshToken = tokenstring.RefreshToken.Trim(),
+                    RefreshTokenExpiryTime = DateTime.Now.AddHours(24),
                     IsBlack = 0
                 };
                 cusauth.LastLogin = DateTime.Now;
@@ -353,6 +395,8 @@ namespace CIB.BankAdmin.Controllers
                     TimeStamp = DateTime.Now
                 };
 
+                string filePath = Path.Combine("htmlTemplate", "CustomerLogin.html");
+
                 UnitOfWork.TokenBlackRepo.Add(tknblack);
                 UnitOfWork.AuditTrialRepo.Add(auditTrail);
                 UnitOfWork.LoginLogCorporate.Add(loginlog);
@@ -361,33 +405,38 @@ namespace CIB.BankAdmin.Controllers
                 _logger.LogInformation("Login Attempt Successful. {0}", Formater.JsonType(payLoad));
                 //int isIndemnitySigned = cusauth.IndemnitySigned ?? 0;
                 var fullName = cusauth.LastName + " " + cusauth.MiddleName + " " + cusauth.FirstName;
-                ThreadPool.QueueUserWorkItem(_ => _emailService.SendEmail(EmailTemplate.LoginMail(cusauth.Email, fullName, "")));
-                return Ok(new LoginResponsedata
+                ThreadPool.QueueUserWorkItem(_ => _emailService.SendEmail(EmailTemplate.LoginMail(cusauth.Email, fullName, filePath)));
+                var dto = JsonConvert.SerializeObject(new LoginDto
                 {
-                    Responsecode = ResponseCode.SUCCESS,
-                    ResponseDescription = Message.Success,
-                    UserId = cusauth.Id,
-                    UserpasswordChanged = passswchanged,
-                    CustomerIdentity = cusauth.Username,
-                    Phone = cusauth.Phone,
-                    SecurityQuestion = "",
-                    LastLoginDate = lastlogindate,
-                    access_token = Tokenstring,
-                    //IndemnitySigned = isIndemnitySigned, 
-                    RegStage = cusauth.RegStage,
-                    Status = cusauth.Status,
-                    RoleId = cusauth.UserRoles,
-                    Role = UnitOfWork.RoleRepo.GetRoleName(cusauth.UserRoles),
-                    Permissions =  UnitOfWork.UserAccessRepo.GetUserPermissions(cusauth.UserRoles?.ToString())
+                    responsecode = ResponseCode.SUCCESS,
+                    responseDescription = Message.Success,
+                    access_token = tokenstring.Token.Trim(),
+                    refresh_token = tokenstring.RefreshToken.Trim(),
+                    userId = cusauth.Id,
+                    userpasswordChanged = passswchanged,
+                    customerIdentity = cusauth.Username,
+                    phone = cusauth.Phone,
+                    securityQuestion = "",
+                    lastLoginDate = lastlogindate,
+                    regStage = cusauth.RegStage,
+                    status = cusauth.Status,
+                    roleId = cusauth.UserRoles,
+                    role = UnitOfWork.RoleRepo.GetRoleName(cusauth.UserRoles),
+
+                });
+                return Ok(new
+                {
+                    Data = Encryption.EncryptStrings(dto),
+                    Permissions = UnitOfWork.UserAccessRepo.GetUserPermissions(cusauth.UserRoles?.ToString())
                 });
             }
-           catch (Exception ex)
+            catch (Exception ex)
             {
-                _logger.LogError("SERVER ERROR {0}, {1}, {2}",Formater.JsonType(ex.StackTrace), Formater.JsonType(ex.Source), Formater.JsonType(ex.Message));
-                return BadRequest(new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: Message.ServerError, responseStatus:false));
+                _logger.LogError("SERVER ERROR {0}, {1}, {2}", Formater.JsonType(ex.StackTrace), Formater.JsonType(ex.Source), Formater.JsonType(ex.Message));
+                return BadRequest(new ErrorResponse(responsecode: ResponseCode.SERVER_ERROR, responseDescription: Message.ServerError, responseStatus: false));
             }
 
-               
+
         }
         // <summary>
         // Forgot Password
@@ -400,7 +449,7 @@ namespace CIB.BankAdmin.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult<bool> ForgetPassword([FromBody] ForgetPassword model)
         {
-        try
+            try
             {
                 bool isSent = false;
 
@@ -458,20 +507,20 @@ namespace CIB.BankAdmin.Controllers
                 UnitOfWork.PasswordResetRepo.Add(tblPasswordReset);
                 UnitOfWork.Complete();
                 string fullName = entity.LastName + " " + entity.MiddleName + " " + entity.FirstName;
-                ThreadPool.QueueUserWorkItem(_ => _emailService.SendEmail(EmailTemplate.PasswordResetMail(entity.Email,fullName,code)));
+                ThreadPool.QueueUserWorkItem(_ => _emailService.SendEmail(EmailTemplate.PasswordResetMail(entity.Email, fullName, code)));
                 isSent = true;
                 return Ok(isSent);
             }
             catch (DbUpdateException ex)
             {
                 var sqlException = ex.InnerException.InnerException;
-                _logger.LogError("DATABASE ERROR:",Formater.JsonType(sqlException));
-                return BadRequest(new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: Message.ServerError, responseStatus:false));
+                _logger.LogError("DATABASE ERROR:", Formater.JsonType(sqlException));
+                return BadRequest(new ErrorResponse(responsecode: ResponseCode.SERVER_ERROR, responseDescription: Message.ServerError, responseStatus: false));
             }
             catch (Exception ex)
             {
-               _logger.LogError("SERVER ERROR {0}, {1}, {2}",Formater.JsonType(ex.StackTrace), Formater.JsonType(ex.Source), Formater.JsonType(ex.Message));
-                return BadRequest(new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: Message.ServerError, responseStatus:false));
+                _logger.LogError("SERVER ERROR {0}, {1}, {2}", Formater.JsonType(ex.StackTrace), Formater.JsonType(ex.Source), Formater.JsonType(ex.Message));
+                return BadRequest(new ErrorResponse(responsecode: ResponseCode.SERVER_ERROR, responseDescription: Message.ServerError, responseStatus: false));
             }
         }
         // <summary>
@@ -481,80 +530,80 @@ namespace CIB.BankAdmin.Controllers
         // <returns>Returns a boolean value indicating where the password reset was successful  </returns>
         // <response code="200">Returns a boolean value indicating where the password reset was successful</response>
         // <response code="400">If the item is null </response>     
-        [HttpPut("ResetPassword")]
+        [HttpPost("ResetPassword")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult<bool> ResetPassword(ResetPasswordModel model)
         {
             try
+            {
+                bool isSent = false;
+
+                if (model == null)
                 {
-                    bool isSent = false;
+                    return BadRequest("Invalid model");
+                }
+                var payload = new ResetPasswordModel
+                {
+                    Email = Encryption.DecryptStrings(model.Email),
+                    Password = Encryption.DecryptStrings(model.Password),
+                    Code = Encryption.DecryptStrings(model.Code),
+                    ClientStaffIPAddress = Encryption.DecryptStrings(model.ClientStaffIPAddress),
+                    IPAddress = Encryption.DecryptStrings(model.IPAddress),
+                    MACAddress = Encryption.DecryptStrings(model.MACAddress),
+                    HostName = Encryption.DecryptStrings(model.HostName),
+                };
 
-                    if (model == null)
-                    {
-                        return BadRequest("Invalid model");
-                    }
-                    var payload = new ResetPasswordModel
-                    {
-                        Email = Encryption.DecryptStrings(model.Email),
-                        Password = Encryption.DecryptStrings(model.Password),
-                        Code = Encryption.DecryptStrings(model.Code),
-                        ClientStaffIPAddress = Encryption.DecryptStrings(model.ClientStaffIPAddress),
-                        IPAddress =  Encryption.DecryptStrings(model.IPAddress),
-                        MACAddress =  Encryption.DecryptStrings(model.MACAddress),
-                        HostName =  Encryption.DecryptStrings(model.HostName),
-                    };
-
-                    var entity = UnitOfWork.BankProfileRepo.GetProfileByEmail(payload.Email);
-                    if (entity == null)
-                    {
-                        return BadRequest("Invalid Email");
-                    }
-                    var currentDate = DateTime.Now;
-                    var tblPasswordReset = UnitOfWork.PasswordResetRepo.Find(x => x.AuthId.Equals(entity.Id) && x.ResetCode.Equals(model.Code) && x.Status == 0 && x.DateGenerated.Value.AddDays(24).AddMinutes(-1) > currentDate);
-                    if(tblPasswordReset == null)
-                    {
-                        return BadRequest("Invalid or expired code");
-                    }
-                    tblPasswordReset.Status = 1;
-                    tblPasswordReset.ResetDate = currentDate;
-                    entity.Password = Encryption.EncriptPassword(payload.Password);
-                    var auditTrail = new TblAuditTrail
-                    {
-                        Id = Guid.NewGuid(),
-                        ActionCarriedOut = nameof(AuditTrailAction.Password_Reset),
-                        Ipaddress = payload.IPAddress,
-                        ClientStaffIpaddress = payload.ClientStaffIPAddress,
-                        Macaddress = payload.MACAddress,
-                        HostName = payload.HostName,
-                        NewFieldValue = $"First Name: {entity.FirstName}, Last Name: {entity.LastName}, Username: {entity.Username}, Email Address:  {entity.Email}, " +
-                        $"Middle Name: {entity.MiddleName}, Phone Number: {entity.Phone}",
-                        PreviousFieldValue = "",
-                        TransactionId = "",
-                        UserId = entity.Id,
-                        Username = entity.Username,
-                        Description = "Password reset successful. New password created",
-                        TimeStamp = DateTime.Now
-                    };
-                    UnitOfWork.PasswordResetRepo.Add(tblPasswordReset);
-                    UnitOfWork.AuditTrialRepo.Add(auditTrail);
-                    UnitOfWork.BankProfileRepo.UpdateBankProfile(entity);
-                    UnitOfWork.Complete();
-                    //send reset password code
-                    string fullName = entity.LastName + " " + entity.MiddleName + " " + entity.FirstName;
-                    ThreadPool.QueueUserWorkItem(_ =>_emailService.SendEmail(EmailTemplate.PasswordResetChangeMail(entity.Email,fullName)));
-                    isSent = true;
-                    return Ok(isSent);
+                var entity = UnitOfWork.BankProfileRepo.GetProfileByEmail(payload.Email);
+                if (entity == null)
+                {
+                    return BadRequest("Invalid Email");
+                }
+                var currentDate = DateTime.Now;
+                var tblPasswordReset = UnitOfWork.PasswordResetRepo.Find(x => x.AuthId.Equals(entity.Id) && x.ResetCode.Equals(model.Code) && x.Status == 0 && x.DateGenerated.Value.AddDays(24).AddMinutes(-1) > currentDate);
+                if (tblPasswordReset == null)
+                {
+                    return BadRequest("Invalid or expired code");
+                }
+                tblPasswordReset.Status = 1;
+                tblPasswordReset.ResetDate = currentDate;
+                entity.Password = Encryption.EncriptPassword(payload.Password);
+                var auditTrail = new TblAuditTrail
+                {
+                    Id = Guid.NewGuid(),
+                    ActionCarriedOut = nameof(AuditTrailAction.Password_Reset),
+                    Ipaddress = payload.IPAddress,
+                    ClientStaffIpaddress = payload.ClientStaffIPAddress,
+                    Macaddress = payload.MACAddress,
+                    HostName = payload.HostName,
+                    NewFieldValue = $"First Name: {entity.FirstName}, Last Name: {entity.LastName}, Username: {entity.Username}, Email Address:  {entity.Email}, " +
+                    $"Middle Name: {entity.MiddleName}, Phone Number: {entity.Phone}",
+                    PreviousFieldValue = "",
+                    TransactionId = "",
+                    UserId = entity.Id,
+                    Username = entity.Username,
+                    Description = "Password reset successful. New password created",
+                    TimeStamp = DateTime.Now
+                };
+                UnitOfWork.PasswordResetRepo.Add(tblPasswordReset);
+                UnitOfWork.AuditTrialRepo.Add(auditTrail);
+                UnitOfWork.BankProfileRepo.UpdateBankProfile(entity);
+                UnitOfWork.Complete();
+                //send reset password code
+                string fullName = entity.LastName + " " + entity.MiddleName + " " + entity.FirstName;
+                ThreadPool.QueueUserWorkItem(_ => _emailService.SendEmail(EmailTemplate.PasswordResetChangeMail(entity.Email, fullName)));
+                isSent = true;
+                return Ok(isSent);
             }
             catch (DbUpdateException ex)
             {
                 var sqlException = ex.InnerException.InnerException;
-                _logger.LogError("DATABASE ERROR:",Formater.JsonType(sqlException));
-                return BadRequest(new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: Message.ServerError, responseStatus:false));
+                _logger.LogError("DATABASE ERROR:", Formater.JsonType(sqlException));
+                return BadRequest(new ErrorResponse(responsecode: ResponseCode.SERVER_ERROR, responseDescription: Message.ServerError, responseStatus: false));
             }
             catch (Exception ex)
             {
-               _logger.LogError("SERVER ERROR {0}, {1}, {2}",Formater.JsonType(ex.StackTrace), Formater.JsonType(ex.Source), Formater.JsonType(ex.Message));
-                return BadRequest(new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: Message.ServerError, responseStatus:false));
+                _logger.LogError("SERVER ERROR {0}, {1}, {2}", Formater.JsonType(ex.StackTrace), Formater.JsonType(ex.Source), Formater.JsonType(ex.Message));
+                return BadRequest(new ErrorResponse(responsecode: ResponseCode.SERVER_ERROR, responseDescription: Message.ServerError, responseStatus: false));
             }
         }
         // <summary>
@@ -576,18 +625,18 @@ namespace CIB.BankAdmin.Controllers
                     return BadRequest("Current password or username is invalid");
                 }
                 var mapResponse = _mapper.Map<List<SecurityQuestionResponseDto>>(entity);
-                return Ok(new ListResponseDTO<SecurityQuestionResponseDto>(_data:mapResponse,success:true, _message:Message.Success) );
+                return Ok(new ListResponseDTO<SecurityQuestionResponseDto>(_data: mapResponse, success: true, _message: Message.Success));
             }
             catch (DbUpdateException ex)
             {
                 var sqlException = ex.InnerException.InnerException;
-                _logger.LogError("DATABASE ERROR:",Formater.JsonType(sqlException));
-                return BadRequest(new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: Message.ServerError, responseStatus:false));
+                _logger.LogError("DATABASE ERROR:", Formater.JsonType(sqlException));
+                return BadRequest(new ErrorResponse(responsecode: ResponseCode.SERVER_ERROR, responseDescription: Message.ServerError, responseStatus: false));
             }
             catch (Exception ex)
             {
-                _logger.LogError("SERVER ERROR {0}, {1}, {2}",Formater.JsonType(ex.StackTrace), Formater.JsonType(ex.Source), Formater.JsonType(ex.Message));
-                return BadRequest(new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: Message.ServerError, responseStatus:false));
+                _logger.LogError("SERVER ERROR {0}, {1}, {2}", Formater.JsonType(ex.StackTrace), Formater.JsonType(ex.Source), Formater.JsonType(ex.Message));
+                return BadRequest(new ErrorResponse(responsecode: ResponseCode.SERVER_ERROR, responseDescription: Message.ServerError, responseStatus: false));
             }
         }
         [HttpGet("GetProfileSecurityQuestions")]
@@ -618,8 +667,8 @@ namespace CIB.BankAdmin.Controllers
             }
             catch (Exception ex)
             {
-             _logger.LogError("SERVER ERROR {0}, {1}, {2}",Formater.JsonType(ex.StackTrace), Formater.JsonType(ex.Source), Formater.JsonType(ex.Message));
-                return BadRequest(new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: Message.ServerError, responseStatus:false));
+                _logger.LogError("SERVER ERROR {0}, {1}, {2}", Formater.JsonType(ex.StackTrace), Formater.JsonType(ex.Source), Formater.JsonType(ex.Message));
+                return BadRequest(new ErrorResponse(responsecode: ResponseCode.SERVER_ERROR, responseDescription: Message.ServerError, responseStatus: false));
             }
         }
         /// <summary>
@@ -631,7 +680,7 @@ namespace CIB.BankAdmin.Controllers
         /// <response code="400">If the item is null </response>
         [HttpPut("SetSecurityQuestion")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async  Task<ActionResult<bool>> SetSecurityQuestion([FromBody] SetSecurityQuestionDto model)
+        public async Task<ActionResult<bool>> SetSecurityQuestion([FromBody] SetSecurityQuestionDto model)
         {
             string errorMsg = string.Empty;
             try
@@ -681,7 +730,7 @@ namespace CIB.BankAdmin.Controllers
                     Answer2 = Encryption.DecryptStrings(model.Answer2),
                     Answer3 = Encryption.DecryptStrings(model.Answer3),
                     CustomerId = Encryption.DecryptStrings(model.CustomerId),
-                    Password =  Uri.EscapeDataString(Encryption.DecryptStrings(model.Password)),
+                    Password = Uri.EscapeDataString(Encryption.DecryptStrings(model.Password)),
                     SecurityQuestionId = Encryption.DecryptInt(model.SecurityQuestionId),
                     SecurityQuestionId2 = Encryption.DecryptInt(model.SecurityQuestionId2),
                     SecurityQuestionId3 = Encryption.DecryptInt(model.SecurityQuestionId3),
@@ -726,9 +775,10 @@ namespace CIB.BankAdmin.Controllers
                 }
                 var authResult = await _apiService.ADLogin(payLoad.UserName, payLoad.Password);
                 var entity = UnitOfWork.BankProfileRepo.Find(x => x.Username.Equals(payLoad.UserName));
-                if(!authResult.IsAuthenticated)
+                if (!authResult.IsAuthenticated)
                 {
-                    if (entity == null) {
+                    if (entity == null)
+                    {
                         return Ok(new LoginResponsedata { Responsecode = "11", ResponseDescription = "Sorry, you have not been profile on this application, please contact our support team", UserpasswordChanged = 0, CustomerIdentity = "" });
                     }
                     if (entity.NoOfWrongAttempts == 3 || entity.NoOfWrongAttempts > 3)
@@ -788,16 +838,16 @@ namespace CIB.BankAdmin.Controllers
                 UnitOfWork.Complete();
                 return Ok(true);
             }
-           catch (DbUpdateException ex)
+            catch (DbUpdateException ex)
             {
                 var sqlException = ex.InnerException.InnerException;
-                _logger.LogError("DATABASE ERROR:",Formater.JsonType(sqlException));
-                return BadRequest(new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: Message.ServerError, responseStatus:false));
+                _logger.LogError("DATABASE ERROR:", Formater.JsonType(sqlException));
+                return BadRequest(new ErrorResponse(responsecode: ResponseCode.SERVER_ERROR, responseDescription: Message.ServerError, responseStatus: false));
             }
             catch (Exception ex)
             {
-                _logger.LogError("SERVER ERROR {0}, {1}, {2}",Formater.JsonType(ex.StackTrace), Formater.JsonType(ex.Source), Formater.JsonType(ex.Message));
-                return BadRequest(new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: Message.ServerError, responseStatus:false));
+                _logger.LogError("SERVER ERROR {0}, {1}, {2}", Formater.JsonType(ex.StackTrace), Formater.JsonType(ex.Source), Formater.JsonType(ex.Message));
+                return BadRequest(new ErrorResponse(responsecode: ResponseCode.SERVER_ERROR, responseDescription: Message.ServerError, responseStatus: false));
             }
         }
         // <summary>
@@ -809,7 +859,7 @@ namespace CIB.BankAdmin.Controllers
         // <response code="400">If the item is null </response>     
         [HttpPost("FirstLoginPasswordChange")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public ActionResult<bool> FirstLoginPasswordChange([FromBody]FirstLoginPasswordChangeModel  model)
+        public ActionResult<bool> FirstLoginPasswordChange([FromBody] FirstLoginPasswordChangeModel model)
         {
             try
             {
@@ -944,16 +994,16 @@ namespace CIB.BankAdmin.Controllers
             catch (DbUpdateException ex)
             {
                 var sqlException = ex.InnerException.InnerException;
-                _logger.LogError("DATABASE ERROR:",Formater.JsonType(sqlException));
-                return BadRequest(new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: Message.ServerError, responseStatus:false));
+                _logger.LogError("DATABASE ERROR:", Formater.JsonType(sqlException));
+                return BadRequest(new ErrorResponse(responsecode: ResponseCode.SERVER_ERROR, responseDescription: Message.ServerError, responseStatus: false));
             }
             catch (Exception ex)
             {
-               _logger.LogError("SERVER ERROR {0}, {1}, {2}",Formater.JsonType(ex.StackTrace), Formater.JsonType(ex.Source), Formater.JsonType(ex.Message));
-                return BadRequest(new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: Message.ServerError, responseStatus:false));
+                _logger.LogError("SERVER ERROR {0}, {1}, {2}", Formater.JsonType(ex.StackTrace), Formater.JsonType(ex.Source), Formater.JsonType(ex.Message));
+                return BadRequest(new ErrorResponse(responsecode: ResponseCode.SERVER_ERROR, responseDescription: Message.ServerError, responseStatus: false));
             }
         }
-    
+
         [HttpPost("LogOut")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult<bool> LogOut()
@@ -962,20 +1012,20 @@ namespace CIB.BankAdmin.Controllers
             {
                 if (!IsAuthenticated)
                 {
-                  return StatusCode(401, "User is not authenticated");
+                    return StatusCode(401, "User is not authenticated");
                 }
 
                 if (!IsUserActive(out string errorMsg))
                 {
                     return StatusCode(400, errorMsg);
                 }
-                if(BankProfile == null)
+                if (BankProfile == null)
                 {
                     return StatusCode(401, "User is not authenticated");
                 }
                 var removeToken = new List<TblTokenBlack>();
                 var tokenBlack = UnitOfWork.TokenBlackRepo.GetBlackTokenById(BankProfile.Id);
-                if(tokenBlack.Count != 0)
+                if (tokenBlack.Count != 0)
                 {
                     foreach (var mykn in tokenBlack)
                     {
@@ -983,10 +1033,20 @@ namespace CIB.BankAdmin.Controllers
                         removeToken.Add(mykn);
                     }
                 }
+                var userId = User.Identity.Name;
+                var user = UnitOfWork.TokenBlackRepo.GetTokenByUserId(Guid.Parse(userId));
+                if (user != null)
+                {
+                    user.RefreshTokenExpiryTime = null;
+                    user.IsBlack = 1;
+                    user.TokenCode = null;
+                    user.RefreshToken = null;
+                    UnitOfWork.TokenBlackRepo.UpdateTokenBlack(user);
+                }
 
                 if (removeToken.Count == 0)
                 {
-                  return Ok(true);
+                    return Ok(true);
                 }
 
                 UnitOfWork.TokenBlackRepo.RemoveRange(removeToken);
@@ -995,18 +1055,86 @@ namespace CIB.BankAdmin.Controllers
             }
             catch (DbUpdateException ex)
             {
-              if (ex.InnerException != null)
-              {
-                var sqlException = ex.InnerException.InnerException;
-                _logger.LogError("DATABASE ERROR:",Formater.JsonType(sqlException));
-              }
-              return BadRequest(new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: Message.ServerError, responseStatus:false));
+                if (ex.InnerException != null)
+                {
+                    var sqlException = ex.InnerException.InnerException;
+                    _logger.LogError("DATABASE ERROR:", Formater.JsonType(sqlException));
+                }
+                return BadRequest(new ErrorResponse(responsecode: ResponseCode.SERVER_ERROR, responseDescription: Message.ServerError, responseStatus: false));
             }
             catch (Exception ex)
             {
-               _logger.LogError("SERVER ERROR {0}, {1}, {2}",Formater.JsonType(ex.StackTrace), Formater.JsonType(ex.Source), Formater.JsonType(ex.Message));
-                return ex.InnerException != null ? BadRequest(new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: ex.InnerException.Message, responseStatus:false)) : StatusCode(500, new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: ex.InnerException != null ? ex.InnerException.Message : ex.Message, responseStatus:false));
+                _logger.LogError("SERVER ERROR {0}, {1}, {2}", Formater.JsonType(ex.StackTrace), Formater.JsonType(ex.Source), Formater.JsonType(ex.Message));
+                return ex.InnerException != null ? BadRequest(new ErrorResponse(responsecode: ResponseCode.SERVER_ERROR, responseDescription: ex.InnerException.Message, responseStatus: false)) : StatusCode(500, new ErrorResponse(responsecode: ResponseCode.SERVER_ERROR, responseDescription: ex.InnerException != null ? ex.InnerException.Message : ex.Message, responseStatus: false));
             }
+        }
+
+        [HttpPost("refresh")]
+        public IActionResult Refresh(Token token)
+        {
+            if (token is null) return BadRequest("Invalid client request");
+            string accessToken = token.access_token;
+            string refreshToken = token.refresh_token;
+            var principal = AuthService.GetPrincipalFromExpiredToken(accessToken);
+            if (principal is null) return BadRequest("Invalid token");
+            IEnumerable<Claim> claim = principal.Claims;
+            // var userId = ; //this is mapped to the Name claim by default
+
+            var usernameClaim = claim.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier);
+
+            var user = UnitOfWork.TokenBlackRepo.GetTokenByUserId(Guid.Parse(usernameClaim.Value));
+            if (user is null || user.RefreshToken != refreshToken || user.RefreshTokenExpiryTime <= DateTime.Now) return BadRequest("Invalid client request");
+
+            var cusauth = UnitOfWork.BankProfileRepo.GetByIdAsync(Guid.Parse(usernameClaim.Value));
+            if (cusauth is null) return BadRequest("Invalid client request");
+            var corpmodel = new CorporateUserModel
+            {
+                UserId = cusauth.Id.ToString(),
+                Username = cusauth.Username,
+                FullName = cusauth.FirstName + " " + cusauth.LastName,
+                Email = cusauth.Email,
+                Phone1 = cusauth.Phone
+            };
+            var newAccessToken = AuthService.JWTAuthentication(corpmodel);
+            var newRefreshToken = AuthService.GenerateRefreshToken();
+            user.TokenCode = newAccessToken.Token;
+            user.RefreshToken = newRefreshToken;
+            UnitOfWork.TokenBlackRepo.UpdateTokenBlack(user);
+            UnitOfWork.Complete();
+
+            return Ok(new LoginResponsedata
+            {
+                Responsecode = ResponseCode.SUCCESS,
+                ResponseDescription = Message.Success,
+                UserId = cusauth.Id,
+                CustomerIdentity = cusauth.Username,
+                Phone = cusauth.Phone,
+                SecurityQuestion = "",
+                access_token = newAccessToken.Token.Trim(),
+                refresh_token = newRefreshToken.Trim(),
+                //IndemnitySigned = isIndemnitySigned, 
+                RegStage = cusauth.RegStage,
+                Status = cusauth.Status,
+                RoleId = cusauth.UserRoles
+            });
+        }
+        [HttpPost("revoke")]
+        public IActionResult Revoke()
+        {
+            if (!IsAuthenticated)
+            {
+                return StatusCode(401, "User is not authenticated");
+            }
+            var userId = User.Identity.Name;
+            var user = UnitOfWork.TokenBlackRepo.GetTokenByUserId(Guid.Parse(userId));
+            if (user == null) return BadRequest();
+            user.RefreshTokenExpiryTime = null;
+            user.IsBlack = 1;
+            user.TokenCode = null;
+            user.RefreshToken = null;
+            UnitOfWork.TokenBlackRepo.UpdateTokenBlack(user);
+            UnitOfWork.Complete();
+            return NoContent();
         }
     }
 }

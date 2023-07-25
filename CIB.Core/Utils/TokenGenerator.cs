@@ -18,7 +18,7 @@ namespace CIB.Core.Utils
         public static string GenerateJSONWebToken(CorporateUserModel userInfo,IConfiguration _config)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Encryption.DecryptStrings(_config["Jwt:Key"])));
-            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
             var claims = new[] {
                 new Claim(JwtRegisteredClaimNames.Sub, userInfo.Username),
                 new Claim(JwtRegisteredClaimNames.Email, userInfo.Email),
@@ -33,7 +33,7 @@ namespace CIB.Core.Utils
                 Issuer = Encryption.DecryptStrings(_config["Jwt:Issuer"]),
                 Audience = Encryption.DecryptStrings(_config["Jwt:Issuer"]),
                 Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.UtcNow.AddMinutes(120),
+                Expires = DateTime.UtcNow.AddMinutes(15),
                 SigningCredentials = credentials
             };
             var tokenHandler = new JwtSecurityTokenHandler();

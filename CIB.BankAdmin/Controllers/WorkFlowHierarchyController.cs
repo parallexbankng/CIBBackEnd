@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
 using CIB.Core.Common;
 using CIB.Core.Common.Dto;
@@ -10,11 +9,11 @@ using CIB.Core.Common.Response;
 using CIB.Core.Entities;
 using CIB.Core.Enums;
 using CIB.Core.Modules.WorkflowHierarchy.Dto;
+using CIB.Core.Services.Authentication;
 using CIB.Core.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 
 namespace CIB.BankAdmin.Controllers
 {
@@ -23,7 +22,7 @@ namespace CIB.BankAdmin.Controllers
     public class WorkFlowHierarchyController : BaseAPIController
     {
         private readonly ILogger<WorkFlowHierarchyController> _logger;
-        public WorkFlowHierarchyController(ILogger<WorkFlowHierarchyController> _logger,IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor accessor) : base(mapper, unitOfWork, accessor)
+        public WorkFlowHierarchyController(ILogger<WorkFlowHierarchyController> _logger,IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor accessor,IAuthenticationService authService):base(mapper,unitOfWork,accessor,authService)
         {
             this._logger = _logger;
         }
@@ -419,8 +418,6 @@ namespace CIB.BankAdmin.Controllers
             }
         }
     
-    
-
         public static bool ValidateWorkflowDropDowns(TblCorporateProfile theCorporateProfile,TblTempWorkflow tblWorkflow, out string errormsg)
         {
             errormsg = string.Empty;

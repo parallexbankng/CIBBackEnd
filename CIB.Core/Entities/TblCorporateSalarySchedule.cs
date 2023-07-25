@@ -11,13 +11,11 @@ namespace CIB.Core.Entities
         public long Sn { get; set; }
         public Guid? CorporateCustomerId { get; set; }
         public string AccountNumber { get; set; }
-        public string AccountName {get;set;}
         public string Frequency { get; set; }
         public string NumberOfBeneficairy { get; set; }
         public string TriggerType { get; set; }
         public DateTime? StartDate { get; set; }
         public string Discription { get; set; }
-        public string Currency {get;set;}
         public DateTime? DateCreated { get; set; }
         public DateTime? DateApproved { get; set; }
         public Guid? InitiatorId { get; set; }
@@ -25,8 +23,10 @@ namespace CIB.Core.Entities
         public string InitiatorUserName { get; set; }
         public Guid? ApproverId { get; set; }
         public string ApproverUserName { get; set; }
-        public string TransactionLocation {get;set;}
         public int? Status { get; set; }
         public byte? IsSalary { get; set; }
+        public string AccountName { get; set; }
+        public string Currency { get; set; }
+        public string TransactionLocation { get; set; }
     }
 }

@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using AutoMapper;
 using CIB.Core.Common;
 using CIB.Core.Common.Dto;
@@ -7,11 +9,13 @@ using CIB.Core.Common.Response;
 using CIB.Core.Entities;
 using CIB.Core.Enums;
 using CIB.Core.Modules.Cheque.Dto;
+using CIB.Core.Services.Authentication;
 using CIB.Core.Services.Notification;
 using CIB.Core.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace CIB.BankAdmin.Controllers
 {
@@ -22,7 +26,7 @@ namespace CIB.BankAdmin.Controllers
         private readonly ILogger _logger;
         protected readonly INotificationService notify;
 
-        public ChequeRequestController(INotificationService notify,ILogger<ChequeRequestController> logger,IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor accessor) : base(mapper, unitOfWork, accessor)
+        public ChequeRequestController(INotificationService notify,ILogger<ChequeRequestController> logger,IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor accessor,IAuthenticationService authService):base(mapper,unitOfWork,accessor,authService)
         {
             _logger = logger;
             this.notify = notify;
@@ -137,9 +141,9 @@ namespace CIB.BankAdmin.Controllers
             }
         }
 
-        [HttpPut("ApprovedChequeBookRequest")]
+        [HttpPost("ApprovedChequeBookRequest")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public ActionResult<ResponseDTO<RequestChequeBookHistory>> ApprovedChequeBookRequest(SimpleActionDto model)
+        public ActionResult<ResponseDTO<RequestChequeBookHistory>> ApprovedChequeBookRequest(GenericRequestDto model)
         {
             try
             {
@@ -155,14 +159,25 @@ namespace CIB.BankAdmin.Controllers
                     return StatusCode(400, errormsg);
                 }
 
+                if(string.IsNullOrEmpty(model.Data))
+                {
+                    return BadRequest("invalid request");
+                }
+
+                var requestData = JsonConvert.DeserializeObject<SimpleAction>(Encryption.DecryptStrings(model.Data));
+                if(requestData == null)
+                {
+                    return BadRequest("invalid request data");
+                }
+
                 // if (string.IsNullOrEmpty(UserRoleId) || !UnitOfWork.CorporateUserRoleAccessRepo.AccessesExist(UserRoleId, Permission.CreateCorporateUserProfile))
                 // {
                 //    return BadRequest("UnAuthorized Access");
                 // }
                 var payload = new SimpleAction
                 {
-                    Id = Encryption.DecryptGuid(model.Id),
-                    Reason = Encryption.DecryptStrings(model.Reason),
+                    Id = requestData.Id,
+                    Reason = requestData.Reason,
                     IPAddress = Encryption.DecryptStrings(model.IPAddress),
                     HostName = Encryption.DecryptStrings(model.HostName),
                     ClientStaffIPAddress = Encryption.DecryptStrings(model.ClientStaffIPAddress),
@@ -173,7 +188,12 @@ namespace CIB.BankAdmin.Controllers
                 {
                     return BadRequest("Invalid Id");
                 }
-                if(!ApprovedRequest(entity,payload,out string errorMessage ))
+                var corporateCustomerDto =  UnitOfWork.CorporateCustomerRepo.GetByIdAsync((Guid)entity.CorporateCustomerId);
+                if (corporateCustomerDto == null)
+                {
+                    return BadRequest("Invalid Corporate Customer ID");
+                }
+                if(!ApprovedRequest(entity,corporateCustomerDto,payload,out string errorMessage ))
                 {
                     return StatusCode(400, errorMessage);
                 }
@@ -192,9 +212,9 @@ namespace CIB.BankAdmin.Controllers
             }
         }
 
-        [HttpPut("DeclineChequeBookRequest")]
+        [HttpPost("DeclineChequeBookRequest")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public ActionResult<ListResponseDTO<RequestChequeBookHistory>> DeclineChequeBookRequest(SimpleActionDto model)
+        public ActionResult<ListResponseDTO<RequestChequeBookHistory>> DeclineChequeBookRequest(GenericRequestDto model)
         {
             try
             {
@@ -210,10 +230,21 @@ namespace CIB.BankAdmin.Controllers
                     return StatusCode(400, errormsg);
                 }
 
+                if(string.IsNullOrEmpty(model.Data))
+                {
+                    return BadRequest("invalid request");
+                }
+
+                var requestData = JsonConvert.DeserializeObject<SimpleAction>(Encryption.DecryptStrings(model.Data));
+                if(requestData == null)
+                {
+                    return BadRequest("invalid request data");
+                }
+
                 var payload = new SimpleAction
                 {
-                    Id = Encryption.DecryptGuid(model.Id),
-                    Reason = Encryption.DecryptStrings(model.Reason),
+                    Id = requestData.Id,
+                    Reason = requestData.Reason,
                     IPAddress = Encryption.DecryptStrings(model.IPAddress),
                     HostName = Encryption.DecryptStrings(model.HostName),
                     ClientStaffIPAddress = Encryption.DecryptStrings(model.ClientStaffIPAddress),
@@ -279,17 +310,9 @@ namespace CIB.BankAdmin.Controllers
                 return ex.InnerException != null ? BadRequest(new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: ex.InnerException.Message, responseStatus:false)) : StatusCode(500, new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: ex.InnerException != null ? ex.InnerException.Message : ex.Message, responseStatus:false));
             }
         }
-
-        private bool ApprovedRequest(TblTempChequeRequest profile, SimpleAction payload, out string errorMessage)
+        private bool ApprovedRequest(TblTempChequeRequest profile, TblCorporateCustomer corporateCustomerDto, SimpleAction payload, out string errorMessage)
         {
             var initiatorProfile = UnitOfWork.CorporateProfileRepo.GetByIdAsync((Guid)profile.InitiatorId);
-            var corporateCustomerDto =  UnitOfWork.CorporateCustomerRepo.GetByIdAsync((Guid)profile.CorporateCustomerId);
-            if (corporateCustomerDto == null)
-            {
-                errorMessage ="Invalid Corporate Customer ID";
-                return false;
-            }
-
             var notifyInfo = new EmailNotification
             {
               CustomerId = corporateCustomerDto.CustomerId,
@@ -330,8 +353,10 @@ namespace CIB.BankAdmin.Controllers
                     TimeStamp = DateTime.Now
                 };
                 mapProfile.Sn = 0;
+                mapProfile.Id = Guid.NewGuid();
                 mapProfile.Status = (int)ProfileStatus.Active;
                 profile.IsTreated = (int) ProfileStatus.Active;
+                profile.Status = (int) ProfileStatus.Active;
                 profile.ApprovedId = BankProfile.Id;
                 profile.ApprovalUsername = UserName;
                 profile.ActionResponseDate = DateTime.Now;
@@ -393,6 +418,7 @@ namespace CIB.BankAdmin.Controllers
                 };
                 entity.Status = (int) ProfileStatus.Declined;
                 entity.IsTreated = (int) ProfileStatus.Declined;
+                entity.Status = (int) ProfileStatus.Declined;
                 entity.Reasons = payload.Reason;
                 entity.ApprovedId = BankProfile.Id;
                 entity.ApprovalUsername = UserName;
@@ -407,6 +433,179 @@ namespace CIB.BankAdmin.Controllers
             errorMessage = " Invalid Request";
             return true;
         }
-    
+
+        [HttpPost("BulkRequestApproved")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(List<BulkError>), StatusCodes.Status400BadRequest)]
+        public ActionResult<bool> BulkRequestApproved(GenericRequestDto model)
+        {
+            try
+            {
+                if (!IsAuthenticated)
+                {
+                    return StatusCode(401, "User is not authenticated");
+                }
+
+                string errormsg = string.Empty;
+
+                if (!IsUserActive(out errormsg))
+                {
+                    return StatusCode(400, errormsg);
+                }
+
+                if(string.IsNullOrEmpty(model.Data))
+                {
+                    return BadRequest("invalid request");
+                }
+
+                var requestData = JsonConvert.DeserializeObject<List<SimpleAction>>(Encryption.DecryptStrings(model.Data));
+                if(requestData == null)
+                {
+                    return BadRequest("invalid request data");
+                }
+
+                var responseErrors = new List<BulkError>();
+                foreach(var item in requestData)
+                {
+                    var payload = new SimpleAction
+                    {
+                        Id = item.Id,
+                        Reason = item.Reason,
+                        IPAddress = Encryption.DecryptStrings(model.IPAddress),
+                        HostName = Encryption.DecryptStrings(model.HostName),
+                        ClientStaffIPAddress = Encryption.DecryptStrings(model.ClientStaffIPAddress),
+                        MACAddress = Encryption.DecryptStrings(model.MACAddress)
+                    };
+
+                    var entity = UnitOfWork.TempChequeRequestRepo.GetByIdAsync(item.Id);
+                    if (entity == null)
+                    {
+                        var bulkError = new BulkError
+                        {
+                            Message = "Invalid Id",
+                            ActionInfo = $"CorporateCustomer : {entity.CorporateCustomer}, Action: {entity.Action}"
+                        };
+                        responseErrors.Add(bulkError);
+                    }
+                    else
+                    {
+                        var corporateCustomerDto =  UnitOfWork.CorporateCustomerRepo.GetByIdAsync((Guid)entity.CorporateCustomerId);
+                        if (corporateCustomerDto == null)
+                        {
+                            var bulkError = new BulkError
+                            {
+                                Message = "Invalid Corporate Customer ID",
+                                ActionInfo = $"CorporateCustomer : {entity.CorporateCustomer}, Action: {entity.Action}"
+                            };
+                            responseErrors.Add(bulkError);
+                        }
+                        else
+                        {
+                            if(!ApprovedRequest(entity,corporateCustomerDto,payload,out string errorMessage ))
+                            {
+                                var bulkError = new BulkError
+                                {
+                                    Message = "Invalid Corporate Customer ID",
+                                    ActionInfo = $"CorporateCustomer : {entity.CorporateCustomer}, Action: {entity.Action}"
+                                };
+                                responseErrors.Add(bulkError);
+                            }
+                        }
+                    }
+                   
+                }
+                if(responseErrors.Any())
+                {
+                    return BadRequest(responseErrors);
+                }
+                return Ok(true);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("SERVER ERROR {0}, {1}, {2}",Formater.JsonType(ex.StackTrace), Formater.JsonType(ex.Source), Formater.JsonType(ex.Message));
+                return ex.InnerException != null ? BadRequest(new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: ex.InnerException.Message, responseStatus:false)) : StatusCode(500, new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: ex.InnerException != null ? ex.InnerException.Message : ex.Message, responseStatus:false));
+            }
+        }
+
+        [HttpPost("BulkRequestDecline")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(List<BulkError>), StatusCodes.Status400BadRequest)]
+        public ActionResult<bool> BulkRequestDecline(GenericRequestDto model)
+        {
+            try
+            {
+                if (!IsAuthenticated)
+                {
+                    return StatusCode(401, "User is not authenticated");
+                }
+
+                string errormsg = string.Empty;
+
+                if (!IsUserActive(out errormsg))
+                {
+                    return StatusCode(400, errormsg);
+                }
+
+                if(string.IsNullOrEmpty(model.Data))
+                {
+                    return BadRequest("invalid request");
+                }
+
+                var requestData = JsonConvert.DeserializeObject<List<SimpleAction>>(Encryption.DecryptStrings(model.Data));
+                if(requestData == null)
+                {
+                    return BadRequest("invalid request data");
+                }
+
+                var responseErrors = new List<BulkError>();
+                foreach(var item in requestData)
+                {
+                    var payload = new SimpleAction
+                    {
+                        Id = item.Id,
+                        Reason = item.Reason,
+                        IPAddress = Encryption.DecryptStrings(model.IPAddress),
+                        ClientStaffIPAddress = Encryption.DecryptStrings(model.ClientStaffIPAddress),
+                        HostName = Encryption.DecryptStrings(model.HostName),
+                        MACAddress = Encryption.DecryptStrings(model.MACAddress),
+                    };
+                    //get profile by id
+                    var entity = UnitOfWork.TempChequeRequestRepo.GetByIdAsync(item.Id);
+                    if (entity == null)
+                    {
+                        var bulkError = new BulkError
+                        {
+                            Message = "Invalid Id",
+                            ActionInfo = $"CorporateCustomer : {entity.CorporateCustomer}, Action: {entity.Action}"
+                        };
+                        responseErrors.Add(bulkError);
+                    }
+                    else
+                    {
+                        if(!DeclineRequest(entity,payload,out string errorMessage ))
+                        {
+                            var bulkError = new BulkError
+                            {
+                                Message = errorMessage,
+                                ActionInfo = $"CorporateCustomer : {entity.CorporateCustomer}, Action: {entity.Action}"
+                            };
+                            responseErrors.Add(bulkError);
+                        }
+                    }
+                }
+                if(responseErrors.Any())
+                {
+                    return BadRequest(responseErrors);
+                }
+                return Ok(true);
+            }
+            catch (Exception ex)
+            {
+                
+                _logger.LogError("SERVER ERROR {0}, {1}, {2}",Formater.JsonType(ex.StackTrace), Formater.JsonType(ex.Source), Formater.JsonType(ex.Message));
+                return ex.InnerException != null ? BadRequest(new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: ex.InnerException.Message, responseStatus:false)) : StatusCode(500, new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: ex.InnerException != null ? ex.InnerException.Message : ex.Message, responseStatus:false));
+            }
+        }
+
     }
 }

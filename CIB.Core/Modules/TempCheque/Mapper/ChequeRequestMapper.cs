@@ -12,6 +12,7 @@ namespace CIB.Core.Modules.Cheque.Mapper
             CreateMap<TblTempChequeRequest, RequestChequeBookDto>().ReverseMap();
             CreateMap<TblTempChequeRequest, RequestChequeBookHistory>().ReverseMap();
             CreateMap<TblChequeRequest, ResponseChequeBookDto>().ReverseMap();
+            CreateMap<TblChequeRequest, TempResponseChequeBookDto>().ReverseMap();
             CreateMap<TblTempChequeRequest, TblChequeRequest>().ReverseMap();
         }
     }

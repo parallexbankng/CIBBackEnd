@@ -116,27 +116,11 @@ namespace CIB.Core.Modules.Transaction
                 Beneficiary = pend.DestinationAcctNo,
                 BeneficiaryName = pend.DestinationAcctName,
                 Sender = pend.SourceAccountNo,
-                SenderName = pend.DestinationAcctName,
+                SenderName = pend.SourceAccountName,
                 WorkflowId = trx.WorkflowId,
                 Type = pend.TranType,
                 Date = pend.TranDate
             }).ToList();
-           
-
-
-        // public DateTime Date {get;set;}
-        // public string Narration  {get;set;}
-        // public string Reference {get;set;}
-        // public string Amount {get;set;}
-        // public string Beneficiary {get;set;}
-        // public string Sender {get;set;}
-        // public string Type {get;set;}
-        // public string Status {get;set;}
-        // public string CreditNumber {get;set;}
-        // public Guid WorkflowId {get;set;}
-        // public string DebitAccount {get;set;}
-        // public Guid TranLogId {get;set;}
-
             return itemj;
             
         }
@@ -145,10 +129,5 @@ namespace CIB.Core.Modules.Transaction
         {
             return _context.TblTransactions.Where(ctx => ctx.CorporateCustomerId == CorporateCustomerId).OrderByDescending(ctx => ctx.Sn).ToList();
         }
-
-    // public List<TblTransaction> GetCorporateTransactions(Guid CorporateCustomerId)
-    // {
-    //     return _context.TblTransactions.Where(x => x.CorporateCustomerId == CorporateCustomerId).OrderByDescending(ctx => ctx.Sn).ToList();
-    // }
   }
 }

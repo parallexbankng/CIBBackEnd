@@ -1,31 +1,31 @@
 {
   "format": 1,
   "restore": {
-    "/Users/macbook/Projects/CIBBackEnd/CIB.CorporateAdmin/CIB.CorporateAdmin.csproj": {}
+    "/Users/macbook/Projects/parallex-backend/CIB.CorporateAdmin/CIB.CorporateAdmin.csproj": {}
   },
   "projects": {
-    "/Users/macbook/Projects/CIBBackEnd/CIB.Core/CIB.Core.csproj": {
+    "/Users/macbook/Projects/parallex-backend/CIB.Core/CIB.Core.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/macbook/Projects/CIBBackEnd/CIB.Core/CIB.Core.csproj",
+        "projectUniqueName": "/Users/macbook/Projects/parallex-backend/CIB.Core/CIB.Core.csproj",
         "projectName": "CIB.Core",
-        "projectPath": "/Users/macbook/Projects/CIBBackEnd/CIB.Core/CIB.Core.csproj",
+        "projectPath": "/Users/macbook/Projects/parallex-backend/CIB.Core/CIB.Core.csproj",
         "packagesPath": "/Users/macbook/.nuget/packages/",
-        "outputPath": "/Users/macbook/Projects/CIBBackEnd/CIB.Core/obj/",
+        "outputPath": "/Users/macbook/Projects/parallex-backend/CIB.Core/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/macbook/Projects/NuGet.Config",
           "/Users/macbook/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
-          "net5.0"
+          "net6.0"
         ],
         "sources": {
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
-          "net5.0": {
-            "targetAlias": "net5.0",
+          "net6.0": {
+            "targetAlias": "net6.0",
             "projectReferences": {}
           }
         },
@@ -36,8 +36,8 @@
         }
       },
       "frameworks": {
-        "net5.0": {
-          "targetAlias": "net5.0",
+        "net6.0": {
+          "targetAlias": "net6.0",
           "dependencies": {
             "AutoMapper": {
               "target": "Package",
@@ -99,16 +99,6 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "downloadDependencies": [
-            {
-              "name": "Microsoft.AspNetCore.App.Ref",
-              "version": "[5.0.0, 5.0.0]"
-            },
-            {
-              "name": "Microsoft.NETCore.App.Ref",
-              "version": "[5.0.0, 5.0.0]"
-            }
-          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
@@ -118,31 +108,31 @@
         }
       }
     },
-    "/Users/macbook/Projects/CIBBackEnd/CIB.CorporateAdmin/CIB.CorporateAdmin.csproj": {
+    "/Users/macbook/Projects/parallex-backend/CIB.CorporateAdmin/CIB.CorporateAdmin.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/macbook/Projects/CIBBackEnd/CIB.CorporateAdmin/CIB.CorporateAdmin.csproj",
+        "projectUniqueName": "/Users/macbook/Projects/parallex-backend/CIB.CorporateAdmin/CIB.CorporateAdmin.csproj",
         "projectName": "CIB.CorporateAdmin",
-        "projectPath": "/Users/macbook/Projects/CIBBackEnd/CIB.CorporateAdmin/CIB.CorporateAdmin.csproj",
+        "projectPath": "/Users/macbook/Projects/parallex-backend/CIB.CorporateAdmin/CIB.CorporateAdmin.csproj",
         "packagesPath": "/Users/macbook/.nuget/packages/",
-        "outputPath": "/Users/macbook/Projects/CIBBackEnd/CIB.CorporateAdmin/obj/",
+        "outputPath": "/Users/macbook/Projects/parallex-backend/CIB.CorporateAdmin/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/macbook/Projects/NuGet.Config",
           "/Users/macbook/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
-          "net5.0"
+          "net6.0"
         ],
         "sources": {
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
-          "net5.0": {
-            "targetAlias": "net5.0",
+          "net6.0": {
+            "targetAlias": "net6.0",
             "projectReferences": {
-              "/Users/macbook/Projects/CIBBackEnd/CIB.Core/CIB.Core.csproj": {
-                "projectPath": "/Users/macbook/Projects/CIBBackEnd/CIB.Core/CIB.Core.csproj"
+              "/Users/macbook/Projects/parallex-backend/CIB.Core/CIB.Core.csproj": {
+                "projectPath": "/Users/macbook/Projects/parallex-backend/CIB.Core/CIB.Core.csproj"
               }
             }
           }
@@ -154,8 +144,8 @@
         }
       },
       "frameworks": {
-        "net5.0": {
-          "targetAlias": "net5.0",
+        "net6.0": {
+          "targetAlias": "net6.0",
           "dependencies": {
             "DocumentFormat.OpenXml": {
               "target": "Package",
@@ -169,29 +159,21 @@
               "target": "Package",
               "version": "[6.22.1, )"
             },
+            "NLog": {
+              "target": "Package",
+              "version": "[4.7.10, )"
+            },
+            "NLog.Config": {
+              "target": "Package",
+              "version": "[4.7.10, )"
+            },
+            "NLog.Web.AspNetCore": {
+              "target": "Package",
+              "version": "[4.12.0, )"
+            },
             "Newtonsoft.Json": {
               "target": "Package",
               "version": "[11.0.1, )"
-            },
-            "Serilog.AspNetCore": {
-              "target": "Package",
-              "version": "[6.0.0, )"
-            },
-            "Serilog.Enrichers.Environment": {
-              "target": "Package",
-              "version": "[2.2.0, )"
-            },
-            "Serilog.Enrichers.Process": {
-              "target": "Package",
-              "version": "[2.0.1, )"
-            },
-            "Serilog.Enrichers.Thread": {
-              "target": "Package",
-              "version": "[3.1.0, )"
-            },
-            "Serilog.Settings.Configuration": {
-              "target": "Package",
-              "version": "[3.3.0, )"
             },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
@@ -213,20 +195,6 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "downloadDependencies": [
-            {
-              "name": "Microsoft.AspNetCore.App.Ref",
-              "version": "[5.0.0, 5.0.0]"
-            },
-            {
-              "name": "Microsoft.NETCore.App.Host.osx-x64",
-              "version": "[5.0.17, 5.0.17]"
-            },
-            {
-              "name": "Microsoft.NETCore.App.Ref",
-              "version": "[5.0.0, 5.0.0]"
-            }
-          ],
           "frameworkReferences": {
             "Microsoft.AspNetCore.App": {
               "privateAssets": "none"

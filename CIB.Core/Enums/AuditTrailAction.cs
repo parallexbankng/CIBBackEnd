@@ -79,11 +79,24 @@ namespace CIB.Core.Enums
         /// Bulk Bank Transfer
         /// </summary>
         Bulk_Bank_Transfer,
+
+        /// <summary>
+        /// Bulk Bank Transfer
+        /// </summary>
+        Salary_Payment,
         /// <summary>
         /// Bulk Bank Transfer
         /// </summary>
         Bulk_Bank_Transfer_With_Duplicate,
-    }
+		    /// <summary>
+		    /// Initia_lending
+		    /// </summary>
+		    initiate_Onlending_Transaction,
+		    /// <summary>
+		    /// Onlending_Disburment
+		    /// </summary>
+		    Onlending_Disburment,
+	  }
 
     public enum TempTableAction
     {
@@ -132,6 +145,15 @@ namespace CIB.Core.Enums
         /// Update_Phone_Number
         /// </summary>
         Update_Phone_Number,
+
+        /// <summary>
+        /// Update_Account_Signatory
+        /// </summary>
+        Change_Account_Signatory,
+        /// <summary>
+        /// Add_OnLending_Feature
+        /// </summary>
+        Add_OnLending_Feature,
         /// <summary>
         /// Enable_Log_Out
         /// </summary>

@@ -35,5 +35,8 @@ namespace CIB.Core.Entities
         public decimal? Vat { get; set; }
         public string TransactionResponseCode { get; set; }
         public string TransactionResponseMessage { get; set; }
+        public Guid? ScheduleId { get; set; }
+        public Guid? EmployeeId { get; set; }
+        public string SessionId { get; set; }
     }
 }

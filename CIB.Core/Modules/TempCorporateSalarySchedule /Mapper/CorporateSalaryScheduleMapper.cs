@@ -14,6 +14,11 @@ namespace CIB.Core.Modules.TempCorporateSalarySchedule.Mapper
         {
             CreateMap<CreateCorporateCustomerSalaryDto, TblCorporateSalarySchedule>().ReverseMap();
             CreateMap<TblCorporateSalarySchedule, CorporateCustomerSalaryResponseDto>().ReverseMap();
+             CreateMap<TblTempCorporateSalarySchedule, CreateCorporateCustomerSalaryDto>().ReverseMap();
+             CreateMap<TblTempCorporateSalarySchedule, UpdateCorporateCustomerSalaryDto>().ReverseMap();
+             
+
+            //TblTempCorporateSalarySchedule
         }
     }
 }

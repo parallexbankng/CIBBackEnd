@@ -1,0 +1,3324 @@
+{
+    "state": [
+        {
+            "stateCode": "1",
+            "stateName": "AKWA IBOM",
+            "lga": [
+                {
+                    "lgaCode": "726",
+                    "lga": "ORUK ANAM"
+                },
+                {
+                    "lgaCode": "723",
+                    "lga": "ORON"
+                },
+                {
+                    "lgaCode": "709",
+                    "lga": "ONNA"
+                },
+                {
+                    "lgaCode": "687",
+                    "lga": "OKOBO"
+                },
+                {
+                    "lgaCode": "645",
+                    "lga": "OBOT AKARA"
+                },
+                {
+                    "lgaCode": "643",
+                    "lga": "EASTERN OBOLO"
+                },
+                {
+                    "lgaCode": "630",
+                    "lga": "NSIT UBIUM"
+                },
+                {
+                    "lgaCode": "629",
+                    "lga": "NSIT IBOM"
+                },
+                {
+                    "lgaCode": "628",
+                    "lga": "NSIT ATAI"
+                },
+                {
+                    "lgaCode": "591",
+                    "lga": "MKPAT ENIN"
+                },
+                {
+                    "lgaCode": "578",
+                    "lga": "MBO"
+                },
+                {
+                    "lgaCode": "437",
+                    "lga": "ITU"
+                },
+                {
+                    "lgaCode": "409",
+                    "lga": "INI"
+                },
+                {
+                    "lgaCode": "386",
+                    "lga": "IKOT EKPENE"
+                },
+                {
+                    "lgaCode": "385",
+                    "lga": "IKOT ABASI"
+                },
+                {
+                    "lgaCode": "383",
+                    "lga": "IKONO"
+                },
+                {
+                    "lgaCode": "371",
+                    "lga": "IKA"
+                },
+                {
+                    "lgaCode": "325",
+                    "lga": "IBESIKPO ASUTAN"
+                },
+                {
+                    "lgaCode": "324",
+                    "lga": "IBENO"
+                },
+                {
+                    "lgaCode": "327",
+                    "lga": "IBIONO IBOM"
+                },
+                {
+                    "lgaCode": "5670",
+                    "lga": "URUAN"
+                },
+                {
+                    "lgaCode": "861",
+                    "lga": "URUE-OFFONG/ORUKO"
+                },
+                {
+                    "lgaCode": "848",
+                    "lga": "UKANAFUN"
+                },
+                {
+                    "lgaCode": "843",
+                    "lga": "UDUNG UKO"
+                },
+                {
+                    "lgaCode": "242",
+                    "lga": "ESSIEN UDIM"
+                },
+                {
+                    "lgaCode": "241",
+                    "lga": "ESIT - EKET"
+                },
+                {
+                    "lgaCode": "248",
+                    "lga": "ETINAN"
+                },
+                {
+                    "lgaCode": "245",
+                    "lga": "ETIM EKPO"
+                },
+                {
+                    "lgaCode": "226",
+                    "lga": "EKET"
+                },
+                {
+                    "lgaCode": "5",
+                    "lga": "ABAK"
+                },
+                {
+                    "lgaCode": "1",
+                    "lga": "UYO"
+                }
+            ]
+        },
+        {
+            "stateCode": "2",
+            "stateName": "ANAMBRA",
+            "lga": [
+                {
+                    "lgaCode": "2",
+                    "lga": "ANAMBRA EAST"
+                },
+                {
+                    "lgaCode": "2",
+                    "lga": "ANAMBRA WEST"
+                },
+                {
+                    "lgaCode": "32",
+                    "lga": "AGUATA"
+                },
+                {
+                    "lgaCode": "210",
+                    "lga": "DUNUKOFIA"
+                },
+                {
+                    "lgaCode": "97",
+                    "lga": "AYAMELUM"
+                },
+                {
+                    "lgaCode": "96",
+                    "lga": "AWKA NORTH"
+                },
+                {
+                    "lgaCode": "96",
+                    "lga": "AWKA SOUTH"
+                },
+                {
+                    "lgaCode": "68",
+                    "lga": "ANAOCHA"
+                },
+                {
+                    "lgaCode": "230",
+                    "lga": "EKWUSIGO"
+                },
+                {
+                    "lgaCode": "363",
+                    "lga": "IHIALA"
+                },
+                {
+                    "lgaCode": "334",
+                    "lga": "IDEMILI NORTH"
+                },
+                {
+                    "lgaCode": "334",
+                    "lga": "IDEMILI SOUTH"
+                },
+                {
+                    "lgaCode": "627",
+                    "lga": "NNEWI NORTH"
+                },
+                {
+                    "lgaCode": "627",
+                    "lga": "NNEWI SOUTH"
+                },
+                {
+                    "lgaCode": "622",
+                    "lga": "NJIKOKA"
+                },
+                {
+                    "lgaCode": "660",
+                    "lga": "OGBARU"
+                },
+                {
+                    "lgaCode": "708",
+                    "lga": "ONITSHA NORTH"
+                },
+                {
+                    "lgaCode": "708",
+                    "lga": "ONITSHA SOUTH"
+                },
+                {
+                    "lgaCode": "744",
+                    "lga": "OYI"
+                },
+                {
+                    "lgaCode": "727",
+                    "lga": "ORUMBA NORTH"
+                },
+                {
+                    "lgaCode": "727",
+                    "lga": "ORUMBA SOUTH"
+                }
+            ]
+        },
+        {
+            "stateCode": "3",
+            "stateName": "BAUCHI",
+            "lga": [
+                {
+                    "lgaCode": "831",
+                    "lga": "TORO"
+                },
+                {
+                    "lgaCode": "814",
+                    "lga": "TAFAWA-BALEWA"
+                },
+                {
+                    "lgaCode": "795",
+                    "lga": "SHIRA"
+                },
+                {
+                    "lgaCode": "620",
+                    "lga": "NINGI"
+                },
+                {
+                    "lgaCode": "590",
+                    "lga": "MISAU"
+                },
+                {
+                    "lgaCode": "500",
+                    "lga": "KIRFI"
+                },
+                {
+                    "lgaCode": "484",
+                    "lga": "KATAGUM"
+                },
+                {
+                    "lgaCode": "1000",
+                    "lga": "DASS"
+                },
+                {
+                    "lgaCode": "435",
+                    "lga": "ITAS/GADAU"
+                },
+                {
+                    "lgaCode": "447",
+                    "lga": "JAMAARE"
+                },
+                {
+                    "lgaCode": "285",
+                    "lga": "GIADE"
+                },
+                {
+                    "lgaCode": "269",
+                    "lga": "GANJUWA"
+                },
+                {
+                    "lgaCode": "874",
+                    "lga": "WARJI"
+                },
+                {
+                    "lgaCode": "5909",
+                    "lga": "GAMAWA"
+                },
+                {
+                    "lgaCode": "900",
+                    "lga": "ZAKI"
+                },
+                {
+                    "lgaCode": "64",
+                    "lga": "ALKALERI"
+                },
+                {
+                    "lgaCode": "194",
+                    "lga": "DARAZO"
+                },
+                {
+                    "lgaCode": "184",
+                    "lga": "DAMBAN"
+                },
+                {
+                    "lgaCode": "147",
+                    "lga": "BOGORO"
+                },
+                {
+                    "lgaCode": "3",
+                    "lga": "BAUCHI"
+                }
+            ]
+        },
+        {
+            "stateCode": "4",
+            "stateName": "EDO",
+            "lga": [
+                {
+                    "lgaCode": "52",
+                    "lga": "AKOKO-EDO"
+                },
+                {
+                    "lgaCode": "847",
+                    "lga": "UHUNMWONDE"
+                },
+                {
+                    "lgaCode": "222",
+                    "lga": "EGOR"
+                },
+                {
+                    "lgaCode": "240",
+                    "lga": "ESAN CENTRAL"
+                },
+                {
+                    "lgaCode": "240",
+                    "lga": "ESAN NORTH EAST"
+                },
+                {
+                    "lgaCode": "240",
+                    "lga": "ESAN SOUTH EAST"
+                },
+                {
+                    "lgaCode": "240",
+                    "lga": "ESAN WEST"
+                },
+                {
+                    "lgaCode": "250",
+                    "lga": "ETSAKO CENTRAL"
+                },
+                {
+                    "lgaCode": "250",
+                    "lga": "ETSAKO EAST"
+                },
+                {
+                    "lgaCode": "250",
+                    "lga": "ETSAKO WEST"
+                },
+                {
+                    "lgaCode": "389",
+                    "lga": "IKPOBA-OKHA"
+                },
+                {
+                    "lgaCode": "361",
+                    "lga": "IGUEBEN"
+                },
+                {
+                    "lgaCode": "739",
+                    "lga": "OWAN EAST"
+                },
+                {
+                    "lgaCode": "739",
+                    "lga": "OWAN WEST"
+                },
+                {
+                    "lgaCode": "737",
+                    "lga": "OVIA NORTH EAST"
+                },
+                {
+                    "lgaCode": "737",
+                    "lga": "OVIA SOUTH WEST"
+                },
+                {
+                    "lgaCode": "716",
+                    "lga": "ORHIONMWON"
+                },
+                {
+                    "lgaCode": "714",
+                    "lga": "OREDO"
+                }
+            ]
+        },
+        {
+            "stateCode": "5",
+            "stateName": "BENUE",
+            "lga": [
+                {
+                    "lgaCode": "736",
+                    "lga": "OTURKPO"
+                },
+                {
+                    "lgaCode": "659",
+                    "lga": "OGBADIBO"
+                },
+                {
+                    "lgaCode": "675",
+                    "lga": "OHIMINI"
+                },
+                {
+                    "lgaCode": "690",
+                    "lga": "OKPOKWU"
+                },
+                {
+                    "lgaCode": "824",
+                    "lga": "TARKA"
+                },
+                {
+                    "lgaCode": "511",
+                    "lga": "KONSHISHA"
+                },
+                {
+                    "lgaCode": "563",
+                    "lga": "MAKURDI"
+                },
+                {
+                    "lgaCode": "544",
+                    "lga": "LOGO"
+                },
+                {
+                    "lgaCode": "529",
+                    "lga": "KWANDE"
+                },
+                {
+                    "lgaCode": "637",
+                    "lga": "OBI"
+                },
+                {
+                    "lgaCode": "312",
+                    "lga": "GWER EAST"
+                },
+                {
+                    "lgaCode": "312",
+                    "lga": "GWER WEST"
+                },
+                {
+                    "lgaCode": "279",
+                    "lga": "GBOKO"
+                },
+                {
+                    "lgaCode": "298",
+                    "lga": "GUMA"
+                },
+                {
+                    "lgaCode": "862",
+                    "lga": "USHONGO"
+                },
+                {
+                    "lgaCode": "850",
+                    "lga": "UKUM"
+                },
+                {
+                    "lgaCode": "868",
+                    "lga": "VANDEIKYA"
+                },
+                {
+                    "lgaCode": "2825",
+                    "lga": "KATSINA-ALA"
+                },
+                {
+                    "lgaCode": "75",
+                    "lga": "APA"
+                },
+                {
+                    "lgaCode": "170",
+                    "lga": "BURUKU"
+                },
+                {
+                    "lgaCode": "5",
+                    "lga": "OJU"
+                },
+                {
+                    "lgaCode": "25",
+                    "lga": "AGATU"
+                },
+                {
+                    "lgaCode": "19",
+                    "lga": "ADO"
+                }
+            ]
+        },
+        {
+            "stateCode": "6",
+            "stateName": "BORNO",
+            "lga": [
+                {
+                    "lgaCode": "2",
+                    "lga": "ABADAM"
+                },
+                {
+                    "lgaCode": "175",
+                    "lga": "CHIBOK"
+                },
+                {
+                    "lgaCode": "145",
+                    "lga": "BIU"
+                },
+                {
+                    "lgaCode": "186",
+                    "lga": "DAMBOA"
+                },
+                {
+                    "lgaCode": "201",
+                    "lga": "DIKWA"
+                },
+                {
+                    "lgaCode": "86",
+                    "lga": "ASKIRA/UBA"
+                },
+                {
+                    "lgaCode": "124",
+                    "lga": "BAYO"
+                },
+                {
+                    "lgaCode": "113",
+                    "lga": "BAMA"
+                },
+                {
+                    "lgaCode": "294",
+                    "lga": "GUBIO"
+                },
+                {
+                    "lgaCode": "316",
+                    "lga": "HAWUL"
+                },
+                {
+                    "lgaCode": "314",
+                    "lga": "GWOZA"
+                },
+                {
+                    "lgaCode": "305",
+                    "lga": "GUZAMALA"
+                },
+                {
+                    "lgaCode": "451",
+                    "lga": "JERE"
+                },
+                {
+                    "lgaCode": "470",
+                    "lga": "KALA/BALGE"
+                },
+                {
+                    "lgaCode": "464",
+                    "lga": "KAGA"
+                },
+                {
+                    "lgaCode": "596",
+                    "lga": "MONGUNO"
+                },
+                {
+                    "lgaCode": "593",
+                    "lga": "MOBBAR"
+                },
+                {
+                    "lgaCode": "571",
+                    "lga": "MARTE"
+                },
+                {
+                    "lgaCode": "615",
+                    "lga": "NGANZAI"
+                },
+                {
+                    "lgaCode": "614",
+                    "lga": "NGALA"
+                },
+                {
+                    "lgaCode": "557",
+                    "lga": "MAIDUGURI"
+                },
+                {
+                    "lgaCode": "555",
+                    "lga": "MAGUMERI"
+                },
+                {
+                    "lgaCode": "553",
+                    "lga": "MAFA"
+                },
+                {
+                    "lgaCode": "510",
+                    "lga": "KONDUGA"
+                },
+                {
+                    "lgaCode": "531",
+                    "lga": "KWAYA KUSAR"
+                },
+                {
+                    "lgaCode": "519",
+                    "lga": "KUKAWA"
+                },
+                {
+                    "lgaCode": "790",
+                    "lga": "SHANI"
+                }
+            ]
+        },
+        {
+            "stateCode": "7",
+            "stateName": "CROSS RIVER",
+            "lga": [
+                {
+                    "lgaCode": "666",
+                    "lga": "OGOJA"
+                },
+                {
+                    "lgaCode": "648",
+                    "lga": "OBUDU"
+                },
+                {
+                    "lgaCode": "647",
+                    "lga": "OBUBRA"
+                },
+                {
+                    "lgaCode": "655",
+                    "lga": "ODUKPANI"
+                },
+                {
+                    "lgaCode": "636",
+                    "lga": "OBANLIKU"
+                },
+                {
+                    "lgaCode": "7599",
+                    "lga": "YAKURR"
+                },
+                {
+                    "lgaCode": "382",
+                    "lga": "IKOM"
+                },
+                {
+                    "lgaCode": "251",
+                    "lga": "ETUNG"
+                },
+                {
+                    "lgaCode": "890",
+                    "lga": "YALA"
+                },
+                {
+                    "lgaCode": "127",
+                    "lga": "BEKWARA"
+                },
+                {
+                    "lgaCode": "131",
+                    "lga": "BIASE"
+                },
+                {
+                    "lgaCode": "108",
+                    "lga": "BAKASSI"
+                },
+                {
+                    "lgaCode": "48",
+                    "lga": "AKAMKPA"
+                },
+                {
+                    "lgaCode": "53",
+                    "lga": "AKPABUYO"
+                },
+                {
+                    "lgaCode": "173",
+                    "lga": "CALABAR-MUNICIPAL"
+                },
+                {
+                    "lgaCode": "173",
+                    "lga": "CALABAR SOUTH"
+                },
+                {
+                    "lgaCode": "148",
+                    "lga": "BOKI"
+                },
+                {
+                    "lgaCode": "8",
+                    "lga": "ABI"
+                }
+            ]
+        },
+        {
+            "stateCode": "8",
+            "stateName": "FEDERAL CAPITAL TERRITORY",
+            "lga": [
+                {
+                    "lgaCode": "4",
+                    "lga": "ABAJI"
+                },
+                {
+                    "lgaCode": "172",
+                    "lga": "BWARI"
+                },
+                {
+                    "lgaCode": "885",
+                    "lga": "ABUJA MUNICIPAL"
+                },
+                {
+                    "lgaCode": "307",
+                    "lga": "GWAGWALADA"
+                },
+                {
+                    "lgaCode": "518",
+                    "lga": "KUJE"
+                },
+                {
+                    "lgaCode": "527",
+                    "lga": "KWALI"
+                }
+            ]
+        },
+        {
+            "stateCode": "9",
+            "stateName": "ADAMAWA",
+            "lga": [
+                {
+                    "lgaCode": "537",
+                    "lga": "LAMURDE"
+                },
+                {
+                    "lgaCode": "583",
+                    "lga": "MICHIKA"
+                },
+                {
+                    "lgaCode": "550",
+                    "lga": "MADAGALI"
+                },
+                {
+                    "lgaCode": "559",
+                    "lga": "MAIHA"
+                },
+                {
+                    "lgaCode": "632",
+                    "lga": "NUMAN"
+                },
+                {
+                    "lgaCode": "601",
+                    "lga": "MUBI NORTH"
+                },
+                {
+                    "lgaCode": "601",
+                    "lga": "MUBI SOUTH"
+                },
+                {
+                    "lgaCode": "792",
+                    "lga": "SHELLENG"
+                },
+                {
+                    "lgaCode": "834",
+                    "lga": "TOUNGO"
+                },
+                {
+                    "lgaCode": "803",
+                    "lga": "SONG"
+                },
+                {
+                    "lgaCode": "8769",
+                    "lga": "HONG"
+                },
+                {
+                    "lgaCode": "443",
+                    "lga": "JADA"
+                },
+                {
+                    "lgaCode": "874",
+                    "lga": "GANYE"
+                },
+                {
+                    "lgaCode": "304",
+                    "lga": "GUYUK"
+                },
+                {
+                    "lgaCode": "896",
+                    "lga": "YOLA NORTH"
+                },
+                {
+                    "lgaCode": "896",
+                    "lga": "YOLA SOUTH"
+                },
+                {
+                    "lgaCode": "5462",
+                    "lga": "MAYO-BELWA"
+                },
+                {
+                    "lgaCode": "292",
+                    "lga": "GOMBI"
+                },
+                {
+                    "lgaCode": "287",
+                    "lga": "GIREI"
+                },
+                {
+                    "lgaCode": "261",
+                    "lga": "FUFORE"
+                },
+                {
+                    "lgaCode": "200",
+                    "lga": "DEMSA"
+                }
+            ]
+        },
+        {
+            "stateCode": "10",
+            "stateName": "IMO",
+            "lga": [
+                {
+                    "lgaCode": "10",
+                    "lga": "ABOH-MBAISE"
+                },
+                {
+                    "lgaCode": "35",
+                    "lga": "AHIAZU-MBAISE"
+                },
+                {
+                    "lgaCode": "223",
+                    "lga": "EHIME-MBANO"
+                },
+                {
+                    "lgaCode": "254",
+                    "lga": "EZINIHITTE"
+                },
+                {
+                    "lgaCode": "433",
+                    "lga": "ISU"
+                },
+                {
+                    "lgaCode": "427",
+                    "lga": "ISIALA MBANO"
+                },
+                {
+                    "lgaCode": "374",
+                    "lga": "IKEDURU"
+                },
+                {
+                    "lgaCode": "333",
+                    "lga": "IDEATO NORTH"
+                },
+                {
+                    "lgaCode": "333",
+                    "lga": "IDEATO SOUTH"
+                },
+                {
+                    "lgaCode": "364",
+                    "lga": "IHITTE/UBOMA"
+                },
+                {
+                    "lgaCode": "669",
+                    "lga": "OGUTA"
+                },
+                {
+                    "lgaCode": "672",
+                    "lga": "OHAJI/EGBEMA"
+                },
+                {
+                    "lgaCode": "685",
+                    "lga": "OKIGWE"
+                },
+                {
+                    "lgaCode": "711",
+                    "lga": "UNUIMO"
+                },
+                {
+                    "lgaCode": "740",
+                    "lga": "OWERRI-MUNICIPAL"
+                },
+                {
+                    "lgaCode": "740",
+                    "lga": "OWERRI NORTH"
+                },
+                {
+                    "lgaCode": "740",
+                    "lga": "OWERRI WEST"
+                },
+                {
+                    "lgaCode": "724",
+                    "lga": "ORSU"
+                },
+                {
+                    "lgaCode": "721",
+                    "lga": "ORU EAST"
+                },
+                {
+                    "lgaCode": "721",
+                    "lga": "ORU WEST"
+                },
+                {
+                    "lgaCode": "721",
+                    "lga": "ORLU"
+                },
+                {
+                    "lgaCode": "633",
+                    "lga": "NWANGELE"
+                },
+                {
+                    "lgaCode": "617",
+                    "lga": "NGOR-OKPALA"
+                },
+                {
+                    "lgaCode": "577",
+                    "lga": "MBAITOLI"
+                },
+                {
+                    "lgaCode": "621",
+                    "lga": "NJABA"
+                },
+                {
+                    "lgaCode": "626",
+                    "lga": "NKWERRE"
+                },
+                {
+                    "lgaCode": "646",
+                    "lga": "OBOWO"
+                }
+            ]
+        },
+        {
+            "stateCode": "11",
+            "stateName": "KADUNA",
+            "lga": [
+                {
+                    "lgaCode": "561",
+                    "lga": "MARKAFI"
+                },
+                {
+                    "lgaCode": "543",
+                    "lga": "LERE"
+                },
+                {
+                    "lgaCode": "517",
+                    "lga": "KUDAN"
+                },
+                {
+                    "lgaCode": "516",
+                    "lga": "KUBAU"
+                },
+                {
+                    "lgaCode": "489",
+                    "lga": "KAURA"
+                },
+                {
+                    "lgaCode": "491",
+                    "lga": "KAURU"
+                },
+                {
+                    "lgaCode": "801",
+                    "lga": "SOBA"
+                },
+                {
+                    "lgaCode": "781",
+                    "lga": "SANGA"
+                },
+                {
+                    "lgaCode": "771",
+                    "lga": "SABON-GARI"
+                },
+                {
+                    "lgaCode": "350",
+                    "lga": "IGABI"
+                },
+                {
+                    "lgaCode": "372",
+                    "lga": "IKARA"
+                },
+                {
+                    "lgaCode": "442",
+                    "lga": "JABA"
+                },
+                {
+                    "lgaCode": "450",
+                    "lga": "JEMAA"
+                },
+                {
+                    "lgaCode": "465",
+                    "lga": "KAGARKO"
+                },
+                {
+                    "lgaCode": "460",
+                    "lga": "KADUNA NORTH"
+                },
+                {
+                    "lgaCode": "459",
+                    "lga": "KACHIA"
+                },
+                {
+                    "lgaCode": "469",
+                    "lga": "KAJURU"
+                },
+                {
+                    "lgaCode": "288",
+                    "lga": "GIWA"
+                },
+                {
+                    "lgaCode": "902",
+                    "lga": "ZARIA"
+                },
+                {
+                    "lgaCode": "901",
+                    "lga": "ZANGO-KATAF"
+                },
+                {
+                    "lgaCode": "11",
+                    "lga": "KADUNA SOUTH"
+                },
+                {
+                    "lgaCode": "142",
+                    "lga": "BIRNIN-GWARI"
+                },
+                {
+                    "lgaCode": "177",
+                    "lga": "CHIKUN"
+                }
+            ]
+        },
+        {
+            "stateCode": "12",
+            "stateName": "KANO",
+            "lga": [
+                {
+                    "lgaCode": "167",
+                    "lga": "BUNKURE"
+                },
+                {
+                    "lgaCode": "197",
+                    "lga": "DAWAKIN TOFA"
+                },
+                {
+                    "lgaCode": "196",
+                    "lga": "DAWAKIN KUDU"
+                },
+                {
+                    "lgaCode": "202",
+                    "lga": "DOGUWA"
+                },
+                {
+                    "lgaCode": "182",
+                    "lga": "DALA"
+                },
+                {
+                    "lgaCode": "185",
+                    "lga": "DAMBATTA"
+                },
+                {
+                    "lgaCode": "47",
+                    "lga": "AJINGI"
+                },
+                {
+                    "lgaCode": "60",
+                    "lga": "ALBASU"
+                },
+                {
+                    "lgaCode": "107",
+                    "lga": "BAGWAI"
+                },
+                {
+                    "lgaCode": "132",
+                    "lga": "BICHI"
+                },
+                {
+                    "lgaCode": "125",
+                    "lga": "BEBEJI"
+                },
+                {
+                    "lgaCode": "856",
+                    "lga": "UNGOGO"
+                },
+                {
+                    "lgaCode": "873",
+                    "lga": "WARAWA"
+                },
+                {
+                    "lgaCode": "881",
+                    "lga": "WUDIL"
+                },
+                {
+                    "lgaCode": "284",
+                    "lga": "GEZAWA"
+                },
+                {
+                    "lgaCode": "256",
+                    "lga": "FAGGE"
+                },
+                {
+                    "lgaCode": "277",
+                    "lga": "GAYA"
+                },
+                {
+                    "lgaCode": "272",
+                    "lga": "GARUM MALLAM"
+                },
+                {
+                    "lgaCode": "271",
+                    "lga": "GARKO"
+                },
+                {
+                    "lgaCode": "265",
+                    "lga": "GABASAWA"
+                },
+                {
+                    "lgaCode": "478",
+                    "lga": "KANO MUNICIPAL"
+                },
+                {
+                    "lgaCode": "458",
+                    "lga": "KABO"
+                },
+                {
+                    "lgaCode": "308",
+                    "lga": "GWALE"
+                },
+                {
+                    "lgaCode": "311",
+                    "lga": "GWARZO"
+                },
+                {
+                    "lgaCode": "764",
+                    "lga": "RIMIN GADO"
+                },
+                {
+                    "lgaCode": "759",
+                    "lga": "RANO"
+                },
+                {
+                    "lgaCode": "791",
+                    "lga": "SHANONO"
+                },
+                {
+                    "lgaCode": "767",
+                    "lga": "ROGO"
+                },
+                {
+                    "lgaCode": "816",
+                    "lga": "TAKAI"
+                },
+                {
+                    "lgaCode": "809",
+                    "lga": "SUMAILA"
+                },
+                {
+                    "lgaCode": "823",
+                    "lga": "TARAUNI"
+                },
+                {
+                    "lgaCode": "829",
+                    "lga": "TOFA"
+                },
+                {
+                    "lgaCode": "837",
+                    "lga": "TUDUN WADA"
+                },
+                {
+                    "lgaCode": "836",
+                    "lga": "TSANYAWA"
+                },
+                {
+                    "lgaCode": "498",
+                    "lga": "KIBIYA"
+                },
+                {
+                    "lgaCode": "481",
+                    "lga": "KARAYE"
+                },
+                {
+                    "lgaCode": "522",
+                    "lga": "KURA"
+                },
+                {
+                    "lgaCode": "521",
+                    "lga": "KUNCHI"
+                },
+                {
+                    "lgaCode": "520",
+                    "lga": "KUMBOTSO"
+                },
+                {
+                    "lgaCode": "502",
+                    "lga": "KIRU"
+                },
+                {
+                    "lgaCode": "562",
+                    "lga": "MAKODA"
+                },
+                {
+                    "lgaCode": "551",
+                    "lga": "MADOBI"
+                },
+                {
+                    "lgaCode": "587",
+                    "lga": "MINJIBIR"
+                },
+                {
+                    "lgaCode": "609",
+                    "lga": "NASARAWA"
+                }
+            ]
+        },
+        {
+            "stateCode": "13",
+            "stateName": "KATSINA",
+            "lga": [
+                {
+                    "lgaCode": "604",
+                    "lga": "MUSAWA"
+                },
+                {
+                    "lgaCode": "575",
+                    "lga": "MATAZU"
+                },
+                {
+                    "lgaCode": "574",
+                    "lga": "MASHI"
+                },
+                {
+                    "lgaCode": "567",
+                    "lga": "MANI"
+                },
+                {
+                    "lgaCode": "565",
+                    "lga": "MALUMFASHI"
+                },
+                {
+                    "lgaCode": "525",
+                    "lga": "KUSADA"
+                },
+                {
+                    "lgaCode": "523",
+                    "lga": "KURFI"
+                },
+                {
+                    "lgaCode": "774",
+                    "lga": "SAFANA"
+                },
+                {
+                    "lgaCode": "773",
+                    "lga": "SABUWA"
+                },
+                {
+                    "lgaCode": "780",
+                    "lga": "SANDAMU"
+                },
+                {
+                    "lgaCode": "763",
+                    "lga": "RIMI"
+                },
+                {
+                    "lgaCode": "1001",
+                    "lga": "MAIADUA"
+                },
+                {
+                    "lgaCode": "463",
+                    "lga": "KAFUR"
+                },
+                {
+                    "lgaCode": "467",
+                    "lga": "KAITA"
+                },
+                {
+                    "lgaCode": "476",
+                    "lga": "KANKIA"
+                },
+                {
+                    "lgaCode": "474",
+                    "lga": "KANKARA"
+                },
+                {
+                    "lgaCode": "452",
+                    "lga": "JIBIA"
+                },
+                {
+                    "lgaCode": "408",
+                    "lga": "INGAWA"
+                },
+                {
+                    "lgaCode": "264",
+                    "lga": "FUNTUA"
+                },
+                {
+                    "lgaCode": "258",
+                    "lga": "FASKARI"
+                },
+                {
+                    "lgaCode": "901",
+                    "lga": "ZANGO"
+                },
+                {
+                    "lgaCode": "109",
+                    "lga": "BAKORI"
+                },
+                {
+                    "lgaCode": "123",
+                    "lga": "BAURE"
+                },
+                {
+                    "lgaCode": "121",
+                    "lga": "BATSARI"
+                },
+                {
+                    "lgaCode": "120",
+                    "lga": "BATAGARAWA"
+                },
+                {
+                    "lgaCode": "187",
+                    "lga": "DAN MUSA"
+                },
+                {
+                    "lgaCode": "191",
+                    "lga": "DANJA"
+                },
+                {
+                    "lgaCode": "189",
+                    "lga": "DANDUME"
+                },
+                {
+                    "lgaCode": "178",
+                    "lga": "CHARANCHI"
+                },
+                {
+                    "lgaCode": "195",
+                    "lga": "DAURA"
+                },
+                {
+                    "lgaCode": "213",
+                    "lga": "DUTSI"
+                },
+                {
+                    "lgaCode": "213",
+                    "lga": "DUTSIN-MA"
+                },
+                {
+                    "lgaCode": "135",
+                    "lga": "BINDAWA"
+                },
+                {
+                    "lgaCode": "13",
+                    "lga": "KATSINA"
+                }
+            ]
+        },
+        {
+            "stateCode": "14",
+            "stateName": "KWARA",
+            "lga": [
+                {
+                    "lgaCode": "216",
+                    "lga": "EDU"
+                },
+                {
+                    "lgaCode": "118",
+                    "lga": "BARUTEN"
+                },
+                {
+                    "lgaCode": "82",
+                    "lga": "ASA"
+                },
+                {
+                    "lgaCode": "5664",
+                    "lga": "EKITI"
+                },
+                {
+                    "lgaCode": "233",
+                    "lga": "PATEGI"
+                },
+                {
+                    "lgaCode": "405",
+                    "lga": "ILORIN EAST"
+                },
+                {
+                    "lgaCode": "405",
+                    "lga": "ILORIN SOUTH"
+                },
+                {
+                    "lgaCode": "405",
+                    "lga": "ILORIN WEST"
+                },
+                {
+                    "lgaCode": "416",
+                    "lga": "IREPODUN"
+                },
+                {
+                    "lgaCode": "428",
+                    "lga": "ISIN"
+                },
+                {
+                    "lgaCode": "466",
+                    "lga": "KAIAMA"
+                },
+                {
+                    "lgaCode": "343",
+                    "lga": "IFELODUN"
+                },
+                {
+                    "lgaCode": "747",
+                    "lga": "OYUN"
+                },
+                {
+                    "lgaCode": "680",
+                    "lga": "OKE-ERO"
+                },
+                {
+                    "lgaCode": "599",
+                    "lga": "MORO"
+                },
+                {
+                    "lgaCode": "656",
+                    "lga": "OFFA"
+                }
+            ]
+        },
+        {
+            "stateCode": "15",
+            "stateName": "LAGOS",
+            "lga": [
+                {
+                    "lgaCode": "605",
+                    "lga": "MUSHIN"
+                },
+                {
+                    "lgaCode": "536",
+                    "lga": "LAGOS MAINLAND"
+                },
+                {
+                    "lgaCode": "535",
+                    "lga": "LAGOS ISLAND"
+                },
+                {
+                    "lgaCode": "677",
+                    "lga": "OJO"
+                },
+                {
+                    "lgaCode": "731",
+                    "lga": "OSHODI-ISOLO"
+                },
+                {
+                    "lgaCode": "798",
+                    "lga": "SHOMOLU"
+                },
+                {
+                    "lgaCode": "375",
+                    "lga": "IKEJA"
+                },
+                {
+                    "lgaCode": "339",
+                    "lga": "IFAKO-IJAYE"
+                },
+                {
+                    "lgaCode": "1002",
+                    "lga": "KOSOFE"
+                },
+                {
+                    "lgaCode": "323",
+                    "lga": "IBEJU/LEKKI"
+                },
+                {
+                    "lgaCode": "384",
+                    "lga": "IKORODU"
+                },
+                {
+                    "lgaCode": "249",
+                    "lga": "ETI-OSA"
+                },
+                {
+                    "lgaCode": "236",
+                    "lga": "EPE"
+                },
+                {
+                    "lgaCode": "3838",
+                    "lga": "SURULERE"
+                },
+                {
+                    "lgaCode": "63",
+                    "lga": "ALIMOSHO"
+                },
+                {
+                    "lgaCode": "67",
+                    "lga": "AMUWO-ODOFIN"
+                },
+                {
+                    "lgaCode": "76",
+                    "lga": "APAPA"
+                },
+                {
+                    "lgaCode": "45",
+                    "lga": "AJEROMI-IFELODUN"
+                },
+                {
+                    "lgaCode": "104",
+                    "lga": "BADAGRY"
+                },
+                {
+                    "lgaCode": "29",
+                    "lga": "AGEGE"
+                }
+            ]
+        },
+        {
+            "stateCode": "16",
+            "stateName": "NIGER",
+            "lga": [
+                {
+                    "lgaCode": "33",
+                    "lga": "AGWARA"
+                },
+                {
+                    "lgaCode": "22",
+                    "lga": "AGAIE"
+                },
+                {
+                    "lgaCode": "214",
+                    "lga": "EDATI"
+                },
+                {
+                    "lgaCode": "133",
+                    "lga": "BIDA"
+                },
+                {
+                    "lgaCode": "174",
+                    "lga": "CHANCHAGA"
+                },
+                {
+                    "lgaCode": "158",
+                    "lga": "BOSSO"
+                },
+                {
+                    "lgaCode": "153",
+                    "lga": "BORGU"
+                },
+                {
+                    "lgaCode": "886",
+                    "lga": "WUSHISHI"
+                },
+                {
+                    "lgaCode": "301",
+                    "lga": "GURARA"
+                },
+                {
+                    "lgaCode": "278",
+                    "lga": "GBAKO"
+                },
+                {
+                    "lgaCode": "796",
+                    "lga": "SHIRORO"
+                },
+                {
+                    "lgaCode": "808",
+                    "lga": "SULEJA"
+                },
+                {
+                    "lgaCode": "813",
+                    "lga": "TAFA"
+                },
+                {
+                    "lgaCode": "762",
+                    "lga": "RIJAU"
+                },
+                {
+                    "lgaCode": "758",
+                    "lga": "RAFI"
+                },
+                {
+                    "lgaCode": "748",
+                    "lga": "PAIKORO"
+                },
+                {
+                    "lgaCode": "541",
+                    "lga": "LAVUN"
+                },
+                {
+                    "lgaCode": "539",
+                    "lga": "LAPAI"
+                },
+                {
+                    "lgaCode": "554",
+                    "lga": "MAGAMA"
+                },
+                {
+                    "lgaCode": "512",
+                    "lga": "KONTAGORA"
+                },
+                {
+                    "lgaCode": "485",
+                    "lga": "KATCHA"
+                },
+                {
+                    "lgaCode": "595",
+                    "lga": "MOKWA"
+                },
+                {
+                    "lgaCode": "573",
+                    "lga": "MASHEGU"
+                },
+                {
+                    "lgaCode": "570",
+                    "lga": "MARIGA"
+                },
+                {
+                    "lgaCode": "606",
+                    "lga": "MUYA"
+                }
+            ]
+        },
+        {
+            "stateCode": "17",
+            "stateName": "OGUN",
+            "lga": [
+                {
+                    "lgaCode": "653",
+                    "lga": "ODOGBOLU"
+                },
+                {
+                    "lgaCode": "650",
+                    "lga": "ODEDA"
+                },
+                {
+                    "lgaCode": "649",
+                    "lga": "REMO NORTH"
+                },
+                {
+                    "lgaCode": "634",
+                    "lga": "OBAFEMI-OWODE"
+                },
+                {
+                    "lgaCode": "252",
+                    "lga": "EWEKORO"
+                },
+                {
+                    "lgaCode": "7654",
+                    "lga": "SHAGAMU"
+                },
+                {
+                    "lgaCode": "3374",
+                    "lga": "OGUN WATERSIDE"
+                },
+                {
+                    "lgaCode": "407",
+                    "lga": "IMEKO-AFON"
+                },
+                {
+                    "lgaCode": "412",
+                    "lga": "IPOKIA"
+                },
+                {
+                    "lgaCode": "346",
+                    "lga": "IFO"
+                },
+                {
+                    "lgaCode": "377",
+                    "lga": "IKENNE"
+                },
+                {
+                    "lgaCode": "367",
+                    "lga": "IJEBU ODE"
+                },
+                {
+                    "lgaCode": "366",
+                    "lga": "IJEBU NORTH EAST"
+                },
+                {
+                    "lgaCode": "365",
+                    "lga": "IJEBU EAST"
+                },
+                {
+                    "lgaCode": "365",
+                    "lga": "IJEBU NORTH"
+                },
+                {
+                    "lgaCode": "219",
+                    "lga": "EGBADO NORTH"
+                },
+                {
+                    "lgaCode": "219",
+                    "lga": "EGBADO SOUTH"
+                },
+                {
+                    "lgaCode": "18",
+                    "lga": "ADO-ODO/OTA"
+                },
+                {
+                    "lgaCode": "7",
+                    "lga": "ABEOKUTA NORTH"
+                },
+                {
+                    "lgaCode": "7",
+                    "lga": "ABEOKUTA SOUTH"
+                }
+            ]
+        },
+        {
+            "stateCode": "18",
+            "stateName": "ONDO",
+            "lga": [
+                {
+                    "lgaCode": "55",
+                    "lga": "AKURE NORTH"
+                },
+                {
+                    "lgaCode": "55",
+                    "lga": "AKURE SOUTH"
+                },
+                {
+                    "lgaCode": "51",
+                    "lga": "AKOKO NORTH EAST"
+                },
+                {
+                    "lgaCode": "51",
+                    "lga": "AKOKO NORTH WEST"
+                },
+                {
+                    "lgaCode": "51",
+                    "lga": "AKOKO SOUTH EAST"
+                },
+                {
+                    "lgaCode": "51",
+                    "lga": "AKOKO SOUTH WEST"
+                },
+                {
+                    "lgaCode": "331",
+                    "lga": "IDANRE"
+                },
+                {
+                    "lgaCode": "342",
+                    "lga": "IFEDORE"
+                },
+                {
+                    "lgaCode": "1003",
+                    "lga": "ESE-ODO"
+                },
+                {
+                    "lgaCode": "414",
+                    "lga": "IRELE"
+                },
+                {
+                    "lgaCode": "396",
+                    "lga": "ILE-OLUJI-OKEIGBO"
+                },
+                {
+                    "lgaCode": "393",
+                    "lga": "ILAJE"
+                },
+                {
+                    "lgaCode": "652",
+                    "lga": "ODIGBO"
+                },
+                {
+                    "lgaCode": "741",
+                    "lga": "OWO"
+                },
+                {
+                    "lgaCode": "729",
+                    "lga": "OSE"
+                },
+                {
+                    "lgaCode": "686",
+                    "lga": "OKITIPUPA"
+                },
+                {
+                    "lgaCode": "705",
+                    "lga": "ONDO EAST"
+                },
+                {
+                    "lgaCode": "705",
+                    "lga": "ONDO WEST"
+                }
+            ]
+        },
+        {
+            "stateCode": "19",
+            "stateName": "OYO",
+            "lga": [
+                {
+                    "lgaCode": "704",
+                    "lga": "ONA-ARA"
+                },
+                {
+                    "lgaCode": "698",
+                    "lga": "OLUYOLE"
+                },
+                {
+                    "lgaCode": "697",
+                    "lga": "OLORUNSOGO"
+                },
+                {
+                    "lgaCode": "717",
+                    "lga": "ORI IRE"
+                },
+                {
+                    "lgaCode": "665",
+                    "lga": "OGO OLUWA"
+                },
+                {
+                    "lgaCode": "662",
+                    "lga": "OGBOMOSHO NORTH"
+                },
+                {
+                    "lgaCode": "662",
+                    "lga": "OGBOMOSHO SOUTH"
+                },
+                {
+                    "lgaCode": "715",
+                    "lga": "ORELOPE"
+                },
+                {
+                    "lgaCode": "746",
+                    "lga": "OYO EAST"
+                },
+                {
+                    "lgaCode": "746",
+                    "lga": "OYO WEST"
+                },
+                {
+                    "lgaCode": "778",
+                    "lga": "SAKI EAST"
+                },
+                {
+                    "lgaCode": "778",
+                    "lga": "SAKI WEST"
+                },
+                {
+                    "lgaCode": "533",
+                    "lga": "LAGELU"
+                },
+                {
+                    "lgaCode": "415",
+                    "lga": "IREPO"
+                },
+                {
+                    "lgaCode": "425",
+                    "lga": "ISEYIN"
+                },
+                {
+                    "lgaCode": "468",
+                    "lga": "KAJOLA"
+                },
+                {
+                    "lgaCode": "436",
+                    "lga": "ITESIWAJU"
+                },
+                {
+                    "lgaCode": "439",
+                    "lga": "IWAJOWA"
+                },
+                {
+                    "lgaCode": "322",
+                    "lga": "IBARAPA CENTRAL"
+                },
+                {
+                    "lgaCode": "322",
+                    "lga": "IBARAPA EAST"
+                },
+                {
+                    "lgaCode": "322",
+                    "lga": "IBARAPA NORTH"
+                },
+                {
+                    "lgaCode": "319",
+                    "lga": "IBADAN NORTH"
+                },
+                {
+                    "lgaCode": "319",
+                    "lga": "IBADAN NORTH EAST"
+                },
+                {
+                    "lgaCode": "319",
+                    "lga": "IBADAN NORTH WEST"
+                },
+                {
+                    "lgaCode": "338",
+                    "lga": "IDO"
+                },
+                {
+                    "lgaCode": "3838",
+                    "lga": "SURULERE"
+                },
+                {
+                    "lgaCode": "2150",
+                    "lga": "IBADAN SOUTH EAST"
+                },
+                {
+                    "lgaCode": "2150",
+                    "lga": "IBADAN SOUTH WEST"
+                },
+                {
+                    "lgaCode": "220",
+                    "lga": "EGBEDA"
+                },
+                {
+                    "lgaCode": "49",
+                    "lga": "AKINYELE"
+                },
+                {
+                    "lgaCode": "89",
+                    "lga": "ATIGBO"
+                },
+                {
+                    "lgaCode": "88",
+                    "lga": "ATIBA"
+                },
+                {
+                    "lgaCode": "20",
+                    "lga": "AFIJIO"
+                }
+            ]
+        },
+        {
+            "stateCode": "20",
+            "stateName": "PLATEAU",
+            "lga": [
+                {
+                    "lgaCode": "20",
+                    "lga": "JOS EAST"
+                },
+                {
+                    "lgaCode": "20",
+                    "lga": "JOS SOUTH"
+                },
+                {
+                    "lgaCode": "119",
+                    "lga": "BASSA"
+                },
+                {
+                    "lgaCode": "149",
+                    "lga": "BOKKOS"
+                },
+                {
+                    "lgaCode": "2725",
+                    "lga": "JOS NORTH"
+                },
+                {
+                    "lgaCode": "878",
+                    "lga": "WASE"
+                },
+                {
+                    "lgaCode": "7778",
+                    "lga": "BARIKIN LADI"
+                },
+                {
+                    "lgaCode": "473",
+                    "lga": "KANAM"
+                },
+                {
+                    "lgaCode": "475",
+                    "lga": "KANKE"
+                },
+                {
+                    "lgaCode": "538",
+                    "lga": "LANGTANG NORTH"
+                },
+                {
+                    "lgaCode": "538",
+                    "lga": "LANGTANG SOUTH"
+                },
+                {
+                    "lgaCode": "566",
+                    "lga": "MANGU"
+                },
+                {
+                    "lgaCode": "585",
+                    "lga": "MIKANG"
+                },
+                {
+                    "lgaCode": "766",
+                    "lga": "RIYOM"
+                },
+                {
+                    "lgaCode": "749",
+                    "lga": "PANKSHIN"
+                },
+                {
+                    "lgaCode": "756",
+                    "lga": "QUAAN PAN"
+                },
+                {
+                    "lgaCode": "793",
+                    "lga": "SHENDAM"
+                }
+            ]
+        },
+        {
+            "stateCode": "21",
+            "stateName": "RIVERS",
+            "lga": [
+                {
+                    "lgaCode": "815",
+                    "lga": "TAI"
+                },
+                {
+                    "lgaCode": "753",
+                    "lga": "PORT-HARCOURT"
+                },
+                {
+                    "lgaCode": "745",
+                    "lga": "OYIGBO"
+                },
+                {
+                    "lgaCode": "712",
+                    "lga": "OPOBO/NKORO"
+                },
+                {
+                    "lgaCode": "668",
+                    "lga": "OGU/BOLO"
+                },
+                {
+                    "lgaCode": "691",
+                    "lga": "OKRIKA"
+                },
+                {
+                    "lgaCode": "701",
+                    "lga": "OMUMMA"
+                },
+                {
+                    "lgaCode": "660",
+                    "lga": "OGBA/EGBEMA/NDONI"
+                },
+                {
+                    "lgaCode": "639",
+                    "lga": "OBIA/AKPOR"
+                },
+                {
+                    "lgaCode": "497",
+                    "lga": "KHANA"
+                },
+                {
+                    "lgaCode": "390",
+                    "lga": "IKWERRE"
+                },
+                {
+                    "lgaCode": "1853",
+                    "lga": "EMOHUA"
+                },
+                {
+                    "lgaCode": "232",
+                    "lga": "ELEME"
+                },
+                {
+                    "lgaCode": "243",
+                    "lga": "ETCHE"
+                },
+                {
+                    "lgaCode": "290",
+                    "lga": "GOKANA"
+                },
+                {
+                    "lgaCode": "152",
+                    "lga": "BONNY"
+                },
+                {
+                    "lgaCode": "198",
+                    "lga": "DEGEMA"
+                },
+                {
+                    "lgaCode": "36",
+                    "lga": "AHOADA EAST"
+                },
+                {
+                    "lgaCode": "36",
+                    "lga": "AHOADA WEST"
+                },
+                {
+                    "lgaCode": "54",
+                    "lga": "AKUKU TORU"
+                },
+                {
+                    "lgaCode": "69",
+                    "lga": "ANDONI"
+                },
+                {
+                    "lgaCode": "84",
+                    "lga": "ASARI-TORU"
+                },
+                {
+                    "lgaCode": "12",
+                    "lga": "ABUA/ODUAL"
+                }
+            ]
+        },
+        {
+            "stateCode": "22",
+            "stateName": "SOKOTO",
+            "lga": [
+                {
+                    "lgaCode": "22",
+                    "lga": "SOKOTO NORTH"
+                },
+                {
+                    "lgaCode": "22",
+                    "lga": "SOKOTO SOUTH"
+                },
+                {
+                    "lgaCode": "137",
+                    "lga": "BINJI"
+                },
+                {
+                    "lgaCode": "190",
+                    "lga": "DANGE-SHUNI"
+                },
+                {
+                    "lgaCode": "146",
+                    "lga": "BODINGA"
+                },
+                {
+                    "lgaCode": "293",
+                    "lga": "GORONYO"
+                },
+                {
+                    "lgaCode": "295",
+                    "lga": "GUDU"
+                },
+                {
+                    "lgaCode": "266",
+                    "lga": "GADA"
+                },
+                {
+                    "lgaCode": "884",
+                    "lga": "WURNO"
+                },
+                {
+                    "lgaCode": "887",
+                    "lga": "YABO"
+                },
+                {
+                    "lgaCode": "871",
+                    "lga": "WAMAKO"
+                },
+                {
+                    "lgaCode": "402",
+                    "lga": "ILLELA"
+                },
+                {
+                    "lgaCode": "420",
+                    "lga": "ISA"
+                },
+                {
+                    "lgaCode": "306",
+                    "lga": "GWADABAWA"
+                },
+                {
+                    "lgaCode": "1004",
+                    "lga": "KWARE"
+                },
+                {
+                    "lgaCode": "494",
+                    "lga": "KEBBE"
+                },
+                {
+                    "lgaCode": "757",
+                    "lga": "RABAH"
+                },
+                {
+                    "lgaCode": "770",
+                    "lga": "SABON BIRNI"
+                },
+                {
+                    "lgaCode": "787",
+                    "lga": "SHAGARI"
+                },
+                {
+                    "lgaCode": "799",
+                    "lga": "SILAME"
+                },
+                {
+                    "lgaCode": "822",
+                    "lga": "TANGAZA"
+                },
+                {
+                    "lgaCode": "821",
+                    "lga": "TAMBUWAL"
+                },
+                {
+                    "lgaCode": "838",
+                    "lga": "TURETA"
+                }
+            ]
+        },
+        {
+            "stateCode": "23",
+            "stateName": "ABIA",
+            "lga": [
+                {
+                    "lgaCode": "671",
+                    "lga": "OHAFIA"
+                },
+                {
+                    "lgaCode": "734",
+                    "lga": "OSISIOMA NGWA"
+                },
+                {
+                    "lgaCode": "638",
+                    "lga": "OBI NGWA"
+                },
+                {
+                    "lgaCode": "427",
+                    "lga": "ISIALA-NGWA NORTH"
+                },
+                {
+                    "lgaCode": "427",
+                    "lga": "ISIALA-NGWA SOUTH"
+                },
+                {
+                    "lgaCode": "434",
+                    "lga": "ISIUKWUATO"
+                },
+                {
+                    "lgaCode": "392",
+                    "lga": "IKWUANO"
+                },
+                {
+                    "lgaCode": "854",
+                    "lga": "UMU-NNEOCHI"
+                },
+                {
+                    "lgaCode": "852",
+                    "lga": "UMUAHIA NORTH"
+                },
+                {
+                    "lgaCode": "852",
+                    "lga": "UMUAHIA SOUTH"
+                },
+                {
+                    "lgaCode": "846",
+                    "lga": "UGWUNAGBO"
+                },
+                {
+                    "lgaCode": "2355",
+                    "lga": "UKWA EAST"
+                },
+                {
+                    "lgaCode": "2355",
+                    "lga": "UKWA WEST"
+                },
+                {
+                    "lgaCode": "128",
+                    "lga": "BENDE"
+                },
+                {
+                    "lgaCode": "81",
+                    "lga": "AROCHUKWU"
+                },
+                {
+                    "lgaCode": "1",
+                    "lga": "ABA NORTH"
+                },
+                {
+                    "lgaCode": "1",
+                    "lga": "ABA SOUTH"
+                }
+            ]
+        },
+        {
+            "stateCode": "24",
+            "stateName": "DELTA",
+            "lga": [
+                {
+                    "lgaCode": "71",
+                    "lga": "ANIOCHA NORTH"
+                },
+                {
+                    "lgaCode": "71",
+                    "lga": "ANIOCHA SOUTH"
+                },
+                {
+                    "lgaCode": "151",
+                    "lga": "BOMADI"
+                },
+                {
+                    "lgaCode": "171",
+                    "lga": "BURUTU"
+                },
+                {
+                    "lgaCode": "992",
+                    "lga": "WARRI SOUTH"
+                },
+                {
+                    "lgaCode": "992",
+                    "lga": "WARRI SOUTH WEST"
+                },
+                {
+                    "lgaCode": "845",
+                    "lga": "UGHELLI NORTH"
+                },
+                {
+                    "lgaCode": "845",
+                    "lga": "UGHELLI SOUTH"
+                },
+                {
+                    "lgaCode": "851",
+                    "lga": "UKWUANI"
+                },
+                {
+                    "lgaCode": "875",
+                    "lga": "WARRI NORTH"
+                },
+                {
+                    "lgaCode": "864",
+                    "lga": "UVWIE"
+                },
+                {
+                    "lgaCode": "244",
+                    "lga": "ETHIOPE EAST"
+                },
+                {
+                    "lgaCode": "244",
+                    "lga": "ETHIOPE WEST"
+                },
+                {
+                    "lgaCode": "431",
+                    "lga": "ISOKO NORTH"
+                },
+                {
+                    "lgaCode": "431",
+                    "lga": "ISOKO SOUTH"
+                },
+                {
+                    "lgaCode": "371",
+                    "lga": "IKA NORTH EAST"
+                },
+                {
+                    "lgaCode": "371",
+                    "lga": "IKA SOUTH"
+                },
+                {
+                    "lgaCode": "611",
+                    "lga": "NDOKWA EAST"
+                },
+                {
+                    "lgaCode": "611",
+                    "lga": "NDOKWA WEST"
+                },
+                {
+                    "lgaCode": "730",
+                    "lga": "OSHIMILI NORTH"
+                },
+                {
+                    "lgaCode": "730",
+                    "lga": "OSHIMILI SOUTH"
+                },
+                {
+                    "lgaCode": "689",
+                    "lga": "OKPE"
+                },
+                {
+                    "lgaCode": "842",
+                    "lga": "UDU"
+                },
+                {
+                    "lgaCode": "751",
+                    "lga": "PATANI"
+                },
+                {
+                    "lgaCode": "784",
+                    "lga": "SAPELE"
+                }
+            ]
+        },
+        {
+            "stateCode": "25",
+            "stateName": "ENUGU",
+            "lga": [
+                {
+                    "lgaCode": "840",
+                    "lga": "UDI"
+                },
+                {
+                    "lgaCode": "839",
+                    "lga": "UDENU"
+                },
+                {
+                    "lgaCode": "676",
+                    "lga": "OJI-RIVER"
+                },
+                {
+                    "lgaCode": "631",
+                    "lga": "NSUKKA"
+                },
+                {
+                    "lgaCode": "623",
+                    "lga": "NKANU EAST"
+                },
+                {
+                    "lgaCode": "623",
+                    "lga": "NKANU WEST"
+                },
+                {
+                    "lgaCode": "358",
+                    "lga": "IGBO-EZE NORTH"
+                },
+                {
+                    "lgaCode": "358",
+                    "lga": "IGBO-EZE SOUTH"
+                },
+                {
+                    "lgaCode": "357",
+                    "lga": "IGBO-ETITI"
+                },
+                {
+                    "lgaCode": "0",
+                    "lga": "AWGU"
+                },
+                {
+                    "lgaCode": "429",
+                    "lga": "ISI-UZO"
+                },
+                {
+                    "lgaCode": "253",
+                    "lga": "EZEAGU"
+                },
+                {
+                    "lgaCode": "866",
+                    "lga": "UZO-UWANI"
+                },
+                {
+                    "lgaCode": "1857",
+                    "lga": "ENUGU NORTH"
+                },
+                {
+                    "lgaCode": "70",
+                    "lga": "ANINRI"
+                },
+                {
+                    "lgaCode": "25",
+                    "lga": "ENUGU EAST"
+                },
+                {
+                    "lgaCode": "25",
+                    "lga": "ENUGU SOUTH"
+                }
+            ]
+        },
+        {
+            "stateCode": "26",
+            "stateName": "JIGAWA",
+            "lga": [
+                {
+                    "lgaCode": "102",
+                    "lga": "BABURA"
+                },
+                {
+                    "lgaCode": "94",
+                    "lga": "AUYO"
+                },
+                {
+                    "lgaCode": "212",
+                    "lga": "DUTSE"
+                },
+                {
+                    "lgaCode": "164",
+                    "lga": "BUJI"
+                },
+                {
+                    "lgaCode": "140",
+                    "lga": "BIRNI KUDU"
+                },
+                {
+                    "lgaCode": "139",
+                    "lga": "BIRINIWA"
+                },
+                {
+                    "lgaCode": "892",
+                    "lga": "YANKWASHI"
+                },
+                {
+                    "lgaCode": "302",
+                    "lga": "GURI"
+                },
+                {
+                    "lgaCode": "299",
+                    "lga": "GUMEL"
+                },
+                {
+                    "lgaCode": "267",
+                    "lga": "GAGARAWA"
+                },
+                {
+                    "lgaCode": "270",
+                    "lga": "GARKI"
+                },
+                {
+                    "lgaCode": "444",
+                    "lga": "JAHUN"
+                },
+                {
+                    "lgaCode": "462",
+                    "lga": "KAFIN HAUSA"
+                },
+                {
+                    "lgaCode": "310",
+                    "lga": "GWARAM"
+                },
+                {
+                    "lgaCode": "313",
+                    "lga": "GWIWA"
+                },
+                {
+                    "lgaCode": "315",
+                    "lga": "HADEJIA"
+                },
+                {
+                    "lgaCode": "584",
+                    "lga": "MIGA"
+                },
+                {
+                    "lgaCode": "492",
+                    "lga": "KAZAURE"
+                },
+                {
+                    "lgaCode": "487",
+                    "lga": "KAUGAMA"
+                },
+                {
+                    "lgaCode": "501",
+                    "lga": "KIRI KASAMMA"
+                },
+                {
+                    "lgaCode": "504",
+                    "lga": "KIYAWA"
+                },
+                {
+                    "lgaCode": "564",
+                    "lga": "MALAM MADORI"
+                },
+                {
+                    "lgaCode": "558",
+                    "lga": "MAIGATARI"
+                },
+                {
+                    "lgaCode": "826",
+                    "lga": "TAURA"
+                },
+                {
+                    "lgaCode": "806",
+                    "lga": "SULE-TANKARKAR"
+                },
+                {
+                    "lgaCode": "769",
+                    "lga": "RONI"
+                },
+                {
+                    "lgaCode": "765",
+                    "lga": "RINGIM"
+                }
+            ]
+        },
+        {
+            "stateCode": "27",
+            "stateName": "KEBBI",
+            "lga": [
+                {
+                    "lgaCode": "777",
+                    "lga": "SAKABA"
+                },
+                {
+                    "lgaCode": "788",
+                    "lga": "SHANGA"
+                },
+                {
+                    "lgaCode": "810",
+                    "lga": "SURU"
+                },
+                {
+                    "lgaCode": "560",
+                    "lga": "MAIYAMA"
+                },
+                {
+                    "lgaCode": "507",
+                    "lga": "KOKO/BESSE"
+                },
+                {
+                    "lgaCode": "616",
+                    "lga": "NGASKI"
+                },
+                {
+                    "lgaCode": "309",
+                    "lga": "GWANDU"
+                },
+                {
+                    "lgaCode": "471",
+                    "lga": "KALGO"
+                },
+                {
+                    "lgaCode": "449",
+                    "lga": "JEGA"
+                },
+                {
+                    "lgaCode": "257",
+                    "lga": "FAKAI"
+                },
+                {
+                    "lgaCode": "877",
+                    "lga": "WASAGU/DANKO"
+                },
+                {
+                    "lgaCode": "894",
+                    "lga": "YAURI"
+                },
+                {
+                    "lgaCode": "906",
+                    "lga": "ZURU"
+                },
+                {
+                    "lgaCode": "143",
+                    "lga": "BIRNIN KEBBI"
+                },
+                {
+                    "lgaCode": "168",
+                    "lga": "BUNZA"
+                },
+                {
+                    "lgaCode": "188",
+                    "lga": "DANDI"
+                },
+                {
+                    "lgaCode": "93",
+                    "lga": "AUGIE"
+                },
+                {
+                    "lgaCode": "106",
+                    "lga": "BAGUDO"
+                },
+                {
+                    "lgaCode": "61",
+                    "lga": "ALEIRO"
+                },
+                {
+                    "lgaCode": "80",
+                    "lga": "ARGUNGU"
+                },
+                {
+                    "lgaCode": "79",
+                    "lga": "AREWA-DANDI"
+                }
+            ]
+        },
+        {
+            "stateCode": "28",
+            "stateName": "KOGI",
+            "lga": [
+                {
+                    "lgaCode": "73",
+                    "lga": "ANKPA"
+                },
+                {
+                    "lgaCode": "44",
+                    "lga": "AJAOKUTA"
+                },
+                {
+                    "lgaCode": "119",
+                    "lga": "BASSA"
+                },
+                {
+                    "lgaCode": "199",
+                    "lga": "DEKINA"
+                },
+                {
+                    "lgaCode": "28",
+                    "lga": "KOGI"
+                },
+                {
+                    "lgaCode": "16",
+                    "lga": "ADAVI"
+                },
+                {
+                    "lgaCode": "888",
+                    "lga": "YAGBA EAST"
+                },
+                {
+                    "lgaCode": "888",
+                    "lga": "YAGBA WEST"
+                },
+                {
+                    "lgaCode": "457",
+                    "lga": "KABBA/BUNU"
+                },
+                {
+                    "lgaCode": "321",
+                    "lga": "IBAJI"
+                },
+                {
+                    "lgaCode": "370",
+                    "lga": "IJUMU"
+                },
+                {
+                    "lgaCode": "330",
+                    "lga": "IDAH"
+                },
+                {
+                    "lgaCode": "348",
+                    "lga": "IGALAMELA-ODOLU"
+                },
+                {
+                    "lgaCode": "598",
+                    "lga": "MOPA-MURO"
+                },
+                {
+                    "lgaCode": "545",
+                    "lga": "LOKOJA"
+                },
+                {
+                    "lgaCode": "684",
+                    "lga": "OKENE"
+                },
+                {
+                    "lgaCode": "681",
+                    "lga": "OKEHI"
+                },
+                {
+                    "lgaCode": "667",
+                    "lga": "OGORI/MAGONGO"
+                },
+                {
+                    "lgaCode": "657",
+                    "lga": "OFU"
+                },
+                {
+                    "lgaCode": "693",
+                    "lga": "OLAMABOLO"
+                },
+                {
+                    "lgaCode": "699",
+                    "lga": "OMALA"
+                }
+            ]
+        },
+        {
+            "stateCode": "29",
+            "stateName": "OSUN",
+            "lga": [
+                {
+                    "lgaCode": "696",
+                    "lga": "OLORUNDA"
+                },
+                {
+                    "lgaCode": "694",
+                    "lga": "OLA-OLUWA"
+                },
+                {
+                    "lgaCode": "734",
+                    "lga": "OSOGBO"
+                },
+                {
+                    "lgaCode": "718",
+                    "lga": "ORIADE"
+                },
+                {
+                    "lgaCode": "722",
+                    "lga": "OROLU"
+                },
+                {
+                    "lgaCode": "642",
+                    "lga": "OBOKUN"
+                },
+                {
+                    "lgaCode": "654",
+                    "lga": "ODO-OTIN"
+                },
+                {
+                    "lgaCode": "341",
+                    "lga": "IFEDAYO"
+                },
+                {
+                    "lgaCode": "343",
+                    "lga": "IFELODUN"
+                },
+                {
+                    "lgaCode": "1006",
+                    "lga": "ILA"
+                },
+                {
+                    "lgaCode": "440",
+                    "lga": "IWO"
+                },
+                {
+                    "lgaCode": "430",
+                    "lga": "ISOKAN"
+                },
+                {
+                    "lgaCode": "418",
+                    "lga": "IREWOLE"
+                },
+                {
+                    "lgaCode": "416",
+                    "lga": "IREPODUN"
+                },
+                {
+                    "lgaCode": "399",
+                    "lga": "ILESHA EAST"
+                },
+                {
+                    "lgaCode": "399",
+                    "lga": "ILESHA WEST"
+                },
+                {
+                    "lgaCode": "221",
+                    "lga": "EGBEDORE"
+                },
+                {
+                    "lgaCode": "224",
+                    "lga": "EJIGBO"
+                },
+                {
+                    "lgaCode": "215",
+                    "lga": "EDE NORTH"
+                },
+                {
+                    "lgaCode": "215",
+                    "lga": "EDE SOUTH"
+                },
+                {
+                    "lgaCode": "155",
+                    "lga": "BORIPE"
+                },
+                {
+                    "lgaCode": "150",
+                    "lga": "BOLUWADURO"
+                },
+                {
+                    "lgaCode": "132",
+                    "lga": "IFE CENTRAL"
+                },
+                {
+                    "lgaCode": "132",
+                    "lga": "IFE EAST"
+                },
+                {
+                    "lgaCode": "132",
+                    "lga": "IFE NORTH"
+                },
+                {
+                    "lgaCode": "132",
+                    "lga": "IFE SOUTH"
+                },
+                {
+                    "lgaCode": "100",
+                    "lga": "AIYEDIRE"
+                },
+                {
+                    "lgaCode": "87",
+                    "lga": "ATAKUMOSA EAST"
+                },
+                {
+                    "lgaCode": "87",
+                    "lga": "ATAKUMOSA WEST"
+                },
+                {
+                    "lgaCode": "38",
+                    "lga": "AIYEDADE"
+                }
+            ]
+        },
+        {
+            "stateCode": "30",
+            "stateName": "TARABA",
+            "lga": [
+                {
+                    "lgaCode": "78",
+                    "lga": "ARDO-KOLA"
+                },
+                {
+                    "lgaCode": "112",
+                    "lga": "BALI"
+                },
+                {
+                    "lgaCode": "205",
+                    "lga": "DONGA"
+                },
+                {
+                    "lgaCode": "275",
+                    "lga": "GASSOL"
+                },
+                {
+                    "lgaCode": "273",
+                    "lga": "GASHAKA"
+                },
+                {
+                    "lgaCode": "903",
+                    "lga": "ZING"
+                },
+                {
+                    "lgaCode": "897",
+                    "lga": "YORRO"
+                },
+                {
+                    "lgaCode": "882",
+                    "lga": "WUKARI"
+                },
+                {
+                    "lgaCode": "863",
+                    "lga": "USSA"
+                },
+                {
+                    "lgaCode": "446",
+                    "lga": "JALINGO"
+                },
+                {
+                    "lgaCode": "482",
+                    "lga": "KARIM-LAMIDO"
+                },
+                {
+                    "lgaCode": "326",
+                    "lga": "IBI"
+                },
+                {
+                    "lgaCode": "540",
+                    "lga": "LAU"
+                },
+                {
+                    "lgaCode": "524",
+                    "lga": "KURMI"
+                },
+                {
+                    "lgaCode": "818",
+                    "lga": "TAKUM"
+                },
+                {
+                    "lgaCode": "785",
+                    "lga": "SARDAUNA"
+                }
+            ]
+        },
+        {
+            "stateCode": "31",
+            "stateName": "YOBE",
+            "lga": [
+                {
+                    "lgaCode": "754",
+                    "lga": "POTISKUM"
+                },
+                {
+                    "lgaCode": "825",
+                    "lga": "TARMUA"
+                },
+                {
+                    "lgaCode": "548",
+                    "lga": "MACHINA"
+                },
+                {
+                    "lgaCode": "479",
+                    "lga": "KARASUWA"
+                },
+                {
+                    "lgaCode": "618",
+                    "lga": "NGURU"
+                },
+                {
+                    "lgaCode": "608",
+                    "lga": "NANGERE"
+                },
+                {
+                    "lgaCode": "445",
+                    "lga": "JAKUSKO"
+                },
+                {
+                    "lgaCode": "899",
+                    "lga": "YUSUFARI"
+                },
+                {
+                    "lgaCode": "898",
+                    "lga": "YUNUSARI"
+                },
+                {
+                    "lgaCode": "263",
+                    "lga": "FUNE"
+                },
+                {
+                    "lgaCode": "259",
+                    "lga": "FIKA"
+                },
+                {
+                    "lgaCode": "297",
+                    "lga": "GULANI"
+                },
+                {
+                    "lgaCode": "296",
+                    "lga": "GUJBA"
+                },
+                {
+                    "lgaCode": "282",
+                    "lga": "GEIDAM"
+                },
+                {
+                    "lgaCode": "183",
+                    "lga": "DAMATURU"
+                },
+                {
+                    "lgaCode": "169",
+                    "lga": "BURSARI"
+                },
+                {
+                    "lgaCode": "105",
+                    "lga": "BADE"
+                }
+            ]
+        },
+        {
+            "stateCode": "32",
+            "stateName": "BAYELSA",
+            "lga": [
+                {
+                    "lgaCode": "161",
+                    "lga": "BRASS"
+                },
+                {
+                    "lgaCode": "225",
+                    "lga": "EKEREMOR"
+                },
+                {
+                    "lgaCode": "612",
+                    "lga": "NEMBE"
+                },
+                {
+                    "lgaCode": "509",
+                    "lga": "KOLOKUMA/OPOKUMA"
+                },
+                {
+                    "lgaCode": "804",
+                    "lga": "SOUTHERN IJAW"
+                },
+                {
+                    "lgaCode": "765",
+                    "lga": "YENEGOA"
+                },
+                {
+                    "lgaCode": "776",
+                    "lga": "SAGBAMA"
+                },
+                {
+                    "lgaCode": "661",
+                    "lga": "OGBIA"
+                }
+            ]
+        },
+        {
+            "stateCode": "33",
+            "stateName": "EBONYI",
+            "lga": [
+                {
+                    "lgaCode": "674",
+                    "lga": "OHAUKWU"
+                },
+                {
+                    "lgaCode": "673",
+                    "lga": "OHAOZARA"
+                },
+                {
+                    "lgaCode": "706",
+                    "lga": "ONICHA"
+                },
+                {
+                    "lgaCode": "255",
+                    "lga": "EZZA NORTH"
+                },
+                {
+                    "lgaCode": "255",
+                    "lga": "EZZA SOUTH"
+                },
+                {
+                    "lgaCode": "438",
+                    "lga": "IVO"
+                },
+                {
+                    "lgaCode": "391",
+                    "lga": "IKWO"
+                },
+                {
+                    "lgaCode": "426",
+                    "lga": "ISHIELU"
+                },
+                {
+                    "lgaCode": "1007",
+                    "lga": "IZZI"
+                },
+                {
+                    "lgaCode": "21",
+                    "lga": "AFIKPO NORTH"
+                },
+                {
+                    "lgaCode": "21",
+                    "lga": "AFIKPO SOUTH"
+                },
+                {
+                    "lgaCode": "33",
+                    "lga": "EBONYI"
+                },
+                {
+                    "lgaCode": "6",
+                    "lga": "ABAKALIKI"
+                }
+            ]
+        },
+        {
+            "stateCode": "34",
+            "stateName": "EKITI",
+            "lga": [
+                {
+                    "lgaCode": "34",
+                    "lga": "ADO EKITI"
+                },
+                {
+                    "lgaCode": "218",
+                    "lga": "EFON"
+                },
+                {
+                    "lgaCode": "338",
+                    "lga": "IDO-OSI"
+                },
+                {
+                    "lgaCode": "368",
+                    "lga": "IJERO"
+                },
+                {
+                    "lgaCode": "417",
+                    "lga": "IREPODUN/IFELODUN"
+                },
+                {
+                    "lgaCode": "423",
+                    "lga": "ISE/ORUN"
+                },
+                {
+                    "lgaCode": "398",
+                    "lga": "ILEJEMEJI"
+                },
+                {
+                    "lgaCode": "281",
+                    "lga": "AIYEKIRE (GBONYIN)"
+                },
+                {
+                    "lgaCode": "234",
+                    "lga": "EMURE"
+                },
+                {
+                    "lgaCode": "2452",
+                    "lga": "IKOLE"
+                },
+                {
+                    "lgaCode": "2446",
+                    "lga": "IKERE"
+                },
+                {
+                    "lgaCode": "5664",
+                    "lga": "EKITI EAST"
+                },
+                {
+                    "lgaCode": "5664",
+                    "lga": "EKITI SOUTH WEST"
+                },
+                {
+                    "lgaCode": "5664",
+                    "lga": "EKITI WEST"
+                },
+                {
+                    "lgaCode": "743",
+                    "lga": "OYE"
+                },
+                {
+                    "lgaCode": "592",
+                    "lga": "MOBA"
+                }
+            ]
+        },
+        {
+            "stateCode": "35",
+            "stateName": "GOMBE",
+            "lga": [
+                {
+                    "lgaCode": "607",
+                    "lga": "NAFADA"
+                },
+                {
+                    "lgaCode": "528",
+                    "lga": "KWAMI"
+                },
+                {
+                    "lgaCode": "797",
+                    "lga": "SHOMGOM"
+                },
+                {
+                    "lgaCode": "891",
+                    "lga": "YAMALTU/DEBA"
+                },
+                {
+                    "lgaCode": "262",
+                    "lga": "FUNAKAYE"
+                },
+                {
+                    "lgaCode": "472",
+                    "lga": "KALTUNGO"
+                },
+                {
+                    "lgaCode": "6789",
+                    "lga": "GOMBE"
+                },
+                {
+                    "lgaCode": "209",
+                    "lga": "DUKKU"
+                },
+                {
+                    "lgaCode": "134",
+                    "lga": "BILLIRI"
+                },
+                {
+                    "lgaCode": "111",
+                    "lga": "BALANGA"
+                },
+                {
+                    "lgaCode": "50",
+                    "lga": "AKKO"
+                }
+            ]
+        },
+        {
+            "stateCode": "36",
+            "stateName": "NASARAWA",
+            "lga": [
+                {
+                    "lgaCode": "57",
+                    "lga": "AKWANGA"
+                },
+                {
+                    "lgaCode": "95",
+                    "lga": "AWE"
+                },
+                {
+                    "lgaCode": "204",
+                    "lga": "DOMA"
+                },
+                {
+                    "lgaCode": "872",
+                    "lga": "WAMBA"
+                },
+                {
+                    "lgaCode": "833",
+                    "lga": "TOTO"
+                },
+                {
+                    "lgaCode": "532",
+                    "lga": "LAFIA"
+                },
+                {
+                    "lgaCode": "508",
+                    "lga": "KOKONA"
+                },
+                {
+                    "lgaCode": "483",
+                    "lga": "KARU"
+                },
+                {
+                    "lgaCode": "493",
+                    "lga": "KEANA"
+                },
+                {
+                    "lgaCode": "495",
+                    "lga": "KEFFI"
+                },
+                {
+                    "lgaCode": "609",
+                    "lga": "NASARAWA-EGGON"
+                },
+                {
+                    "lgaCode": "609",
+                    "lga": "NASARAWA"
+                },
+                {
+                    "lgaCode": "637",
+                    "lga": "OBI"
+                }
+            ]
+        },
+        {
+            "stateCode": "37",
+            "stateName": "ZAMFARA",
+            "lga": [
+                {
+                    "lgaCode": "568",
+                    "lga": "MARADUN"
+                },
+                {
+                    "lgaCode": "572",
+                    "lga": "MARU"
+                },
+                {
+                    "lgaCode": "490",
+                    "lga": "KAURA NAMODA"
+                },
+                {
+                    "lgaCode": "820",
+                    "lga": "TALATA MAFARA"
+                },
+                {
+                    "lgaCode": "835",
+                    "lga": "TSAFE"
+                },
+                {
+                    "lgaCode": "794",
+                    "lga": "SHINKAFI"
+                },
+                {
+                    "lgaCode": "300",
+                    "lga": "GUMMI"
+                },
+                {
+                    "lgaCode": "303",
+                    "lga": "GUSAU"
+                },
+                {
+                    "lgaCode": "905",
+                    "lga": "ZURMI"
+                },
+                {
+                    "lgaCode": "141",
+                    "lga": "BIRNIN MAGAJI"
+                },
+                {
+                    "lgaCode": "166",
+                    "lga": "BUNGUDU"
+                },
+                {
+                    "lgaCode": "165",
+                    "lga": "BUKKUYUM"
+                },
+                {
+                    "lgaCode": "110",
+                    "lga": "BAKURA"
+                },
+                {
+                    "lgaCode": "72",
+                    "lga": "ANKA"
+                }
+            ]
+        }
+    ],
+    "responseCode": "00",
+    "responseDescription": "Operation Successful"
+}

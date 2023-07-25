@@ -1,5 +1,4 @@
 using System.Net.Http.Headers;
-using CIB.TransactionReversalService;
 using CIB.TransactionReversalService.Entities;
 using CIB.TransactionReversalService.Jobs;
 using CIB.TransactionReversalService.Modules.Common.Interface;
@@ -7,31 +6,34 @@ using CIB.TransactionReversalService.Modules.Common.Repository;
 using CIB.TransactionReversalService.Services;
 using CIB.TransactionReversalService.Utils;
 using Microsoft.EntityFrameworkCore;
-using Serilog;
+using NLog.Extensions.Logging;
+using NLog.Web;
 
 
 namespace CIB.TransactionReversalService;
 
 public class Program
 {
+  [Obsolete]
   public static void Main(string[] args)
   {
 
-    var config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
-    //Initialize Logger
-    Log.Logger = new LoggerConfiguration().ReadFrom.Configuration(config).CreateLogger();
+    var logger = NLogBuilder.ConfigureNLog("nlog.config").GetCurrentClassLogger();
     try
     {
-      Log.Information("Application Starting.");
+      logger.Debug("init main");
       CreateHostBuilder(args).Build().Run();
     }
     catch (Exception ex)
     {
-      Log.Fatal(ex, "The Application failed to start.");
+      //NLog: catch setup errors
+      logger.Error(ex, "Stopped program because of exception");
+      throw;
     }
     finally
     {
-      Log.CloseAndFlush();
+      // Ensure to flush and stop internal timers/threads before application-exit (Avoid segmentation fault on Linux)
+      NLog.LogManager.Shutdown();
     }
   }
   public static IHostBuilder CreateHostBuilder(string[] args) =>
@@ -50,5 +52,9 @@ public class Program
         services.AddScoped<IApiService, ApiService>();
         services.AddHostedService<Worker>();
       })
-      .UseSerilog();
+      .ConfigureLogging((hostingContext,logging) =>
+      {
+        logging.AddNLog(hostingContext.Configuration.GetSection("Logging")); 
+        logging.SetMinimumLevel(LogLevel.Information);
+      });
 }

@@ -10,6 +10,7 @@ using CIB.Core.Entities;
 using CIB.Core.Enums;
 using CIB.Core.Modules.CorporateProfile.Dto;
 using CIB.Core.Modules.CorporateProfile.Validation;
+using CIB.Core.Services.Authentication;
 using CIB.Core.Services.Email;
 using CIB.Core.Services.Notification;
 using CIB.Core.Templates;
@@ -30,7 +31,7 @@ namespace CIB.CorporateAdmin.Controllers
         private readonly ILogger<CorporateProfileController> _logger;
         private readonly IConfiguration _config;
         protected readonly INotificationService notify;
-        public CorporateProfileController(INotificationService notify,IConfiguration config,ILogger<CorporateProfileController> logger,IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor accessor,IEmailService emailService) : base( unitOfWork,mapper, accessor)
+        public CorporateProfileController(INotificationService notify,IConfiguration config,ILogger<CorporateProfileController> logger,IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor accessor,IEmailService emailService,IAuthenticationService authService):base(unitOfWork,mapper,accessor,authService)
         {
             this._emailService = emailService;
             this._logger = logger;
@@ -353,7 +354,7 @@ namespace CIB.CorporateAdmin.Controllers
             }
         }
 
-        [HttpPut("UpdateProfile")]
+        [HttpPost("UpdateProfile")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         public ActionResult<ResponseDTO<CorporateProfileResponseDto>> UpdateTemCorporateProfile(UpdateProfile model)
         {
@@ -502,7 +503,7 @@ namespace CIB.CorporateAdmin.Controllers
             }
         }
 
-        [HttpPut("RequestProfileApproval")]
+        [HttpPost("RequestProfileApproval")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         public ActionResult<ResponseDTO<CorporateProfileResponseDto>> RequestProfileApproval(SimpleActionDto model)
         {
@@ -570,7 +571,7 @@ namespace CIB.CorporateAdmin.Controllers
             }
         }
 
-        [HttpPut("ApproveProfile")]
+        [HttpPost("ApproveProfile")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         public ActionResult<ResponseDTO<CorporateProfileResponseDto>> ApproveProfile(SimpleActionDto model)
         {
@@ -636,7 +637,7 @@ namespace CIB.CorporateAdmin.Controllers
             }
         }
 
-        [HttpPut("ReActivateProfile")]
+        [HttpPost("ReActivateProfile")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         public ActionResult<ResponseDTO<CorporateProfileResponseDto>> ReActivateProfile(SimpleActionDto model)
         {
@@ -736,7 +737,7 @@ namespace CIB.CorporateAdmin.Controllers
             }
         }
 
-        [HttpPut("DeclineProfile")]
+        [HttpPost("DeclineProfile")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         public ActionResult<ResponseDTO<CorporateProfileResponseDto>> DeclineProfile(AppAction model)
         {
@@ -798,7 +799,7 @@ namespace CIB.CorporateAdmin.Controllers
             }
         }
 
-        [HttpPut("DeactivateProfile")]
+        [HttpPost("DeactivateProfile")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         public ActionResult<ResponseDTO<CorporateProfileResponseDto>> DeactivateProfile(AppAction model)
         {
@@ -904,7 +905,7 @@ namespace CIB.CorporateAdmin.Controllers
             }
         }
 
-        [HttpPut("UpdateProfileUserRole")]
+        [HttpPost("UpdateProfileUserRole")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         public ActionResult<ResponseDTO<CorporateProfileResponseDto>> UpdateProfileUserRole(UpdateProfileRoleDto model)
         {
@@ -1029,7 +1030,7 @@ namespace CIB.CorporateAdmin.Controllers
             }
         }
 
-        [HttpPut("EnableLoggedOutProfile")]
+        [HttpPost("EnableLoggedOutProfile")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         public ActionResult<TblCorporateProfile> EnableLoggedOutProfile(CorporateProfileDto model)
         {
@@ -2080,5 +2081,7 @@ namespace CIB.CorporateAdmin.Controllers
             errorMessage = "invalid Request";
             return false;
         }
+    
+    
     }
 }

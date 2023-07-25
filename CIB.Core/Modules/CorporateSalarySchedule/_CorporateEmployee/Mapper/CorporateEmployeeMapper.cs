@@ -13,7 +13,11 @@ namespace CIB.Core.Modules.CorporateSalarySchedule._CorporateEmployee.Mapper
         public CorporateEmployeeMapper() 
         {
             CreateMap<CreateCorporateEmployeeDto, TblCorporateCustomerEmployee>().ReverseMap();
+            CreateMap<TblCorporateCustomerEmployee, TblTempCorporateCustomerEmployee>().ReverseMap();
+            CreateMap<TblCorporateCustomerEmployee, UpdateCorporateEmployeeDto>().ReverseMap();
+            CreateMap<CreateCorporateEmployeeDto, TblTempCorporateCustomerEmployee>().ReverseMap();
             CreateMap<TblCorporateSalarySchedule, CorporateEmployeeResponse>().ReverseMap();
+            CreateMap<TblCorporateSalarySchedule, CorporateEmployeeResponseDto>().ReverseMap();
         }
     
     }

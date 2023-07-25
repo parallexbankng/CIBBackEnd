@@ -24,7 +24,6 @@ namespace CIB.Core.Modules.CorporateCustomerSalary.Validation
                 .NotNull();
             RuleFor(p => p.TriggerType.Trim())
                 .NotEmpty().WithMessage("{PropertyName} is required.")
-                .EmailAddress().WithMessage("{PropertyName} is not valid.")
                 .NotNull();
             RuleFor(p => p.StartDate)
                 .NotEmpty().WithMessage("{PropertyName} is required.")
@@ -57,7 +56,6 @@ namespace CIB.Core.Modules.CorporateCustomerSalary.Validation
                 .NotNull();
             RuleFor(p => p.TriggerType.Trim())
                 .NotEmpty().WithMessage("{PropertyName} is required.")
-                .EmailAddress().WithMessage("{PropertyName} is not valid.")
                 .NotNull();
             RuleFor(p => p.StartDate)
                 .NotEmpty().WithMessage("{PropertyName} is required.")

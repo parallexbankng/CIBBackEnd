@@ -18,7 +18,7 @@ public class Worker : BackgroundService
   {
     while (await _timer.WaitForNextTickAsync(stoppingToken) && !stoppingToken.IsCancellationRequested)
     {
-      //_logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
+      _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
       await _postIntraBankTransaction.Run();
     }
   }

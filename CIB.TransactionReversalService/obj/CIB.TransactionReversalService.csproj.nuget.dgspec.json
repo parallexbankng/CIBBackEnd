@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/Users/macbook/Projects/CIBBackEnd/CIB.TransactionReversalService/CIB.TransactionReversalService.csproj": {}
+    "/Users/macbook/Projects/parallex-backend/CIB.TransactionReversalService/CIB.TransactionReversalService.csproj": {}
   },
   "projects": {
-    "/Users/macbook/Projects/CIBBackEnd/CIB.TransactionReversalService/CIB.TransactionReversalService.csproj": {
+    "/Users/macbook/Projects/parallex-backend/CIB.TransactionReversalService/CIB.TransactionReversalService.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/macbook/Projects/CIBBackEnd/CIB.TransactionReversalService/CIB.TransactionReversalService.csproj",
+        "projectUniqueName": "/Users/macbook/Projects/parallex-backend/CIB.TransactionReversalService/CIB.TransactionReversalService.csproj",
         "projectName": "CIB.TransactionReversalService",
-        "projectPath": "/Users/macbook/Projects/CIBBackEnd/CIB.TransactionReversalService/CIB.TransactionReversalService.csproj",
+        "projectPath": "/Users/macbook/Projects/parallex-backend/CIB.TransactionReversalService/CIB.TransactionReversalService.csproj",
         "packagesPath": "/Users/macbook/.nuget/packages/",
-        "outputPath": "/Users/macbook/Projects/CIBBackEnd/CIB.TransactionReversalService/obj/",
+        "outputPath": "/Users/macbook/Projects/parallex-backend/CIB.TransactionReversalService/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/macbook/Projects/NuGet.Config",
@@ -67,17 +67,21 @@
               "target": "Package",
               "version": "[6.0.0, )"
             },
-            "Serilog.AspNetCore": {
+            "NLog": {
               "target": "Package",
-              "version": "[6.0.1, )"
+              "version": "[5.2.2, )"
             },
-            "Serilog.Extensions.Logging.File": {
+            "NLog.Extensions.Logging": {
               "target": "Package",
-              "version": "[2.0.0, )"
+              "version": "[5.3.2, )"
             },
-            "Serilog.Sinks.File": {
+            "NLog.Schema": {
               "target": "Package",
-              "version": "[5.0.0, )"
+              "version": "[5.2.2, )"
+            },
+            "NLog.Web.AspNetCore": {
+              "target": "Package",
+              "version": "[5.3.2, )"
             },
             "System.Data.OleDb": {
               "target": "Package",

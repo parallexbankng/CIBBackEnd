@@ -12,6 +12,7 @@ namespace CIB.Core.Modules.CorporateSalarySchedule
     {
         SalaryScheduleDuplicateStatus CheckDuplicate(TblCorporateSalarySchedule schedule, bool isUpdate=false);
         void UpdateCorporateSalarySchedule(TblCorporateSalarySchedule request);
+        Task<List<TblCorporateSalarySchedule>> GetCorporateSalarySchedules(Guid CorporateCustomerId);
        
     }
 }

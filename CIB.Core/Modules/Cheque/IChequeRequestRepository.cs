@@ -10,6 +10,7 @@ namespace CIB.Core.Modules.Cheque
     public interface IChequeRequestRepository : IRepository<TblChequeRequest>
     {
         List<TblChequeRequest> GetChequeRequetsByCorporateCustomer(Guid corporateCustomerId);
+        Task<List<TblTempChequeRequest>> GetPendingChequeRequetsByCorporateCustomer(Guid corporateCustomerId);
         List<TblChequeRequest>GetChequeRequestList(int status);
     }
 }

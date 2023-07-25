@@ -10,6 +10,7 @@ using CIB.Core.Entities;
 using CIB.Core.Modules.Authentication.Dto;
 using CIB.Core.Modules.CorporateRole.Dto;
 using CIB.Core.Modules.CorporateRole.Validation;
+using CIB.Core.Services.Authentication;
 using CIB.Core.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -22,7 +23,7 @@ namespace CIB.BankAdmin.Controllers
     public class CorporateRoleController : BaseAPIController
     {
       private readonly ILogger<CorporateRoleController> _logger;
-      public CorporateRoleController(ILogger<CorporateRoleController> _logger,IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor accessor) : base(mapper, unitOfWork, accessor)
+      public CorporateRoleController(ILogger<CorporateRoleController> _logger,IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor accessor,IAuthenticationService authService):base(mapper,unitOfWork,accessor,authService)
       {
         this._logger = _logger;
       }

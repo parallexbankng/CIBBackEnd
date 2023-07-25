@@ -47,5 +47,7 @@ namespace CIB.Core.Entities
         public string FullName { get; set; }
         public string Nationality { get; set; }
         public string CorporateEmail { get; set; }
+        public string Title { get; set; }
+        public Guid? CorporateProfileId { get; set; }
     }
 }

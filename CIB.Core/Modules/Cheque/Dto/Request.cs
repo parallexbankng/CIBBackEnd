@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CIB.Core.Common;
+using CIB.Core.Entities;
 
 namespace CIB.Core.Modules.Cheque.Dto
 {
@@ -51,4 +52,12 @@ namespace CIB.Core.Modules.Cheque.Dto
         public DateTime? ActionResponseDate { get; set; }
         public int? IsTreated { get; set; }
     }
+
+    public class BulkApprovalReponseChequeBook
+    {
+        public string Message {get;set;}
+        public TblTempChequeRequest ChequeRequests {get;set;}
+       
+    }
+
 }

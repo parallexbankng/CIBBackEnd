@@ -33,5 +33,6 @@ namespace CIB.Core.Entities
         public Guid? CorporateCustomerId { get; set; }
         public string ResponseCode { get; set; }
         public string ResponseDescription { get; set; }
+        public string SessionId { get; set; }
     }
 }

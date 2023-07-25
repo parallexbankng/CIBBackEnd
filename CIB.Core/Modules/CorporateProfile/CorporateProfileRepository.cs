@@ -380,5 +380,10 @@ namespace CIB.Core.Modules.CorporateProfile
       }
       return false;
     }
+
+    public IEnumerable<TblCorporateProfile> GetCorporateProfiles(Guid id)
+    {
+      return _context.TblCorporateProfiles.Where(ctx => ctx.CorporateCustomerId == id).ToList();
+    }
   }
 }

@@ -29,5 +29,7 @@ namespace CIB.Core.Entities
         public string Reasons { get; set; }
         public int? IsTreated { get; set; }
         public int? PreviousStatus { get; set; }
+        public Guid? CorporateSalaryScheduleId { get; set; }
+        public string TransactionLocation { get; set; }
     }
 }

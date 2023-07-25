@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace CIB.Core.Modules.TempCorporateSalarySchedule._TempCorporateEmployee.Dto
 {
-    public class CorporateEmployeeResponse
+    public class TempCorporateEmployeeResponse
     {
         public Guid Id {get;set;}
         public Guid? CorporateCustomerId { get; set; }
@@ -20,8 +20,6 @@ namespace CIB.Core.Modules.TempCorporateSalarySchedule._TempCorporateEmployee.Dt
         public string GradeLevel { get; set; }
         public string Description { get; set; }
         public int? Status { get; set; }
-        public DateTime? DateCreated { get; set; }
-        public Guid? CreatedBy { get; set; }
     }
     public class CorporateEmployeeDuplicateStatus 
     {

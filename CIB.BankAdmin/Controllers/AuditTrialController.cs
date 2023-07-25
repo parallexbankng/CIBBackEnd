@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
 using CIB.Core.Common;
 using CIB.Core.Common.Dto;
 using CIB.Core.Common.Interface;
 using CIB.Core.Entities;
 using CIB.Core.Enums;
+using CIB.Core.Services.Authentication;
 using CIB.Core.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -20,7 +20,7 @@ namespace CIB.BankAdmin.Controllers
     public class AuditTrialController : BaseAPIController
     {
         private readonly ILogger<AuditTrialController> _logger;
-        public AuditTrialController(ILogger<AuditTrialController> _logger,IUnitOfWork unitOfWork,IMapper mapper,IHttpContextAccessor accessor) : base(mapper,unitOfWork,accessor)
+        public AuditTrialController(ILogger<AuditTrialController> _logger,IUnitOfWork unitOfWork,IMapper mapper,IHttpContextAccessor accessor, IAuthenticationService authService):base(mapper,unitOfWork,accessor,authService)
         {
             this._logger = _logger;
         }
@@ -193,36 +193,100 @@ namespace CIB.BankAdmin.Controllers
             }
         }
 
-    [HttpGet("BulkCreditLogs")]
-    [ProducesResponseType(StatusCodes.Status201Created)]
-    public ActionResult<List<TblNipbulkTransferLog>> BulkCreditLogs(string bulkFileId)
-    {
-      try
-      {
-        if (!IsAuthenticated)
+        [HttpGet("BulkCreditLogs")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        public ActionResult<List<TblNipbulkTransferLog>> BulkCreditLogs(string bulkFileId)
         {
-          return StatusCode(401, "User is not authenticated");
+            try
+            {
+                if (!IsAuthenticated)
+                {
+                    return StatusCode(401, "User is not authenticated");
+                }
+
+                if (!IsUserActive(out string errormsg))
+                {
+                    return StatusCode(400, errormsg);
+                }
+
+                if (string.IsNullOrEmpty(bulkFileId))
+                {
+                    return BadRequest("Bulk file Id is required");
+                }
+
+                var Id = Encryption.DecryptGuid(bulkFileId);
+                var tblTransactions = UnitOfWork.NipBulkCreditLogRepo.GetbulkCreditLog(Id);
+                return Ok(tblTransactions);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("SERVER ERROR {0}, {1}, {2}", Formater.JsonType(ex.StackTrace), Formater.JsonType(ex.Source), Formater.JsonType(ex.Message));
+                return BadRequest(new ErrorResponse(responsecode: ResponseCode.SERVER_ERROR, responseDescription: Message.ServerError, responseStatus: false));
+            }
         }
 
-        if (!IsUserActive(out string errormsg))
+        [HttpGet("TransactionReportFilter")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public ActionResult<List<TblTransaction>> TransactionReportFilter(string CorporateCustomerId, string Transref, string dateFrom = null, string dateTo = null, string IsBulk = null)
         {
-          return StatusCode(400, errormsg);
+            try
+            {
+                if (!IsAuthenticated)
+                {
+                    return StatusCode(401, "User is not authenticated");
+                }
+
+                if (!IsUserActive(out string errormsg))
+                {
+                    return StatusCode(400, errormsg);
+                }
+
+                if (!UnitOfWork.UserRoleAccessRepo.AccessesExist(UserRoleId, Permission.ViewAuditTrail))
+                {
+                    return BadRequest("UnAuthorized Access");
+                }
+                Guid? _userId = null;
+                var UserName = "";
+                bool _IsBulk = false;
+                if (!string.IsNullOrEmpty(CorporateCustomerId))
+                {
+                    _userId = Encryption.DecryptGuid(CorporateCustomerId);
+                }
+                if (!string.IsNullOrEmpty(IsBulk))
+                {
+                    _IsBulk = Encryption.DecryptBooleans(IsBulk);
+                }
+
+                if (!string.IsNullOrEmpty(Transref))
+                {
+                    UserName = Encryption.DecryptStrings(Transref);
+                }
+                var _dateFrom = new DateTime();
+                var _dateTo = new DateTime();
+                if(!string.IsNullOrEmpty(dateFrom) && !string.IsNullOrEmpty(dateTo))
+                {
+                    _dateFrom = Encryption.DecryptDateTime(dateFrom);
+                    _dateTo = Encryption.DecryptDateTime(dateTo);
+                    if (!DateTime.TryParse(_dateFrom.ToString(), out _dateFrom) || !DateTime.TryParse(_dateTo.ToString(), out _dateTo))
+                    {
+                        return BadRequest("Please enter a valid start and end date");
+                    }
+                }
+                var allTransaction = _unitOfWork.TransactionRepo.Search(_userId, UserName, _dateFrom, _dateTo,_IsBulk)?.ToList();
+                if (allTransaction == null || allTransaction?.Count == 0)
+                {
+                    return StatusCode(204);
+                }
+                return Ok(allTransaction);
+            }
+            catch (Exception ex)
+            {
+               _logger.LogError("SERVER ERROR {0}, {1}, {2}",Formater.JsonType(ex.StackTrace), Formater.JsonType(ex.Source), Formater.JsonType(ex.Message));
+                return BadRequest(new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: Message.ServerError, responseStatus:false));
+            }
         }
 
-        if (string.IsNullOrEmpty(bulkFileId))
-        {
-          return BadRequest("Bulk file Id is required");
-        }
 
-        var Id = Encryption.DecryptGuid(bulkFileId);
-        var tblTransactions = UnitOfWork.NipBulkCreditLogRepo.GetbulkCreditLog(Id);
-        return Ok(tblTransactions);
-      }
-      catch (Exception ex)
-      {
-        _logger.LogError("SERVER ERROR {0}, {1}, {2}", Formater.JsonType(ex.StackTrace), Formater.JsonType(ex.Source), Formater.JsonType(ex.Message));
-        return BadRequest(new ErrorResponse(responsecode: ResponseCode.SERVER_ERROR, responseDescription: Message.ServerError, responseStatus: false));
-      }
     }
-  }
 }

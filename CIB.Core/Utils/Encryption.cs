@@ -271,7 +271,7 @@ namespace CIB.Core.Utils
         }
         private static string EncrptionKey()
         {
-            return "2343443sDFkfkaasds";
+            return "#!$96secure";
         }
         private static string AccountEncrptionKey()
         {

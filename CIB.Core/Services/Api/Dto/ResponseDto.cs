@@ -32,7 +32,7 @@ namespace CIB.Core.Services.Api.Dto
     public string Bvn { get; set; }
     public string KycLevel { get; set; }
     public string Dob { get; set; }
-    public string Effectiveavail { get; set; }
+    public decimal? Effectiveavail { get; set; }
     public string Address { get; set; }
     public string FreezeReason { get; set; }
     public string AcctOffEmpId { get; set; }
@@ -174,7 +174,8 @@ namespace CIB.Core.Services.Api.Dto
     public ADUserData Data { get; set; }
   }
 
-  public class ADUserData {
+  public class ADUserData 
+  {
     public string FirstName { get; set; }
     public string LastName { get; set; }
     public string Email { get; set; }
@@ -200,7 +201,10 @@ namespace CIB.Core.Services.Api.Dto
     public string Email { get; set; }
   }
 
-  
+  public class ADData
+  {
+    public string Data {get;set;}
+  }
 
   public class RequeryTransactionResponse
   {

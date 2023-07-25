@@ -1,0 +1,14 @@
+/Users/macbook/Projects/parallex-backend/CIB.Core/bin/Debug/net6.0/CIB.Core.deps.json
+/Users/macbook/Projects/parallex-backend/CIB.Core/bin/Debug/net6.0/CIB.Core.runtimeconfig.json
+/Users/macbook/Projects/parallex-backend/CIB.Core/bin/Debug/net6.0/CIB.Core.dll
+/Users/macbook/Projects/parallex-backend/CIB.Core/bin/Debug/net6.0/CIB.Core.pdb
+/Users/macbook/Projects/parallex-backend/CIB.Core/obj/Debug/net6.0/CIB.Core.csproj.AssemblyReference.cache
+/Users/macbook/Projects/parallex-backend/CIB.Core/obj/Debug/net6.0/CIB.Core.GeneratedMSBuildEditorConfig.editorconfig
+/Users/macbook/Projects/parallex-backend/CIB.Core/obj/Debug/net6.0/CIB.Core.AssemblyInfoInputs.cache
+/Users/macbook/Projects/parallex-backend/CIB.Core/obj/Debug/net6.0/CIB.Core.AssemblyInfo.cs
+/Users/macbook/Projects/parallex-backend/CIB.Core/obj/Debug/net6.0/CIB.Core.csproj.CoreCompileInputs.cache
+/Users/macbook/Projects/parallex-backend/CIB.Core/obj/Debug/net6.0/CIB.Core.dll
+/Users/macbook/Projects/parallex-backend/CIB.Core/obj/Debug/net6.0/refint/CIB.Core.dll
+/Users/macbook/Projects/parallex-backend/CIB.Core/obj/Debug/net6.0/CIB.Core.pdb
+/Users/macbook/Projects/parallex-backend/CIB.Core/obj/Debug/net6.0/CIB.Core.genruntimeconfig.cache
+/Users/macbook/Projects/parallex-backend/CIB.Core/obj/Debug/net6.0/ref/CIB.Core.dll

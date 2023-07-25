@@ -42,5 +42,10 @@ namespace CIB.Core.Modules.TokenBlack
       }
       return false;
     }
+
+    public TblTokenBlack GetTokenByUserId(Guid userId)
+    {
+      return _context.TblTokenBlacks.Where(ctx => ctx.CustAutId != null && ctx.CustAutId == userId && ctx.IsBlack == 0).FirstOrDefault();
+    }
   }
 }

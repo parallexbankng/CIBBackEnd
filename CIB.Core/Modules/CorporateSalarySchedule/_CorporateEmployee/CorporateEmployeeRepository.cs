@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 using CIB.Core.Common.Repository;
 using CIB.Core.Entities;
 using CIB.Core.Enums;
-using CIB.Core.Modules.Cheque.Dto;
 using CIB.Core.Modules.CorporateSalarySchedule._CorporateEmployee.Dto;
+using Microsoft.EntityFrameworkCore;
 
 namespace CIB.Core.Modules.CorporateSalarySchedule._CorporateEmployee
 {
@@ -67,7 +67,7 @@ namespace CIB.Core.Modules.CorporateSalarySchedule._CorporateEmployee
 
         public async Task<List<TblCorporateCustomerEmployee>> GetCorporateCustomerEmployees(Guid corporateCustomerId)
         {
-            return _context.TblCorporateCustomerEmployees.Where(xtc => xtc.CorporateCustomerId ==  corporateCustomerId && xtc.Status == (int)ProfileStatus.Active).ToList();
+            return await _context.TblCorporateCustomerEmployees.Where(xtc => xtc.CorporateCustomerId.Value ==  corporateCustomerId).ToListAsync();
         }
-  }
+    }
 }

@@ -67,12 +67,13 @@ namespace CIB.Core.Modules.CorporateCustomer.Dto
 
      public class ValidateCorporateCustomerRequestDto :BaseDto
     {
-        public string CompanyName { get; set; }
-        public string Email { get; set; }
-        public string CustomerId { get; set; }
-        public string DefaultAccountNumber { get; set; }
-        public string DefaultAccountName { get; set; }
-        public string AuthorizationType { get; set; }
+        public string? CompanyName { get; set; }
+        public string? Email { get; set; }
+        public string? CustomerId { get; set; }
+        public string? DefaultAccountNumber { get; set; }
+        public string? DefaultAccountName { get; set; }
+        public string? AuthorizationType { get; set; }
+        public string? Data {get;set;}
     }
 
     public class UpdateAccountLimitRequestDto : BaseUpdateDto
@@ -109,13 +110,14 @@ namespace CIB.Core.Modules.CorporateCustomer.Dto
 
     public class AccountLimitRequest:BaseDto
     {
-        public bool IsApprovalByLimit { get; set; }
+        
+        public bool? IsApprovalByLimit { get; set; }
         public Guid? CorporateCustomerId { get; set; }
         public decimal? MinAccountLimit { get; set; }
         public decimal? MaxAccountLimit { get; set; }
         public decimal? SingleTransDailyLimit { get; set; }
         public decimal? BulkTransDailyLimit { get; set; }
-        public string AuthorizationType { get; set; }
+        public string? AuthorizationType { get; set; }
     }
 
     public class OnboardCorporateCustomerRequestDto : BaseDto
@@ -151,37 +153,38 @@ namespace CIB.Core.Modules.CorporateCustomer.Dto
     }
     public class OnboardCorporateCustomer : BaseDto
     {
-    public string CompanyName { get; set; }
-    public string Email1 { get; set; }
-    public string CorporateEmail {get;set;}
-    public string CustomerId { get; set; }
-    public string DefaultAccountNumber { get; set; }
-    public string DefaultAccountName { get; set; }
+    public string? CompanyName { get; set; }
+     public string? Title { get; set; }
+    public string? Email1 { get; set; }
+    public string? CorporateEmail {get;set;}
+    public string? CustomerId { get; set; }
+    public string? DefaultAccountNumber { get; set; }
+    public string? DefaultAccountName { get; set; }
     public Guid? CorporateCustomerId { get; set; }
     public Guid? CorporateRoleId { get; set; }
-    public string Username { get; set; }
-    public string Phone { get; set; }
-    public string Email { get; set; }
-    public string FirstName { get; set; }
-    public string MiddleName { get; set; }
+    public string? Username { get; set; }
+    public string? Phone { get; set; }
+    public string? Email { get; set; }
+    public string? FirstName { get; set; }
+    public string? MiddleName { get; set; }
     public decimal? ApprovalLimit { get; set; }
     public decimal? MinAccountLimit { get; set; }
     public decimal? MaxAccountLimit { get; set; }
-    public string AuthorizationType { get; set; }
-    public string LastName { get; set; }
-    public string PhoneNumber { get; set; }
-    public bool IsApprovalByLimit { get; set; }
-    public string Password { get; set; }
+    public string? AuthorizationType { get; set; }
+    public string? LastName { get; set; }
+    public string? PhoneNumber { get; set; }
+    public bool? IsApprovalByLimit { get; set; }
+    public string? Password { get; set; }
     public decimal? SingleTransDailyLimit {get;set;}
     public decimal? BulkTransDailyLimit {get;set;}
   }
 
     public class AddBeneficiaryDto: BaseDto
     {
-        public string AccountNumber { get; set; }
-        public string BankCode { get; set; }
-        public string AccountName { get; set; }
-        public string BankName { get; set; }
+        public string? AccountNumber { get; set; }
+        public string? BankCode { get; set; }
+        public string? AccountName { get; set; }
+        public string? BankName { get; set; }
     }
 
     public class RemoveBeneficiaryDto : BaseUpdateDto
@@ -195,8 +198,8 @@ namespace CIB.Core.Modules.CorporateCustomer.Dto
 
     public class CreateAccountLimitFormModel : BaseDto
     {
-        public string IsApprovalByLimit { get; set; }
-        public string CorporateCustomerId { get; set; }
+        public string? IsApprovalByLimit { get; set; }
+        public string? CorporateCustomerId { get; set; }
         public string? MinAccountLimit { get; set; }
         public string? MaxAccountLimit { get; set; }
         public string AuthorizationType { get; set; }
@@ -205,18 +208,18 @@ namespace CIB.Core.Modules.CorporateCustomer.Dto
     }
     public class CreateAccountLimitDto: BaseDto
     {
-        public bool IsApprovalByLimit { get; set; }
-        public Guid CorporateCustomerId { get; set; }
+        public bool? IsApprovalByLimit { get; set; }
+        public Guid? CorporateCustomerId { get; set; }
         public decimal? MinAccountLimit { get; set; }
         public decimal? MaxAccountLimit { get; set; }
-        public string AuthorizationType { get; set; }
+        public string? AuthorizationType { get; set; }
         public decimal? SingleTransDailyLimit { get; set; }
         public decimal? BulkTransDailyLimit { get; set; }
     }
 
      public class CreateAccountLimitModel : BaseDto
     {
-        public bool IsApprovalByLimit { get; set; }
+        public bool? IsApprovalByLimit { get; set; }
         public Guid CorporateCustomerId { get; set; }
         public decimal? MinAccountLimit { get; set; }
         public decimal? MaxAccountLimit { get; set; }
@@ -227,7 +230,7 @@ namespace CIB.Core.Modules.CorporateCustomer.Dto
 
     public class SetAccountLimitModel
     {
-        public bool IsApprovalByLimit { get; set; }
+        public bool? IsApprovalByLimit { get; set; }
         public decimal? MinAccountLimit { get; set; }
         public decimal? MaxAccountLimit { get; set; }
         public string AuthorizationType { get; set; }
@@ -237,27 +240,27 @@ namespace CIB.Core.Modules.CorporateCustomer.Dto
 
     public class BulkCustomerOnboading 
     {
-        public string CompanyName { get; set; }
-        public string Email1 { get; set; }
-        public string CorporateEmail {get;set;}
-        public string CustomerId { get; set; }
-        public string DefaultAccountNumber { get; set; }
-        public string DefaultAccountName { get; set; }
+        public string? CompanyName { get; set; }
+        public string? Email1 { get; set; }
+        public string? CorporateEmail {get;set;}
+        public string? CustomerId { get; set; }
+        public string? DefaultAccountNumber { get; set; }
+        public string? DefaultAccountName { get; set; }
         public Guid? CorporateCustomerId { get; set; }
         public Guid? CorporateRoleId { get; set; }
-        public string Username { get; set; }
-        public string Phone { get; set; }
-        public string Email { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string PhoneNumber { get; set; }
-        public string MiddleName { get; set; }
+        public string? Username { get; set; }
+        public string? Phone { get; set; }
+        public string? Email { get; set; }
+        public string? FirstName { get; set; }
+        public string? LastName { get; set; }
+        public string? PhoneNumber { get; set; }
+        public string? MiddleName { get; set; }
         public decimal? ApprovalLimit { get; set; }
         public decimal? MinAccountLimit { get; set; }
         public decimal? MaxAccountLimit { get; set; }
-        public string AuthorizationType { get; set; }
-        public bool IsApprovalByLimit { get; set; }
-        public string Password { get; set; }
+        public string? AuthorizationType { get; set; }
+        public bool? IsApprovalByLimit { get; set; }
+        public string? Password { get; set; }
         public decimal? SingleTransDailyLimit {get;set;}
         public decimal? BulkTransDailyLimit {get;set;}
         public string? Error {get;set;}
@@ -270,6 +273,20 @@ namespace CIB.Core.Modules.CorporateCustomer.Dto
         public Guid CorporateCustomerId {get;set;}
     }
 
+    public class ChangeCorporateCustomerSignatory : BaseDto
+    {
+        public string? CorporateCustomerId {get; set;}
+        public string? ProfileId {get; set;}
+        public string? AuthorizationType { get; set; }
+        public string? CorporateRole {get;set;}
+    }
 
-
+    public class ChangeCorporateCustomerSignatoryDto : BaseDto
+    {
+        public Guid? CorporateCustomerId {get; set;}
+        public string? AuthorizationType { get; set; }
+        public Guid? CorporateRole {get;set;}
+        public Guid? ProfileId {get; set;}
+    }
 }
+

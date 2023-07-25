@@ -34,7 +34,7 @@ public class TransactionReversal : ITransactionReversal
         foreach (var i in pendingTransfers)
         {
           var pendingCreditItemList = unitOfWork.BulkCreditLogRepo.GetFailedTransaction(i.Id, 2, 5,100, toDay);
-          if (pendingCreditItemList.Count != 0)
+          if (pendingCreditItemList.Any())
           {
             foreach (var creditLog in pendingCreditItemList)
             {
@@ -103,47 +103,52 @@ public class TransactionReversal : ITransactionReversal
                     TranType = "VAT"
                   }
                 };
-                foreach(var reversalItem in reversalListItem)
+                
+                var checkBal = await apiService.GetCustomerDetailByAccountNumber(i.IntreBankSuspenseAccountNumber);
+                if(checkBal.ResponseCode != "00")
                 {
-                  var date = DateTime.Now;
-                  var transfer = new PostIntraBankTransaction {
-                    AccountToDebit = i.IntreBankSuspenseAccountNumber,
-                    UserName = i.InitiatorUserName,
-                    Channel = "2",
-                    TransactionLocation = i.TransactionLocation,
-                    IntraTransferDetails = new List<IntraTransferDetail>{
-                      new IntraTransferDetail{
-                        TransactionReference = Transactions.Ref(),
-                        TransactionDate = date.ToString("MM/dd/yyyy HH:mm:ss"),
-                        BeneficiaryAccountName = i?.DebitAccountName,
-                        BeneficiaryAccountNumber = i?.DebitAccountNumber,
-                        Amount = reversalItem.Amount,
-                        Narration = reversalItem.Narration,
-                      }
-                    },
-                  };
-          
-                  var checkBal = await apiService.GetCustomerDetailByAccountNumber(i.IntreBankSuspenseAccountNumber);
-                  if(checkBal.ResponseCode != "00")
+                  _logger.LogError("LO ERROR {0}, {1}, {2}",JsonConvert.SerializeObject(checkBal.ResponseCode), JsonConvert.SerializeObject(checkBal.ResponseDescription), JsonConvert.SerializeObject(checkBal.RequestId));
+                }
+                else
+                {
+                  var transactionAmount = reversalListItem.Sum(ctx => ctx.Amount);
+                  if(checkBal.AvailableBalance <  transactionAmount)
                   {
-                    _logger.LogError("LO ERROR {0}, {1}, {2}",JsonConvert.SerializeObject(checkBal.ResponseCode), JsonConvert.SerializeObject(checkBal.ResponseDescription), JsonConvert.SerializeObject(checkBal.RequestId));
+                    // notify settlemet officer
+                    _logger.LogError("Insufficient Balance!");
                   }
                   else
                   {
-                    if(checkBal.AvailableBalance <  reversalItem?.Amount)
+                    foreach(var reversalItem in reversalListItem)
                     {
-                      // notify settlemet officer
-                      _logger.LogError("Insufficient Balance!");
-                    }
-                    else
-                    {
+                      var tranRef = Transactions.Ref();
+                      var date = DateTime.Now;
+                      var transfer = new PostIntraBankTransaction 
+                      {
+                        AccountToDebit = i.IntreBankSuspenseAccountNumber,
+                        UserName = i.InitiatorUserName,
+                        Channel = "2",
+                        TransactionLocation = i.TransactionLocation,
+                        IntraTransferDetails = new List<IntraTransferDetail>
+                        {
+                          new IntraTransferDetail
+                          {
+                            TransactionReference = tranRef,
+                            TransactionDate = date.ToString("MM/dd/yyyy HH:mm:ss"),
+                            BeneficiaryAccountName = i?.DebitAccountName,
+                            BeneficiaryAccountNumber = i?.DebitAccountNumber,
+                            Amount = reversalItem.Amount,
+                            Narration = reversalItem.Narration,
+                          }
+                        },
+                      };
+
                       var result = await apiService.PostIntraBankTransfer(transfer);
                       if(result.ResponseCode != "00")
                       {
-                        _logger.LogInformation("FAILED REVERSAL ERROR {0}, {1}",JsonConvert.SerializeObject(result.ResponseCode), JsonConvert.SerializeObject(result.ResponseDescription));
-                        unitOfWork.TransactionRepo.Add(new TblTransaction{
+                        unitOfWork.TransactionRepo.Add(new TblTransaction
+                        {
                           Id = Guid.NewGuid(),
-                          TransactionReference = result.TransactionReference,
                           TranAmout = reversalItem?.Amount,
                           TranDate = DateTime.Now,
                           SourceAccountNo =  i.IntreBankSuspenseAccountNumber,
@@ -156,16 +161,20 @@ public class TransactionReversal : ITransactionReversal
                           DestinationAcctNo =  i.DebitAccountNumber,
                           DestinationAcctName =  i.DebitAccountName,
                           CorporateCustomerId = creditLog?.CorporateCustomerId,
-                          BatchId = creditLog?.BatchId
+                          BatchId = creditLog?.BatchId,
+                          SessionId = result.TransactionReference,
+                          TransactionReference = tranRef,
                         });
                         unitOfWork.Complete();
+                        _logger.LogError("SERVER ERROR {0}, {1}",JsonConvert.SerializeObject(result.ResponseCode), JsonConvert.SerializeObject(result.ResponseDescription));
                       }
                       else
                       {
                         if(reversalItem?.TranType == "PRINCIPAL")
                         {
                           creditLog.CreditStatus = 4;
-                          unitOfWork.BulkCreditLogRepo.Add(new TblNipbulkCreditLog{
+                          unitOfWork.BulkCreditLogRepo.Add(new TblNipbulkCreditLog 
+                          {
                             Id = Guid.NewGuid(),
                             TranLogId = creditLog?.TranLogId,
                             CreditAccountNumber = i.DebitAccountNumber,
@@ -176,35 +185,41 @@ public class TransactionReversal : ITransactionReversal
                             Narration = $"{reversalItem.Narration}",
                             CreditStatus = 1,
                             BatchId = creditLog?.BatchId,
-                            TransactionReference = result.TransactionReference,
                             ResponseCode = result.ResponseCode,
                             ResponseMessage = "REVERSED",
                             NameEnquiryStatus = 1,
                             TryCount = 0,
                             CorporateCustomerId = creditLog?.CorporateCustomerId,
                             CreditReversalId = creditLog?.Id,
-                            CreditDate = DateTime.Now
+                            CreditDate = DateTime.Now,
+                            SessionId  = result.TransactionReference,
+                            TransactionReference = tranRef
                           });
                           unitOfWork.BulkCreditLogRepo.UpdateCreditStatus(creditLog);
                         }
-                        unitOfWork.TransactionRepo.Add(new TblTransaction{
-                          Id = Guid.NewGuid(),
-                          TransactionReference = result.TransactionReference,
-                          TranAmout = reversalItem?.Amount,
-                          TranDate = DateTime.Now,
-                          SourceAccountNo =  i.IntreBankSuspenseAccountNumber,
-                          SourceAccountName =  i.IntreBankSuspenseAccountName,
-                          SourceBank =prallexBankCode,
-                          TransactionStatus = nameof(TransactionStatus.Failed),
-                          TranType = "Intrabank transfer",
-                          Narration = $"{reversalItem?.Narration}",
-                          Channel = "WEB",
-                          DestinationAcctNo =  i.DebitAccountNumber,
-                          DestinationAcctName =  i.DebitAccountName,
-                          CorporateCustomerId = creditLog?.CorporateCustomerId,
-                          BatchId = creditLog?.BatchId
-                        });
-                        unitOfWork.Complete();
+                        else
+                        {
+                          unitOfWork.TransactionRepo.Add(new TblTransaction 
+                          {
+                            Id = Guid.NewGuid(),
+                            TranAmout = reversalItem?.Amount,
+                            TranDate = DateTime.Now,
+                            SourceAccountNo =  i.IntreBankSuspenseAccountNumber,
+                            SourceAccountName =  i.IntreBankSuspenseAccountName,
+                            SourceBank =prallexBankCode,
+                            TransactionStatus = nameof(TransactionStatus.Failed),
+                            TranType = "Intrabank transfer",
+                            Narration = $"{reversalItem?.Narration}",
+                            Channel = "WEB",
+                            DestinationAcctNo =  i.DebitAccountNumber,
+                            DestinationAcctName =  i.DebitAccountName,
+                            CorporateCustomerId = creditLog?.CorporateCustomerId,
+                            BatchId = creditLog?.BatchId,
+                            SessionId  = result.TransactionReference,
+                            TransactionReference = tranRef
+                          });
+                          unitOfWork.Complete();
+                        }
                       }
                     }
                   }
@@ -234,7 +249,8 @@ public class TransactionReversal : ITransactionReversal
   {        
     if (result.ResponseCode != "00")
     {
-      var transaction = new TblTransaction{
+      var transaction = new TblTransaction 
+      {
         Id = Guid.NewGuid(),
         TransactionReference = result.TransactionReference,
         TranAmout = creditLog?.CreditAmount,
@@ -256,14 +272,14 @@ public class TransactionReversal : ITransactionReversal
       creditLog.CreditStatus = 2;
       creditLog.ResponseMessage = result.ResponseDescription;
       creditLog.ResponseCode = result.ResponseCode;
-      creditLog.TransactionReference= result.TransactionReference;
       unitOfWork.BulkCreditLogRepo.UpdateCreditStatus(creditLog);
       unitOfWork.TransactionRepo.Add(transaction);
       unitOfWork.Complete();
     }
     else 
     {
-      var transaction = new TblTransaction{
+      var transaction = new TblTransaction 
+      {
         Id = Guid.NewGuid(),
         TransactionReference = result.TransactionReference,
         TranAmout = creditLog?.CreditAmount,
@@ -280,7 +296,8 @@ public class TransactionReversal : ITransactionReversal
         CorporateCustomerId = creditLog?.CorporateCustomerId,
         BatchId = creditLog?.BatchId
       };
-      var reversal = new TblNipbulkCreditLog{
+      var reversal = new TblNipbulkCreditLog 
+      {
         Id = Guid.NewGuid(),
         TranLogId = creditLog?.TranLogId,
         CreditAccountNumber = info.DebitAccountNumber,

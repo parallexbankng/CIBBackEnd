@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Serilog;
+﻿
+using NLog.Web;
+using NLog.Extensions.Logging;
 
 namespace CIB.CorporateAdmin
 {
@@ -14,30 +8,34 @@ namespace CIB.CorporateAdmin
   {
     public static void Main(string[] args)
     {
-      var config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
-      //Initialize Logger
-      Log.Logger = new LoggerConfiguration().ReadFrom.Configuration(config).CreateLogger();
+      var logger = NLogBuilder.ConfigureNLog("nlog.config").GetCurrentClassLogger();
       try
       {
-        Log.Information("Corporate Application Starting.");
+        logger.Debug("init main");
         CreateHostBuilder(args).Build().Run();
       }
       catch (Exception ex)
       {
-        Log.Fatal(ex, "The Application failed to start.");
+        //NLog: catch setup errors
+        logger.Error(ex, "Stopped program because of exception");
+        throw;
       }
       finally
       {
-        Log.CloseAndFlush();
+        // Ensure to flush and stop internal timers/threads before application-exit (Avoid segmentation fault on Linux)
+        NLog.LogManager.Shutdown();
       }
     }
-
-    public static IHostBuilder CreateHostBuilder(string[] args) =>
+    private static IHostBuilder CreateHostBuilder(string[] args) =>
       Host.CreateDefaultBuilder(args)
-      .UseSerilog()
       .ConfigureWebHostDefaults(webBuilder =>
       {
-        webBuilder.UseStartup<Startup>();
+        webBuilder.UseStartup<Startup>()
+        .ConfigureLogging((hostingContext,logging) =>
+          {
+            logging.AddNLog(hostingContext.Configuration.GetSection("Logging")); 
+            logging.SetMinimumLevel(LogLevel.Information);
+          });
       });
   }
 }

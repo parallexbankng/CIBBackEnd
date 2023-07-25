@@ -3,7 +3,7 @@ using CIB.Core.Common;
 
 namespace CIB.Core.Modules.TempCorporateSalarySchedule._TempCorporateEmployee.Dto
 {
-    public class CreateCorporateEmployeeRequest : BaseDto
+    public class TempCreateCorporateEmployeeRequest : BaseDto
     {
         public string CorporateCustomerId { get; set; }
         public string FirstName { get; set; }
@@ -13,11 +13,12 @@ namespace CIB.Core.Modules.TempCorporateSalarySchedule._TempCorporateEmployee.Dt
         public string AccountName { get; set; }
         public string AccountNumber { get; set; }
         public string BankCode { get; set; }
+        public string BankName { get; set; }
         public string SalaryAmount { get; set; }
         public string GradeLevel { get; set; }
         public string Description { get; set; }
     }
-    public class CreateCorporateEmployeeDto : BaseDto
+    public class TempCreateCorporateEmployeeDto : BaseDto
     {
         public Guid? CorporateCustomerId { get; set; }
         public string FirstName { get; set; }
@@ -30,8 +31,9 @@ namespace CIB.Core.Modules.TempCorporateSalarySchedule._TempCorporateEmployee.Dt
         public decimal? SalaryAmount { get; set; }
         public string GradeLevel { get; set; }
         public string Description { get; set; }
+        public string BankName { get; set; }
     }
-    public class UpdateCorporateEmployeeRequest : BaseDto
+    public class TempUpdateCorporateEmployeeRequest : BaseDto
     {
         public string Id { get; set; }
         public string CorporateCustomerId { get; set; }
@@ -46,7 +48,7 @@ namespace CIB.Core.Modules.TempCorporateSalarySchedule._TempCorporateEmployee.Dt
         public string GradeLevel { get; set; }
         public string Description { get; set; }
     }
-    public class UpdateCorporateEmployeeDto : BaseDto
+    public class TempUpdateCorporateEmployeeDto : BaseDto
     {
         public Guid Id {get;set;}
         public Guid? CorporateCustomerId { get; set; }

@@ -1,8 +1,9 @@
 ﻿using System;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Serilog;
+using NLog.Web;
+using Microsoft.Extensions.Logging;
+using NLog.Extensions.Logging;
 
 namespace CIB.BankAdmin
 {
@@ -10,29 +11,34 @@ namespace CIB.BankAdmin
   {
     public static void Main(string[] args)
     {
-      var config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
-      //Initialize Logger
-      Log.Logger = new LoggerConfiguration().ReadFrom.Configuration(config).CreateLogger();
-      try
-      {
-        Log.Information("Application Starting.");
-        CreateHostBuilder(args).Build().Run();
-      }
-      catch (Exception ex)
-      {
-        Log.Fatal(ex, "The Application failed to start.");
-      }
-      finally
-      {
-        Log.CloseAndFlush();
-      }
+      var logger = NLogBuilder.ConfigureNLog("nlog.config").GetCurrentClassLogger();
+        try
+        {
+            logger.Debug("init main");
+            CreateHostBuilder(args).Build().Run();
+        }
+        catch (Exception ex)
+        {
+            //NLog: catch setup errors
+            logger.Error(ex, "Stopped program because of exception");
+            throw;
+        }
+        finally
+        {
+            // Ensure to flush and stop internal timers/threads before application-exit (Avoid segmentation fault on Linux)
+            NLog.LogManager.Shutdown();
+        }
     }
     private static IHostBuilder CreateHostBuilder(string[] args) =>
       Host.CreateDefaultBuilder(args)
-      .UseSerilog()
       .ConfigureWebHostDefaults(webBuilder =>
       {
-        webBuilder.UseStartup<Startup>();
+        webBuilder.UseStartup<Startup>()
+        .ConfigureLogging((hostingContext,logging) =>
+          {
+            logging.AddNLog(hostingContext.Configuration.GetSection("Logging")); 
+            logging.SetMinimumLevel(LogLevel.Information);
+          });
       });
   }
 }

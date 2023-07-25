@@ -24,7 +24,7 @@ namespace CIB.Core.Modules.Cheque
 
       public List<TblTempChequeRequest> GetChequeRequestList(int status)
       {
-        return _context.TblTempChequeRequests.Where(ctx => ctx.Status == status).ToList();
+        return _context.TblTempChequeRequests.Where(ctx => ctx.IsTreated == status).ToList();
       }
 
       public void UpdateChequeRequest(TblTempChequeRequest request)

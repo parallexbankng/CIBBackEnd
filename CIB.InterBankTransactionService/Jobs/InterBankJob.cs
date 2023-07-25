@@ -4,7 +4,6 @@ using CIB.InterBankTransactionService.Services;
 using CIB.InterBankTransactionService.Services.Request;
 using CIB.InterBankTransactionService.Utils;
 using Newtonsoft.Json;
-using Serilog;
 using TransactionStatus = CIB.InterBankTransactionService.Utils.TransactionStatus;
 
 namespace CIB.InterBankTransactionService.Jobs;
@@ -36,100 +35,179 @@ public class InterBankJob : IInterBankJob
       if (pendingTransfers.Count != 0)
       {
           var processDuration = DateTime.Now.Date;
-          foreach (TblNipbulkTransferLog i in pendingTransfers)
+          foreach (var i in pendingTransfers)
           {
+
             var pendingCreditItemList = unitOfWork.BulkCreditLogRepo.GetPendingCredit(i.Id, i.TryCount > 0 ? 2 : 0, prallexBankCode, processDuration);
             if (pendingCreditItemList.Count != 0)
             {
               foreach (var creditLog in pendingCreditItemList)
               {
-                decimal creditAmount = creditLog.CreditAmount ?? 0;
                 var date = DateTime.Now;
-                var transfer = new PostInterBankTransaction{
-                  accountToDebit = i.IntreBankSuspenseAccountNumber,
-                  userName = i.InitiatorUserName,
-                  channel = "2",
-                  transactionLocation = i.TransactionLocation,
-                  interTransferDetails = new List<InterTransferDetail>{
-                    new InterTransferDetail {
-                      transactionReference = Transactions.Ref(),
-                      beneficiaryAccountName = creditLog.CreditAccountName,
-                      beneficiaryAccountNumber = creditLog.CreditAccountNumber,
-                      transactionDate = date.ToString("MM/dd/yyyy HH:mm:ss"),
-                      amount = creditLog.CreditAmount,
-                      customerRemark = creditLog.Narration,
-                      beneficiaryBVN = creditLog.BankVerificationNo,
-                      beneficiaryKYC = creditLog.KycLevel,
-                      beneficiaryBankCode = creditLog.CreditBankCode,
-                      beneficiaryBankName = creditLog.CreditBankName,
-                      nameEnquirySessionID = creditLog.NameEnquiryRef
-                    }
-                  },
-                };
-                var result = await apiService.PostInterBankTransfer(transfer);
-                if (result.ResponseCode != "00")
+                decimal creditAmount = creditLog.CreditAmount ?? 0;
+                var transaction = new TblTransaction
                 {
-                  var transaction = new TblTransaction{
-                    Id = Guid.NewGuid(),
-                    TransactionReference = result.TransactionReference,
-                    TranAmout = creditAmount,
-                    TranDate = DateTime.Now,
-                    SourceAccountNo = i.SuspenseAccountNumber,
-                    SourceAccountName = i.SuspenseAccountName,
-                    SourceBank = prallexBankCode,
-                    TransactionStatus = nameof(TransactionStatus.Failed),
-                    TranType = "Interbank transfer",
-                    Narration = i.Narration,
-                    Channel = "WEB",
-                    DesctionationBank = creditLog.CreditBankCode,
-                    DestinationAcctNo = creditLog.CreditAccountNumber,
-                    DestinationAcctName = creditLog.CreditBankName,
-                    CorporateCustomerId = i.CompanyId,
-                    BatchId = i.BatchId
+                  Id = Guid.NewGuid(),
+                  TranAmout = creditAmount,
+                  TranDate = DateTime.Now,
+                  SourceAccountNo = i.IntreBankSuspenseAccountNumber,
+                  SourceAccountName = i.IntreBankSuspenseAccountName,
+                  SourceBank = prallexBankCode,
+                  TranType = "Interbank transfer",
+                  Narration = i.Narration,
+                  Channel = "WEB",
+                  DesctionationBank = creditLog.CreditBankCode,
+                  DestinationAcctNo = creditLog.CreditAccountNumber,
+                  DestinationAcctName = creditLog.CreditBankName,
+                  CorporateCustomerId = i.CompanyId,
+                  BatchId = i.BatchId
+                };
+
+                var tranRef = creditLog.TryCount == 0 ? creditLog.TransactionReference : Transactions.Ref();
+                if(creditLog.TryCount > 0)
+                {
+                  string[]? sessionIds = creditLog?.SessionId.Split('|');
+                  var getLastSessionId =  sessionIds.Last();
+                  var query = new  RequeryTransaction()
+                  {
+                    UserName = i.InitiatorUserName,
+                    TransactionReference = getLastSessionId,
+                    BeneficiaryAccountNumber = creditLog.CreditAccountNumber,
+                    BeneficiaryBankCode = creditLog.CreditBankCode,
+                    AccountToDebit = i.SuspenseAccountNumber,
+                    Amount = creditLog.CreditAmount
                   };
-                  creditLog.TryCount = (creditLog.TryCount ?? 0) + 1;
-                  creditLog.CreditStatus = 2;
-                  creditLog.CreditDate = DateTime.Now;
-                  creditLog.ResponseMessage = result.ResponseDescription;
-                  creditLog.ResponseCode = result.ResponseCode;
-                  creditLog.TransactionReference = result.TransactionReference;
-                  unitOfWork.BulkCreditLogRepo.UpdateCreditStatus(creditLog);
-                  unitOfWork.TransactionRepo.Add(transaction);
-                  unitOfWork.Complete();
-                 }
+                  var queryResult = await apiService.QueryTransferTransaction(query);
+                  if(queryResult.ResponseCode != "00")
+                  {
+                    var newTranRef  = string.Concat(creditLog.TransactionReference + $"|{tranRef}");
+                    var transfer = new PostInterBankTransaction 
+                    {
+                      accountToDebit = i.IntreBankSuspenseAccountNumber,
+                      userName = i.InitiatorUserName,
+                      channel = "2",
+                      transactionLocation = i.TransactionLocation,
+                      interTransferDetails = new List<InterTransferDetail>
+                      {
+                        new InterTransferDetail 
+                        {
+                          transactionReference = tranRef,
+                          beneficiaryAccountName = creditLog.CreditAccountName,
+                          beneficiaryAccountNumber = creditLog.CreditAccountNumber,
+                          transactionDate = date.ToString("MM/dd/yyyy HH:mm:ss"),
+                          amount = creditLog.CreditAmount,
+                          customerRemark = creditLog.Narration,
+                          beneficiaryBVN = creditLog.BankVerificationNo,
+                          beneficiaryKYC = creditLog.KycLevel,
+                          beneficiaryBankCode = creditLog.CreditBankCode,
+                          beneficiaryBankName = creditLog.CreditBankName,
+                          nameEnquirySessionID = creditLog.NameEnquiryRef
+                        }
+                      },
+                    };
+
+                    var result = await apiService.PostInterBankTransfer(transfer);
+                    creditLog.TryCount = (creditLog.TryCount ?? 0) + 1;
+                    creditLog.CreditDate = DateTime.Now;
+                    creditLog.TransactionResponseMessage = result.ResponseDescription;
+                    creditLog.TransactionResponseCode = result.ResponseCode;
+                    creditLog.SessionId = string.Concat(creditLog.SessionId + $"|{result.TransactionReference}");
+                    transaction.TransactionReference = tranRef;
+                    transaction.SessionId = result.TransactionReference;
+
+                    if (result.ResponseCode != "00")
+                    {
+                      _logger.LogError("TRANSACTION ERROR {0}, {1}",JsonConvert.SerializeObject(result.ResponseCode), JsonConvert.SerializeObject(result.ResponseDescription));
+                    
+                      transaction.TransactionStatus = nameof(TransactionStatus.Failed);
+                      creditLog.CreditStatus = 2;
+                      creditLog.TransactionReference = newTranRef;
+                      unitOfWork.BulkCreditLogRepo.UpdateCreditStatus(creditLog);
+                      unitOfWork.TransactionRepo.Add(transaction);
+                      unitOfWork.Complete();
+                    }
+                    else
+                    {
+                      transaction.TransactionStatus = nameof(TransactionStatus.Successful);
+                      creditLog.TransactionReference = newTranRef;
+                      creditLog.CreditStatus = 1;
+                      unitOfWork.BulkCreditLogRepo.UpdateCreditStatus(creditLog);
+                      unitOfWork.TransactionRepo.Add(transaction);
+                      unitOfWork.Complete();
+                    }
+                  }
+                  else
+                  {
+                    string[]? transactionRef = creditLog?.TransactionReference.Split('|');
+                    var lastTransactionRef =  transactionRef.Last();
+                    transaction.TransactionReference = lastTransactionRef;
+                    transaction.SessionId = queryResult.TransactionReference;
+                    transaction.TransactionStatus = nameof(TransactionStatus.Successful);
+                    creditLog.CreditStatus = 1;
+                    unitOfWork.BulkCreditLogRepo.UpdateCreditStatus(creditLog);
+                    unitOfWork.TransactionRepo.Add(transaction);
+                    unitOfWork.Complete();
+                  }
+                 
+                }
                 else
                 {
-                  var transaction = new TblTransaction{
-                    Id = Guid.NewGuid(),
-                    TransactionReference = result.TransactionReference,
-                    TranAmout = creditAmount,
-                    TranDate = DateTime.Now,
-                    SourceAccountNo = i.SuspenseAccountNumber,
-                    SourceAccountName = i.SuspenseAccountName,
-                    SourceBank = prallexBankCode,
-                    TransactionStatus = nameof(TransactionStatus.Successful),
-                    TranType = "Interbank transfer",
-                    Narration = i.Narration,
-                    Channel = "WEB",
-                    DesctionationBank = creditLog.CreditBankCode,
-                    DestinationAcctNo = creditLog.CreditAccountNumber,
-                    DestinationAcctName = creditLog.CreditBankName,
-                    CorporateCustomerId = i.CompanyId,
-                    BatchId = i.BatchId
+
+                  var transfer = new PostInterBankTransaction
+                  {
+                    accountToDebit = i.IntreBankSuspenseAccountNumber,
+                    userName = i.InitiatorUserName,
+                    channel = "2",
+                    transactionLocation = i.TransactionLocation,
+                    interTransferDetails = new List<InterTransferDetail>
+                    {
+                      new InterTransferDetail 
+                      {
+                        transactionReference = creditLog.TransactionReference,
+                        beneficiaryAccountName = creditLog.CreditAccountName,
+                        beneficiaryAccountNumber = creditLog.CreditAccountNumber,
+                        transactionDate = date.ToString("MM/dd/yyyy HH:mm:ss"),
+                        amount = creditLog.CreditAmount,
+                        customerRemark = creditLog.Narration,
+                        beneficiaryBVN = creditLog.BankVerificationNo,
+                        beneficiaryKYC = creditLog.KycLevel,
+                        beneficiaryBankCode = creditLog.CreditBankCode,
+                        beneficiaryBankName = creditLog.CreditBankName,
+                        nameEnquirySessionID = creditLog.NameEnquiryRef
+                      }
+                    },
                   };
+
+                  var result = await apiService.PostInterBankTransfer(transfer);
                   creditLog.TryCount = (creditLog.TryCount ?? 0) + 1;
-                  creditLog.CreditStatus = 1;
                   creditLog.CreditDate = DateTime.Now;
-                  creditLog.ResponseMessage = result.ResponseDescription;
-                  creditLog.ResponseCode = result.ResponseCode;
-                  creditLog.TransactionReference = result.TransactionReference;
-                  unitOfWork.BulkCreditLogRepo.UpdateCreditStatus(creditLog);
-                  unitOfWork.TransactionRepo.Add(transaction);
-                  unitOfWork.Complete();
+                  creditLog.TransactionResponseMessage = result.ResponseDescription;
+                  creditLog.TransactionResponseCode = result.ResponseCode;
+                  creditLog.SessionId = result.TransactionReference;
+                  transaction.TransactionReference = tranRef;
+                  transaction.SessionId = result.TransactionReference;
+
+                  if (result.ResponseCode != "00")
+                  {
+                    _logger.LogError("TRANSACTION ERROR {0}, {1}",JsonConvert.SerializeObject(result.ResponseCode), JsonConvert.SerializeObject(result.ResponseDescription));
+                  
+                    transaction.TransactionStatus = nameof(TransactionStatus.Failed);
+                    creditLog.CreditStatus = 2;
+                    unitOfWork.BulkCreditLogRepo.UpdateCreditStatus(creditLog);
+                    unitOfWork.TransactionRepo.Add(transaction);
+                    unitOfWork.Complete();
+                  }
+                  else
+                  {
+                    transaction.TransactionStatus = nameof(TransactionStatus.Successful);
+                    creditLog.CreditStatus = 1;
+                    unitOfWork.BulkCreditLogRepo.UpdateCreditStatus(creditLog);
+                    unitOfWork.TransactionRepo.Add(transaction);
+                    unitOfWork.Complete();
+                  }
                 }
               }
             }
-
             if (i.TryCount < maxTryCount)
             {
               var totalCredit = unitOfWork.BulkCreditLogRepo.GetInterBankTotalCredit(i.Id, prallexBankCode, processDuration);
@@ -151,7 +229,6 @@ public class InterBankJob : IInterBankJob
               unitOfWork.BulkPaymentLogRepo.UpdateStatus(i);
               unitOfWork.Complete();
             }
-            
           }
       }
     }

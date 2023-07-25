@@ -30,6 +30,7 @@ namespace CIB.Core.Modules.Authentication.Dto
         public string Phone { get; set; }
         public string BVN { get; set; }
         public string access_token { get; set; }
+        public string refresh_token { get; set; }
         public string token_type { get; set; }
         public string expires_in { get; set; }
         public string SecurityQuestion { get; set; }
@@ -45,5 +46,42 @@ namespace CIB.Core.Modules.Authentication.Dto
         public int? RegStage { get; set; }
         public int? Status { get; set; }
         public Guid? CorporateCustomerId { get; set; }
+    }
+    public class LoginResponseDto
+    {
+        public string Responsecode { get; set; }
+        public string ResponseDescription { get; set; }
+        public string access_token { get; set; }
+        public string refresh_token { get; set; }
+        public string Data {get;set;}
+    }
+
+    public class LoginDto 
+    {
+        public string responsecode { get; set; }
+        public string responseDescription { get; set; }
+        public string access_token { get; set; }
+        public string refresh_token { get; set; }
+        public int userpasswordChanged { get; set; }
+        public string customerIdentity { get; set; }
+        public Guid userId { get; set; }
+        public string defaultAccountNumber { get; set; }
+        public string defaultAccountName { get; set; }
+        public string defaultAccountBalance { get; set; }
+        public string lastLoginDate { get; set; }
+        public string phone { get; set; }
+        public string bVN { get; set; }
+        public string securityQuestion { get; set; }
+        public string authorizationType {get;set;}
+        public string customerID { get; set; }
+        public int indemnitySigned { get; set; }
+        public string role { get; set; }
+        public string roleId { get; set; }
+        //public List<UserAccessModel> Permissions { get; set; }
+        public string companyName { get; set; }
+        public int? regStage { get; set; }
+        public int? status { get; set; }
+        public Guid? corporateCustomerId { get; set; }
+        public string token_type { get; set; }
     }
 }

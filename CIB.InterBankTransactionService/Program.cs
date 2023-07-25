@@ -6,38 +6,40 @@ using CIB.InterBankTransactionService.Modules.Common.Repository;
 using CIB.InterBankTransactionService.Services;
 using CIB.InterBankTransactionService.Utils;
 using Microsoft.EntityFrameworkCore;
-using Serilog;
+using NLog.Extensions.Logging;
+using NLog.Web;
 
 
 namespace CIB.InterBankTransactionService;
 
 public class Program
 {
+  [Obsolete]
   public static void Main(string[] args)
   {
 
-    var config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
-    //Initialize Logger
-    Log.Logger = new LoggerConfiguration().ReadFrom.Configuration(config).CreateLogger();
-    try
-    {
-      Log.Information("Application Starting.");
-      CreateHostBuilder(args).Build().Run();
-    }
-    catch (Exception ex)
-    {
-      Log.Fatal(ex, "The Application failed to start.");
-    }
-    finally
-    {
-      Log.CloseAndFlush();
-    }
+    var logger = NLogBuilder.ConfigureNLog("nlog.config").GetCurrentClassLogger();
+      try
+      {
+        logger.Debug("init main");
+        CreateHostBuilder(args).Build().Run();
+      }
+      catch (Exception ex)
+      {
+        //NLog: catch setup errors
+        logger.Error(ex, "Stopped program because of exception");
+        throw;
+      }
+      finally
+      {
+        // Ensure to flush and stop internal timers/threads before application-exit (Avoid segmentation fault on Linux)
+        NLog.LogManager.Shutdown();
+      }
   }
   public static IHostBuilder CreateHostBuilder(string[] args) =>
   Host.CreateDefaultBuilder(args)
   .UseWindowsService()
   .ConfigureServices((hostContext, services) => {
-    
     services.AddSingleton<IInterBankJob, InterBankJob>();
     IConfiguration configuration = hostContext.Configuration;
     var con = Encryption.DecryptStrings(configuration.GetConnectionString("parallaxCIBCon"));
@@ -50,6 +52,10 @@ public class Program
     services.AddScoped<IApiService, ApiService>();
     services.AddHostedService<Worker>();
   })
-  .UseSerilog();
+   .ConfigureLogging((hostingContext,logging) =>
+    {
+      logging.AddNLog(hostingContext.Configuration.GetSection("Logging")); 
+      logging.SetMinimumLevel(LogLevel.Information);
+    });
 }
 

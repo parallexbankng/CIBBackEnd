@@ -12,10 +12,12 @@ public class ApiService : IApiService
   private readonly IConfiguration _config;
   private readonly IHttpClientFactory _client;
   private readonly  AuthTokenResponse _token;
+  private readonly ILogger<ApiService> _logger;
   
-  public ApiService (IConfiguration config,IHttpClientFactory client){
+  public ApiService (IConfiguration config,IHttpClientFactory client,ILogger<ApiService> logger){
     _config = config;
     _client = client;
+    _logger = logger;
     _token = this.GetAuthToken();
   }
   public async Task<TransferResponse> PostIntraBankTransfer(PostIntraBankTransaction transaction)
@@ -49,5 +51,29 @@ public class ApiService : IApiService
     response.EnsureSuccessStatusCode();
     var content = response.Content.ReadAsStringAsync().Result;
     return JsonConvert.DeserializeObject<AuthTokenResponse>(content);
+  }
+
+  public async Task<RequeryTransactionResponse> QueryTransferTransaction(RequeryTransaction query)
+  {
+    var _httpClient = _client.CreateClient("tokenClient");
+    _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _token.Token);
+    var url = _config.GetValue<string>("TestApiUrl:queryTransaction");
+    var data = JsonConvert.SerializeObject(query);
+    var payLoad = new StringContent(data, Encoding.UTF8, "application/json");
+    try
+    {
+      var response = await _httpClient.PostAsync(url, payLoad).Result.Content.ReadAsStringAsync();
+      if(string.IsNullOrEmpty(response))
+      {
+        return new RequeryTransactionResponse { ResponseCode = "15", ResponseMessage = "API Error Return Null" };
+      }
+      return JsonConvert.DeserializeObject<RequeryTransactionResponse>(response);
+    }
+    catch(Exception ex)
+    {
+      var errorItem = ex.InnerException != null ?  new RequeryTransactionResponse{ResponseCode = "14", ResponseMessage= ex.InnerException.Message } : new RequeryTransactionResponse{ResponseCode ="500", ResponseMessage = ex.InnerException != null ? ex.InnerException.Message : ex.Message};
+      _logger.LogError("API ERROR {0}", JsonConvert.SerializeObject(errorItem));
+      return errorItem;
+    } 
   }
 }

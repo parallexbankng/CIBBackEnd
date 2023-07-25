@@ -6,6 +6,7 @@ using CIB.BankAdmin.Extensions;
 using CIB.Core.Configuration;
 using CIB.Core.Services._2FA;
 using CIB.Core.Services.Api;
+using CIB.Core.Services.Authentication;
 using CIB.Core.Services.Email;
 using CIB.Core.Services.File;
 using CIB.Core.Services.Notification;
@@ -88,10 +89,15 @@ namespace CIB.BankAdmin
         c.BaseAddress = new Uri(Configuration.GetValue<string>("TestApiUrl:baseUrl"));
         c.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
       });
+      services.AddHttpClient("adClient",c => {
+        c.BaseAddress = new Uri(Configuration.GetValue<string>("AdAuthenticationBaseUrl"));
+        c.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+      });
       services.TryAddSingleton<IActionContextAccessor, ActionContextAccessor>();
       services.AddTransient<IApiService, ApiService>();
       services.AddTransient<IToken2faService, Token2faService>();
       services.AddTransient<INotificationService, NotificationService>();
+      services.AddTransient<IAuthenticationService,AuthenticationService>();
       services.AddTransient<IFileService, FileService>();
       services.AddAutoMapper(Assembly.GetExecutingAssembly());
     }

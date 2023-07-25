@@ -17,7 +17,6 @@ namespace CIB.Core.Entities
         public string AccountName { get; set; }
         public string AccountNumber { get; set; }
         public string BankCode { get; set; }
-        public string BankName { get; set; }
         public decimal? SalaryAmount { get; set; }
         public string GradeLevel { get; set; }
         public string Description { get; set; }
@@ -27,5 +26,6 @@ namespace CIB.Core.Entities
         public Guid? ApprovedBy { get; set; }
         public DateTime? DateApproved { get; set; }
         public string InitiatorUserName { get; set; }
+        public string BankName { get; set; }
     }
 }

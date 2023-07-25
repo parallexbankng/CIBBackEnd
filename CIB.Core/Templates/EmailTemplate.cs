@@ -1,3 +1,4 @@
+using System.IO;
 using CIB.Core.Common;
 using CIB.Core.Entities;
 using CIB.Core.Enums;
@@ -19,9 +20,9 @@ namespace CIB.Core.Templates
             };
             return template;
         }
-        public static EmailRequestDto LoginCredentialMail(string receiverEmail, string fullName, string username, string password, string customerId, string authUrl )
+        public static EmailRequestDto LoginCredentialMail(string receiverEmail, string fullName, string username, string password, string customerId, string authUrl)
         {
-            var isPasswordNeed = password != "" ? $"<p>Your password is {password}</p><br/>" :"";
+            var isPasswordNeed = password != "" ? $"<p>Your password is {password}</p><br/>" : "";
             var template = new EmailRequestDto
             {
                 subject = $"Parallexbank Corporate Banking Login Credentials",
@@ -175,13 +176,13 @@ namespace CIB.Core.Templates
         public static EmailRequestDto Transfer(string receiverEmail, EmailNotification profile, string amount)
         {
             string body = "";
-            if(profile.Action == nameof(AuthorizationStatus.Decline))
+            if (profile.Action == nameof(AuthorizationStatus.Decline))
             {
                 body = $"<p> A fund transfer of {amount} initiated by {profile.FullName} has been decline<br /> </p>" +
                         $"<p> Reason {profile.Reason} </p>";
             }
 
-            if(profile.Action == nameof(AuthorizationStatus.Approved))
+            if (profile.Action == nameof(AuthorizationStatus.Approved))
             {
                 body = $"<p> A fund transfer of {amount} initiated by {profile.FullName} requires your approval, please login to the parallex bank corporate internet banking to approve.<br /> </p>";
             }
@@ -210,15 +211,15 @@ namespace CIB.Core.Templates
 
 
 
-        public static EmailRequestDto BankAdminApprovalRequest(string receiverEmail,string fullName,string Role, string Message)
+        public static EmailRequestDto BankAdminApprovalRequest(string receiverEmail, string fullName, string Role, string Message)
         {
-            
+
             var template = new EmailRequestDto
             {
                 subject = $"parallexbank Corporate Banking Approval Request",
                 recipient = receiverEmail,
                 sender = "e-statement@parallexbank.com",
-                message = 
+                message =
                 $"<!DOCTYPE html>" +
                 $" <html>" +
                 $"<head>" +
@@ -241,49 +242,49 @@ namespace CIB.Core.Templates
             return template;
         }
 
-        public static EmailRequestDto BankApprovalRequest(string receiverEmail,EmailNotification profile,string Role, string Message)
+        public static EmailRequestDto BankApprovalRequest(string receiverEmail, EmailNotification profile, string Role, string Message)
         {
-          var userRole = profile.Role == "" ? "" : $"<p>Role {profile.Role}</p>";
-            
-          var template = new EmailRequestDto
-          {
-            subject = $"parallexbank Corporate Banking Approval Request to {profile.Action} Corporate Profile",
-            recipient = receiverEmail,
-            sender = "e-statement@parallexbank.com",
-            message = 
-              $"<!DOCTYPE html>" +
-              $" <html>" +
-              $"<head>" +
-              $"<meta charset='utf-8' />" +
-              $"<title></title>" +
-              $"</head>" +
-              $"<body>" +
-              $"<p>Dear Sir/Madam,</p>" +
-              $"<p>Kindly Approved Pending Request to {profile.Action} Corporate Profile </p>" +
-              $"<p>Customer Id  {profile.CustomerId} </p>" +
-              $"<p>First Name: {profile.FirstName}</p>" +
-              $"<p>Last Name:  {profile.LastName}</p>" +
-              $"<p>Middle Name {profile.MiddleName}</p>" +
-              $"<p>Email {profile.Email}</p>" +
-              $"<p>Phone Number {profile.PhoneNumber}</p>" +
-              $"<p>Approval Limit {profile.ApprovalLimit}</p>" +
-              $"{userRole}" +
-              $"<p></p>" +
-              $"<p> Thank you for banking with parallex bank  </p>" +
-              $"</body>" +
-              $"</html>"
-          };
-          return template;
+            var userRole = profile.Role == "" ? "" : $"<p>Role {profile.Role}</p>";
+
+            var template = new EmailRequestDto
+            {
+                subject = $"parallexbank Corporate Banking Approval Request to {profile.Action} Corporate Profile",
+                recipient = receiverEmail,
+                sender = "e-statement@parallexbank.com",
+                message =
+                $"<!DOCTYPE html>" +
+                $" <html>" +
+                $"<head>" +
+                $"<meta charset='utf-8' />" +
+                $"<title></title>" +
+                $"</head>" +
+                $"<body>" +
+                $"<p>Dear Sir/Madam,</p>" +
+                $"<p>Kindly Approved Pending Request to {profile.Action} Corporate Profile </p>" +
+                $"<p>Customer Id  {profile.CustomerId} </p>" +
+                $"<p>First Name: {profile.FirstName}</p>" +
+                $"<p>Last Name:  {profile.LastName}</p>" +
+                $"<p>Middle Name {profile.MiddleName}</p>" +
+                $"<p>Email {profile.Email}</p>" +
+                $"<p>Phone Number {profile.PhoneNumber}</p>" +
+                $"<p>Approval Limit {profile.ApprovalLimit}</p>" +
+                $"{userRole}" +
+                $"<p></p>" +
+                $"<p> Thank you for banking with parallex bank  </p>" +
+                $"</body>" +
+                $"</html>"
+            };
+            return template;
         }
 
-        public static EmailRequestDto BankProfileApprovalRequest(string receiverEmail,string Action,EmailNotification Profile, string Message)
+        public static EmailRequestDto BankProfileApprovalRequest(string receiverEmail, string Action, EmailNotification Profile, string Message)
         {
             var template = new EmailRequestDto
             {
                 subject = $"parallexbank Corporate Banking Approval Request",
                 recipient = receiverEmail,
                 sender = "e-statement@parallexbank.com",
-                message = 
+                message =
                 $"<!DOCTYPE html>" +
                 $" <html>" +
                 $"<head>" +
@@ -302,14 +303,14 @@ namespace CIB.Core.Templates
             return template;
         }
 
-        public static EmailRequestDto CorporateProfileApprovalRequest(string receiverEmail,string fullName,string Role, string Message)
+        public static EmailRequestDto CorporateProfileApprovalRequest(string receiverEmail, string fullName, string Role, string Message)
         {
             var template = new EmailRequestDto
             {
                 subject = $"parallexbank Corporate Banking Approval Request",
                 recipient = receiverEmail,
                 sender = "e-statement@parallexbank.com",
-                message = 
+                message =
                 $"<!DOCTYPE html>" +
                 $" <html>" +
                 $"<head>" +
@@ -326,15 +327,15 @@ namespace CIB.Core.Templates
             };
             return template;
         }
-       
-        public static EmailRequestDto CorporateCustomerApprovalRequest(string receiverEmail,string fullName,string Role, string Message)
+
+        public static EmailRequestDto CorporateCustomerApprovalRequest(string receiverEmail, string fullName, string Role, string Message)
         {
             var template = new EmailRequestDto
             {
                 subject = $"parallexbank Corporate Banking Approval Request",
                 recipient = receiverEmail,
                 sender = "e-statement@parallexbank.com",
-                message = 
+                message =
                 $"<!DOCTYPE html>" +
                 $" <html>" +
                 $"<head>" +
@@ -351,7 +352,7 @@ namespace CIB.Core.Templates
             };
             return template;
         }
-        public static EmailRequestDto BankAdminDeclineRequest(string receiverEmail,string Action,string Profile, string Message)
+        public static EmailRequestDto BankAdminDeclineRequest(string receiverEmail, string Action, string Profile, string Message)
         {
 
             var template = new EmailRequestDto
@@ -359,7 +360,7 @@ namespace CIB.Core.Templates
                 subject = $"parallexbank Corporate Banking Request Decline",
                 recipient = receiverEmail,
                 sender = "e-statement@parallexbank.com",
-                message = 
+                message =
                 $"<!DOCTYPE html>" +
                 $" <html>" +
                 $"<head>" +
@@ -377,7 +378,7 @@ namespace CIB.Core.Templates
             return template;
         }
 
-        public static EmailRequestDto DeclineBankProfilRequest(string receiverEmail,string Action,EmailNotification Profile, string Message)
+        public static EmailRequestDto DeclineBankProfilRequest(string receiverEmail, string Action, EmailNotification Profile, string Message)
         {
 
             var template = new EmailRequestDto
@@ -385,7 +386,7 @@ namespace CIB.Core.Templates
                 subject = $"parallexbank Corporate Banking Request Decline",
                 recipient = receiverEmail,
                 sender = "e-statement@parallexbank.com",
-                message = 
+                message =
                 $"<!DOCTYPE html>" +
                 $" <html>" +
                 $"<head>" +
@@ -404,7 +405,7 @@ namespace CIB.Core.Templates
             return template;
         }
 
-        public static EmailRequestDto DeclineCorporateProfilRequest(string receiverEmail,string Action,EmailNotification Profile,string Message)
+        public static EmailRequestDto DeclineCorporateProfilRequest(string receiverEmail, string Action, EmailNotification Profile, string Message)
         {
 
             var template = new EmailRequestDto
@@ -412,7 +413,7 @@ namespace CIB.Core.Templates
                 subject = $"parallexbank Corporate Banking Request Decline",
                 recipient = receiverEmail,
                 sender = "e-statement@parallexbank.com",
-                message = 
+                message =
                 $"<!DOCTYPE html>" +
                 $" <html>" +
                 $"<head>" +
@@ -431,7 +432,7 @@ namespace CIB.Core.Templates
             return template;
         }
 
-        public static EmailRequestDto DeclineCorporateCustomerRequest(string receiverEmail,string Action,EmailNotification Profile, string Message)
+        public static EmailRequestDto DeclineCorporateCustomerRequest(string receiverEmail, string Action, EmailNotification Profile, string Message)
         {
 
             var template = new EmailRequestDto
@@ -439,7 +440,7 @@ namespace CIB.Core.Templates
                 subject = $"parallexbank Corporate Banking Request Decline",
                 recipient = receiverEmail,
                 sender = "e-statement@parallexbank.com",
-                message = 
+                message =
                 $"<!DOCTYPE html>" +
                 $" <html>" +
                 $"<head>" +
@@ -458,14 +459,14 @@ namespace CIB.Core.Templates
             return template;
         }
 
-        public static EmailRequestDto NewCorporateCustomerApprovalRequest(string receiverEmail,string Company,string CustomerId)
+        public static EmailRequestDto NewCorporateCustomerApprovalRequest(string receiverEmail, string Company, string CustomerId)
         {
             var template = new EmailRequestDto
             {
                 subject = $"parallexbank Corporate Banking Approval Request",
                 recipient = receiverEmail,
                 sender = "e-statement@parallexbank.com",
-                message = 
+                message =
                 $"<!DOCTYPE html>" +
                 $" <html>" +
                 $"<head>" +
@@ -483,15 +484,15 @@ namespace CIB.Core.Templates
             };
             return template;
         }
-    
-        public static EmailRequestDto CorporateAdminApprovalRequest(string receiverEmail,string fullName,string Role)
+
+        public static EmailRequestDto CorporateAdminApprovalRequest(string receiverEmail, string fullName, string Role)
         {
             var template = new EmailRequestDto
             {
                 subject = $"parallexbank Corporate Banking Approval Request",
                 recipient = receiverEmail,
                 sender = "e-statement@parallexbank.com",
-                message = 
+                message =
                 $"<!DOCTYPE html>" +
                 $" <html>" +
                 $"<head>" +
@@ -507,18 +508,18 @@ namespace CIB.Core.Templates
             };
             return template;
         }
-    
-        
-        public static EmailRequestDto WorkflowApprovalRequest(string receiverEmail,EmailNotification Profile, bool isUpdate = false)
+
+
+        public static EmailRequestDto WorkflowApprovalRequest(string receiverEmail, EmailNotification Profile, bool isUpdate = false)
         {
 
-            var actionMessage = isUpdate == true ? "for a newly created workflow " :" for updated  workflow";
+            var actionMessage = isUpdate == true ? "for a newly created workflow " : " for updated  workflow";
             var template = new EmailRequestDto
             {
                 subject = $"parallexbank Corporate Banking Workflow Approval Request",
                 recipient = receiverEmail,
                 sender = "e-statement@parallexbank.com",
-                message = 
+                message =
                 $"<!DOCTYPE html>" +
                 $" <html>" +
                 $"<head>" +
@@ -538,15 +539,15 @@ namespace CIB.Core.Templates
             };
             return template;
         }
-    
-        public static EmailRequestDto ProfileApprovalRequest(string receiverEmail,EmailNotification Profile, string Action)
+
+        public static EmailRequestDto ProfileApprovalRequest(string receiverEmail, EmailNotification Profile, string Action)
         {
             var template = new EmailRequestDto
             {
                 subject = $"parallexbank Corporate Banking Workflow Approval Request",
                 recipient = receiverEmail,
                 sender = "e-statement@parallexbank.com",
-                message = 
+                message =
                 $"<!DOCTYPE html>" +
                 $" <html>" +
                 $"<head>" +
@@ -568,15 +569,15 @@ namespace CIB.Core.Templates
             };
             return template;
         }
-    
-        public static EmailRequestDto CorporateCompanyApprovalRequest(string receiverEmail,EmailNotification Profile, string Action)
+
+        public static EmailRequestDto CorporateCompanyApprovalRequest(string receiverEmail, EmailNotification Profile, string Action)
         {
             var template = new EmailRequestDto
             {
                 subject = $"parallexbank Corporate Banking Workflow Approval Request",
                 recipient = receiverEmail,
                 sender = "e-statement@parallexbank.com",
-                message = 
+                message =
                 $"<!DOCTYPE html>" +
                 $" <html>" +
                 $"<head>" +
@@ -598,6 +599,33 @@ namespace CIB.Core.Templates
             };
             return template;
         }
-    
+
+        // public static EmailRequestDto TestMail(string receiverEmail, EmailNotification Profile, string Action)
+        public static EmailRequestDto LoginMailo(string receiverEmail, string fullName, string filePath)
+        {
+            string body = string.Empty;
+            //using streamreader for reading my htmltemplate  
+            //string AssemblyPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location).ToString();
+            // var path = "./htmlTemplate/CustomerLogin.html";
+            using (StreamReader reader = new(filePath))
+            {
+                body = reader.ReadToEnd();
+
+            }
+            body = body.Replace("[Name]", fullName); //replacing the required things  
+                                                     //return body;
+            var template = new EmailRequestDto
+            {
+                subject = $"Parallexbank Corporate Banking Login Notification",
+                message = body,
+                recipient = receiverEmail,
+                sender = "e-statement@parallexbank.com"
+            };
+            return template;
+
+        }
+
+
+
     }
 }

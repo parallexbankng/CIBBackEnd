@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using CIB.Core.Common.Repository;
 using CIB.Core.Entities;
 using CIB.Core.Modules.CorporateSalarySchedule.Dto;
+using Microsoft.EntityFrameworkCore;
 
 namespace CIB.Core.Modules.TempCorporateSalarySchedule
 {
@@ -27,7 +28,7 @@ namespace CIB.Core.Modules.TempCorporateSalarySchedule
             {
                 if(isUpdate)
                 {
-                    if(schedule.Id != checkShedule.Id)
+                    if(schedule.CorporateSalaryScheduleId != checkShedule.CorporateSalaryScheduleId)
                     {
                         return new SalaryScheduleDuplicateStatus { Message = "Schedule Already Exit", IsDuplicate = true };
                     }
@@ -44,5 +45,10 @@ namespace CIB.Core.Modules.TempCorporateSalarySchedule
         {
             _context.Update(update).Property(x=>x.Sn).IsModified = false;
         }
+
+    public async Task<List<TblTempCorporateSalarySchedule>> GetPendingCorporateSalarySchedule(Guid corporateCustomerId)
+    {
+      return await _context.TblTempCorporateSalarySchedules.Where(ctx => ctx.CorporateCustomerId != null && ctx.CorporateCustomerId == corporateCustomerId && ctx.IsTreated == 0).ToListAsync();
+    } 
   }
 }

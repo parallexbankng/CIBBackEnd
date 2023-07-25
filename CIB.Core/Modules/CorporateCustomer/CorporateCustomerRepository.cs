@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using CIB.Core.Common.Repository;
 using CIB.Core.Entities;
 using CIB.Core.Modules.CorporateCustomer.Dto;
@@ -9,61 +8,71 @@ using CIB.Core.Modules.CorporateProfile.Dto;
 
 namespace CIB.Core.Modules.CorporateCustomer
 {
-    public class CorporateCustomerRepository: Repository<TblCorporateCustomer>,ICorporateCustomerRepository
+  public class CorporateCustomerRepository: Repository<TblCorporateCustomer>,ICorporateCustomerRepository
+  {
+    public CorporateCustomerRepository(ParallexCIBContext context) : base(context)
     {
-        public CorporateCustomerRepository(ParallexCIBContext context) : base(context)
-        {
 
-        }
-        public ParallexCIBContext context
-        {
-          get { return _context as ParallexCIBContext; }
-        }
+    }
+    public ParallexCIBContext context
+    {
+      get { return _context as ParallexCIBContext; }
+    }
 
-        public IEnumerable<TblCorporateCustomer> GetAllCorporateCustomers()
-        {
-          return _context.TblCorporateCustomers.OrderByDescending(ctx => ctx.Sn).ToList();
-          
-        }
+    public IEnumerable<TblCorporateCustomer> GetAllCorporateCustomers()
+    {
+      return _context.TblCorporateCustomers.OrderByDescending(ctx => ctx.Sn).ToList();
+      
+    }
 
-        public TblCorporateCustomer GetCorporateCustomerByCompanyName(string companyName)
-        {
-          throw new NotImplementedException();
-        }
+    public TblCorporateCustomer GetCorporateCustomerByCompanyName(string companyName)
+    {
+      throw new NotImplementedException();
+    }
 
 
-        public TblCorporateCustomer GetCorporateCustomerByCustomerID(string id)
-        {
-          return _context.TblCorporateCustomers.SingleOrDefault(a => a.CustomerId == id);
-        }
+    public TblCorporateCustomer GetCorporateCustomerByCustomerID(string id)
+    {
+      return _context.TblCorporateCustomers.SingleOrDefault(a => a.CustomerId == id);
+    }
 
-        public void UpdateCorporateCustomer(TblCorporateCustomer profile)
-        {
-            _context.Update(profile).Property(x=>x.Sn).IsModified = false;
-        }
+    public void UpdateCorporateCustomer(TblCorporateCustomer profile)
+    {
+        _context.Update(profile).Property(x=>x.Sn).IsModified = false;
+    }
 
-      public CorporateUserStatus CheckDuplicate(TblCorporateCustomer profile, bool IsUpdate = false)
+    public CorporateUserStatus CheckDuplicate(TblCorporateCustomer profile, bool IsUpdate = false)
+  {
+    var duplicateEmail = _context.TblCorporateCustomers.FirstOrDefault(x => x.CustomerId.Trim().Equals(profile.CustomerId.Trim()) && x.Status == 1);
+    if(duplicateEmail != null)
+    {
+      if(IsUpdate)
       {
-        var duplicateEmail = _context.TblCorporateCustomers.FirstOrDefault(x => x.CustomerId.Trim().Equals(profile.CustomerId.Trim()) && x.Status == 1);
-        if(duplicateEmail != null)
+        if(profile.Id != duplicateEmail.Id)
         {
-          if(IsUpdate)
-          {
-            if(profile.Id != duplicateEmail.Id)
-            {
-              return new CorporateUserStatus { Message = "Corporate Customer Already Exit", IsDuplicate = "01" };
-            }
-          }else
-          {
-            return new CorporateUserStatus { Message = "Corporate Customer Already Exit", IsDuplicate = "01" };
-          }
+          return new CorporateUserStatus { Message = "Corporate Customer Already Exit", IsDuplicate = "01" };
         }
-        return new CorporateUserStatus { Message = "", IsDuplicate = "02" };
-      }
-
-      public TblCorporateCustomer GetCustomerByCustomerId(string customerId)
+      }else
       {
-        return _context.TblCorporateCustomers.SingleOrDefault(a => a.CustomerId == customerId);
+        return new CorporateUserStatus { Message = "Corporate Customer Already Exit", IsDuplicate = "01" };
       }
     }
+    return new CorporateUserStatus { Message = "", IsDuplicate = "02" };
+  }
+
+    public TblCorporateCustomer GetCustomerByCustomerId(string customerId)
+    {
+      return _context.TblCorporateCustomers.SingleOrDefault(a => a.CustomerId == customerId);
+    }
+
+    public IEnumerable<ChangeSignatoryDto> Search(string CompanyName, string Signatory)
+    {
+      throw new NotImplementedException();
+    }
+
+    public IEnumerable<ChangeSignatoryDto> GetCorporateCustomerWhoChangeSigntory()
+    {
+      throw new NotImplementedException();
+    }
+  }
 }

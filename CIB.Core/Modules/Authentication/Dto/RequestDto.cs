@@ -70,6 +70,12 @@ namespace CIB.Core.Modules.Authentication.Dto
         public string Password { get; set; }
         public string Token { get; set; }
     }
+    public class UserData
+    {
+        public string Username { get; set; }
+        public string Password { get; set; }
+        public string Token { get; set; }
+    }
 
     public class ChangeUserPasswordParam: BaseDto
     {
@@ -89,12 +95,13 @@ namespace CIB.Core.Modules.Authentication.Dto
 
     public class CorporateUserModel
     {
-        public string Username { get; set; }
-        public string Phone1 { get; set; }
-        public string Email { get; set; }
-        public string FullName { get; set; }
-        public string CustomerID { get; set; }
-        public string CorporateCustomerId { get; set; }
+        public string? UserId { get; set; }
+        public string? Username { get; set; }
+        public string? Phone1 { get; set; }
+        public string? Email { get; set; }
+        public string? FullName { get; set; }
+        public string? CustomerID { get; set; }
+        public string? CorporateCustomerId { get; set; }
     }
 
 }

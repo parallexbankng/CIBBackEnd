@@ -1,9 +1,13 @@
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using CIB.Core.Common.Repository;
 using CIB.Core.Entities;
 using CIB.Core.Modules.Cheque.Dto;
 using CIB.Core.Modules.CorporateSalarySchedule._CorporateEmployee.Dto;
+using Microsoft.EntityFrameworkCore;
 
 namespace CIB.Core.Modules.TempCorporateSalarySchedule._TempCorporateEmployee
 {
@@ -20,14 +24,14 @@ namespace CIB.Core.Modules.TempCorporateSalarySchedule._TempCorporateEmployee
 
         public CorporateEmployeeDuplicateStatus CheckDuplicate(TblTempCorporateCustomerEmployee employee,bool IsUpdate)
         {
-            var checkDuplicateStaffId = _context.TblCorporateCustomerEmployees.Where(ctx => ctx.StaffId == employee.StaffId && ctx.CorporateCustomerId != null && ctx.CorporateCustomerId == employee.CorporateCustomerId).FirstOrDefault();
-            var checkDuplicateAccountNumber = _context.TblCorporateCustomerEmployees.Where(ctx => ctx.AccountNumber== employee.AccountNumber && ctx.CorporateCustomerId != null && ctx.CorporateCustomerId == employee.CorporateCustomerId).FirstOrDefault();
+            var checkDuplicateStaffId = _context.TblTempCorporateCustomerEmployees.Where(ctx => ctx.StaffId == employee.StaffId && ctx.CorporateCustomerId != null && ctx.CorporateCustomerId == employee.CorporateCustomerId && ctx.IsTreated == 0).FirstOrDefault();
+            var checkDuplicateAccountNumber = _context.TblTempCorporateCustomerEmployees.Where(ctx => ctx.AccountNumber== employee.AccountNumber && ctx.CorporateCustomerId != null && ctx.CorporateCustomerId == employee.CorporateCustomerId && ctx.IsTreated == 0).FirstOrDefault();
 
             if(checkDuplicateStaffId != null)
             {
                 if(IsUpdate)
                 {
-                    if(employee.Id != checkDuplicateStaffId.Id)
+                    if(employee.CorporateCustomerEmployeeId != checkDuplicateStaffId.CorporateCustomerEmployeeId)
                     {
                         return new CorporateEmployeeDuplicateStatus { Message = "newly updated staff id Already Exit", IsDuplicate = true };
                     }
@@ -42,14 +46,14 @@ namespace CIB.Core.Modules.TempCorporateSalarySchedule._TempCorporateEmployee
             {
                 if(IsUpdate)
                 {
-                    if(employee.Id != checkDuplicateAccountNumber.Id)
+                    if(employee.AccountNumber != checkDuplicateAccountNumber.AccountNumber)
                     {
                         return new CorporateEmployeeDuplicateStatus { Message = "newly updated Account number Already Exit", IsDuplicate = true };
                     }
                 }
                 else
                 {
-                    return new CorporateEmployeeDuplicateStatus { Message = "Account number id Already Exit", IsDuplicate =true};
+                    return new CorporateEmployeeDuplicateStatus { Message = "Account number Already Exit", IsDuplicate =true};
                 }
             }
 
@@ -60,6 +64,10 @@ namespace CIB.Core.Modules.TempCorporateSalarySchedule._TempCorporateEmployee
         {
           _context.Update(request).Property(x=>x.Sn).IsModified = false;
         }
-  
+
+    public async Task<List<TblTempCorporateCustomerEmployee>> GetPendingCorporateEmployee(Guid CorporateCustomerId)
+    {
+      return await _context.TblTempCorporateCustomerEmployees.Where(ctx => ctx.CorporateCustomerId != null && ctx.CorporateCustomerId == CorporateCustomerId && ctx.IsTreated == 0).ToListAsync();
+    }
   }
 }

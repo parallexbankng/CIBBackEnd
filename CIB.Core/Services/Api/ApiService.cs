@@ -127,8 +127,8 @@ namespace CIB.Core.Services.Api
     public async Task<CustomerDataResponseDto> CustomerNameInquiry(string accountNumber)
     {
       var _httpClient = httpClient.CreateClient("tokenClient");
-      // var authResult = await GetAuthToken();
-      // _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authResult.Token);
+      var authResult = await GetAuthToken();
+      _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authResult.Token);
       var url = _config.GetValue<string>("TestApiUrl:accountInfo");
       var response = await _httpClient.GetAsync(url + $"?accountNumber={accountNumber}&bankId=01").Result.Content.ReadAsStringAsync();
       if(string.IsNullOrEmpty(response))
@@ -165,41 +165,50 @@ namespace CIB.Core.Services.Api
     {
       var bankUserName = UserName.ToLower().Trim();
       var bankPassword = Password.Trim();
-      var _httpClient = httpClient.CreateClient("finnacleClient");
+      var _httpClient = httpClient.CreateClient("adClient");
       var url = _config.GetValue<string>("TestApiUrl:adUserAuthentication");
 
-      var data = JsonConvert.SerializeObject(new {UserName=$"{bankUserName}",Password=$"{bankPassword}"});
+      var payLoadData = JsonConvert.SerializeObject(new {UserName=$"{bankUserName}",Password=$"{bankPassword}"});
+      var data = JsonConvert.SerializeObject(new {Data= Encryption.EncryptStrings(payLoadData)});
       var payLoad = new StringContent(data, Encoding.UTF8, "application/json");
       try
       {
         var response = await _httpClient.PostAsync(url, payLoad).Result.Content.ReadAsStringAsync();
-        //var response = await _httpClient.PostAsync(url + $"?username={bankUserName}&password={bankPassword}").Result.Content.ReadAsStringAsync();
         if(string.IsNullOrEmpty(response))
         {
           return new ADLoginResponseDto{IsAuthenticated = false, ResponseMessage = "Error Authenticating User With AD"};
         }
-        return JsonConvert.DeserializeObject<ADLoginResponseDto>(response);
+        var result = JsonConvert.DeserializeObject<ADData>(response); 
+        return JsonConvert.DeserializeObject<ADLoginResponseDto>(Encryption.DecryptStrings(result.Data));
       }
       catch (Exception ex)
       { 
-      
-          var message = ex.InnerException != null ?  ex.InnerException.Message : ex.Message;
-           return new ADLoginResponseDto{IsAuthenticated = false, ResponseMessage = message};
+        var message = ex.InnerException != null ?  ex.InnerException.Message : ex.Message;
+        return new ADLoginResponseDto{IsAuthenticated = false, ResponseMessage = message};
       }
     }
     public async Task<BulkIntraBankTransactionResponse> IntraBankBulkTransfer(BulkIntrabankTransactionModel transaction)
     {
-     
       var _httpClient = httpClient.CreateClient("finnacleClient");
       var url = _config.GetValue<string>("TestApiUrl:bulkTransaction");
       var data = JsonConvert.SerializeObject(transaction);
       var payLoad = new StringContent(data, Encoding.UTF8, "application/json");
-      var response = await _httpClient.PostAsync(url, payLoad).Result.Content.ReadAsStringAsync();
-      if(string.IsNullOrEmpty(response))
+      try
       {
-        return new BulkIntraBankTransactionResponse{ResponseCode = ResponseCode.API_ERROR, ResponseMessage = "Error Posting Bulk Intrabank Transaction"};
+        var response = await _httpClient.PostAsync(url, payLoad).Result.Content.ReadAsStringAsync();
+        if(string.IsNullOrEmpty(response))
+        {
+          return new BulkIntraBankTransactionResponse{ResponseCode = ResponseCode.API_ERROR, ResponseMessage = "Error Posting Bulk Intrabank Transaction"};
+        }
+        return JsonConvert.DeserializeObject<BulkIntraBankTransactionResponse>(response);
       }
-      return JsonConvert.DeserializeObject<BulkIntraBankTransactionResponse>(response);
+      catch (Exception ex)
+      { 
+        var message = ex.InnerException != null ?  ex.InnerException.Message : ex.Message;
+        return new BulkIntraBankTransactionResponse{ResponseCode = ResponseCode.API_ERROR, ResponseMessage = message};
+      }
     }
   }
 }
+
+

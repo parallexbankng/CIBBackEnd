@@ -10,7 +10,9 @@ using CIB.Core.Utils;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
 using CIB.Core.Common.Dto;
-using CIB.Core.Modules.Authentication.Dto;
+using CIB.Core.Services.Authentication;
+using Newtonsoft.Json;
+using CIB.Core.Common;
 
 namespace CIB.BankAdmin.Controllers
 {
@@ -20,7 +22,11 @@ namespace CIB.BankAdmin.Controllers
     {
         protected readonly IApiService _apiService;
         private readonly ILogger<ActiveDirectoryController> _logger;
-        public ActiveDirectoryController(ILogger<ActiveDirectoryController> _logger,IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor accessor,IApiService apiService) : base(mapper, unitOfWork, accessor)
+        public ActiveDirectoryController(ILogger<ActiveDirectoryController> _logger,
+        IUnitOfWork unitOfWork, 
+        IMapper mapper, 
+        IHttpContextAccessor accessor,
+        IApiService apiService, IAuthenticationService authService):base(mapper,unitOfWork,accessor,authService)
         {
             this._apiService = apiService;
             this._logger = _logger;
@@ -29,7 +35,7 @@ namespace CIB.BankAdmin.Controllers
         [HttpPost("GetBasicInfo")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public async Task<ActionResult<ResponseDTO<ADUserData>>> GetActiveDirectoryUserDetail(ADUserRequestDto model)
+        public async Task<ActionResult<ResponseDTO<ADUserData>>> GetActiveDirectoryUserDetail(GenericRequestDto model)
         {
             try
             {
@@ -44,24 +50,35 @@ namespace CIB.BankAdmin.Controllers
                 {
                     return StatusCode(400, errormsg);
                 }
-
-                if (string.IsNullOrEmpty(model.UserName))
-                {
-                    return BadRequest("Username is required");
-                }
-
+                
                 if (!UnitOfWork.UserRoleAccessRepo.IsSuperAdminMaker(UserRoleId))
                 {
                     return BadRequest("UnAuthorized Access");
                 }
 
+                if(string.IsNullOrEmpty(model.Data))
+                {
+                    return BadRequest("invalid request");
+                }
+
+                var requestData = JsonConvert.DeserializeObject<ADUserRequestDto>(Encryption.DecryptStrings(model.Data));
+                if(requestData == null)
+                {
+                    return BadRequest("invalid request data");
+                }
+
                 var payLoad = new ADUserRequestDto
                 {
-                    UserName = Encryption.DecryptStrings(model.UserName),
+                    UserName = requestData.UserName,
                     ClientStaffIPAddress = Encryption.DecryptStrings(model.ClientStaffIPAddress),
                     HostName = Encryption.DecryptStrings(model.HostName),
                     IPAddress = Encryption.DecryptStrings(model.IPAddress)
                 };
+
+                if (string.IsNullOrEmpty(payLoad.UserName))
+                {
+                    return BadRequest("Username is required");
+                }
 
                 var result = await _apiService.ADBasicInfoInquire(payLoad.UserName);
                 if (result.ResponseCode != "00")

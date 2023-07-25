@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using CIB.Core.Common;
 using CIB.Core.Common.Dto;
 using CIB.Core.Common.Interface;
 using CIB.Core.Common.Response;
@@ -10,6 +11,7 @@ using CIB.Core.Entities;
 using CIB.Core.Enums;
 using CIB.Core.Modules.UserAccess.Dto;
 using CIB.Core.Modules.UserAccess.Validation;
+using CIB.Core.Services.Authentication;
 using CIB.Core.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -23,7 +25,7 @@ namespace CIB.BankAdmin.Controllers
   public class UserAccessController : BaseAPIController
   {
     private readonly ILogger<UserAccessController> _logger;
-    public UserAccessController(ILogger<UserAccessController> _logger,IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor accessor) : base(mapper, unitOfWork, accessor)
+    public UserAccessController(ILogger<UserAccessController> _logger,IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor accessor,IAuthenticationService authService):base(mapper,unitOfWork,accessor,authService)
     {
         this._logger = _logger;
     }
@@ -60,6 +62,7 @@ namespace CIB.BankAdmin.Controllers
             return BadRequest(new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: Message.ServerError, responseStatus:false));
         }
     }
+
     [HttpGet("GetUserAccess")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -86,9 +89,10 @@ namespace CIB.BankAdmin.Controllers
         }
         return Ok(new ResponseDTO<UserAccessResponseDto>(_data:Mapper.Map<UserAccessResponseDto>(UserAccess),success:true, _message:Message.Success) );
     }
+
     [HttpPost("CreateUserAccess")]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    public ActionResult<UserAccessResponseDto> CreateUserAccess(CreateRequestDto model)
+    public ActionResult<UserAccessResponseDto> CreateUserAccess(GenericRequestDto model)
     {
         try
         {
@@ -96,10 +100,19 @@ namespace CIB.BankAdmin.Controllers
             {
                 return StatusCode(401, "User is not authenticated");
             }
+            if(string.IsNullOrEmpty(model.Data))
+            {
+                return BadRequest("invalid request");
+            }
+            var requestData = JsonConvert.DeserializeObject<CreateRequestDto>(Encryption.DecryptStrings(model.Data));
+            if(requestData == null)
+            {
+                return BadRequest("invalid request data");
+            }
             var payload = new CreateRequestDto
             {
-                Name = Encryption.DecryptStrings(model.Name),
-                IsCorporate = Encryption.DecryptBooleans(model.IsCorporate.ToString()),
+                Name = requestData.Name,
+                IsCorporate = requestData.IsCorporate,
                 IPAddress = Encryption.DecryptStrings(model.IPAddress),
                 ClientStaffIPAddress = Encryption.DecryptStrings(model.ClientStaffIPAddress),
                 HostName = Encryption.DecryptStrings(model.HostName)
@@ -141,9 +154,10 @@ namespace CIB.BankAdmin.Controllers
             return BadRequest(new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: Message.ServerError, responseStatus:false));
         }
     }
+
     [HttpPost("UpdateUserAccess")]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    public ActionResult<TblUserAccess> UpdateUserAccess(UpdateRequestDto model)
+    public ActionResult<TblUserAccess> UpdateUserAccess(GenericRequestDto model)
     {
         try
         {
@@ -151,11 +165,20 @@ namespace CIB.BankAdmin.Controllers
             {
                 return StatusCode(401, "User is not authenticated");
             }
+            if(string.IsNullOrEmpty(model.Data))
+            {
+                return BadRequest("invalid request");
+            }
+            var requestData = JsonConvert.DeserializeObject<UpdateRequestDto>(Encryption.DecryptStrings(model.Data));
+            if(requestData == null)
+            {
+                return BadRequest("invalid request data");
+            }
             var payload = new UpdateRequestDto
             {
-                Id = Encryption.DecryptGuid(model.Id.ToString()),
-                Name = Encryption.DecryptStrings(model.Name),
-                IsCorporate = Encryption.DecryptBooleans(model.IsCorporate.ToString()),
+                Id = requestData.Id,
+                Name = requestData.Name,
+                IsCorporate = requestData.IsCorporate,
                 IPAddress = Encryption.DecryptStrings(model.IPAddress),
                 ClientStaffIPAddress = Encryption.DecryptStrings(model.ClientStaffIPAddress),
                 HostName = Encryption.DecryptStrings(model.HostName),
@@ -207,7 +230,7 @@ namespace CIB.BankAdmin.Controllers
 
     [HttpPost("SetCorporateUserAccess")]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    public ActionResult<bool> SetCorporateUserAccess(List<CreateRequest> models)
+    public ActionResult<bool> SetCorporateUserAccess(GenericRequestDto models)
     {
         try
         {
@@ -220,13 +243,26 @@ namespace CIB.BankAdmin.Controllers
                 return BadRequest("Aunthorized Access");
             }
 
+            if(string.IsNullOrEmpty(models.Data))
+            {
+                return BadRequest("invalid request");
+            }
+            var requestData = JsonConvert.DeserializeObject<List<SetPermissionCreateRequestDto>>(Encryption.DecryptStrings(models.Data));
+            if(requestData == null)
+            {
+                return BadRequest("invalid request data");
+            }
+
+            
+
             //Validate Model
-            if (models.Count == 0)
+            if (requestData.Count == 0)
             {
                 return BadRequest("Model is empty");
             }
 
-            var data = models.FirstOrDefault();
+
+            var data = requestData.FirstOrDefault();
             var payload = new UpdateRequestDto
             {
                 IPAddress = Encryption.DecryptStrings(data.IPAddress),
@@ -235,10 +271,10 @@ namespace CIB.BankAdmin.Controllers
                 MACAddress = Encryption.DecryptStrings(data.MACAddress)
             };
             var accessList = new List<TblUserAccess>();
-            foreach(var item in models)
+            foreach(var item in requestData)
             {
-                var userAccessId = Encryption.DecryptGuid(item.Id);
-                var IsCorporate = Encryption.DecryptBooleans(item.IsCorporate);
+                var userAccessId = item.Id;
+                var IsCorporate = item.IsCorporate;
                 var userAccess = UnitOfWork.UserAccessRepo.GetByIdAsync(userAccessId);
                 if (userAccess == null)
                 {
@@ -280,9 +316,10 @@ namespace CIB.BankAdmin.Controllers
             return BadRequest(new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: Message.ServerError, responseStatus:false));
         }
     }
+
     [HttpPost("AddRoleAccess")]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    public ActionResult<List<TblRoleUserAccess>> AddPermissionToRole(AddRoleAccessRequestDto model)
+    public ActionResult<List<TblRoleUserAccess>> AddPermissionToRole(GenericRequestDto model)
     {
         try
         {
@@ -295,6 +332,16 @@ namespace CIB.BankAdmin.Controllers
             {
                 return StatusCode(400, errormsg);
             }
+
+            if(string.IsNullOrEmpty(model.Data))
+            {
+                return BadRequest("invalid request");
+            }
+            var requestData = JsonConvert.DeserializeObject<AddRoleAccessRequestDto>(Encryption.DecryptStrings(model.Data));
+            if(requestData == null)
+            {
+                return BadRequest("invalid request data");
+            }
             
             // super authorize
             if (!UnitOfWork.UserRoleAccessRepo.IsSuperAdminAuthorizer(UserRoleId))
@@ -303,7 +350,7 @@ namespace CIB.BankAdmin.Controllers
             }
            
             //validate role
-            var roleId = Encryption.DecryptGuid(model.RoleId);
+            var roleId = Guid.Parse(requestData.RoleId);
             var tblRole = UnitOfWork.RoleRepo.GetByIdAsync(roleId);
             if (tblRole == null)
             {
@@ -316,9 +363,9 @@ namespace CIB.BankAdmin.Controllers
             var newAccessList = new List<string>();
             var _previouseRoleUserAccess = UnitOfWork.UserRoleAccessRepo.GetRoleUserAccessesByRoleID(roleId.ToString());
 
-            foreach (var item in model.AccessIds)
+            foreach (var item in requestData.AccessIds)
             {
-                var userAccessId = Encryption.DecryptGuid(item);
+                var userAccessId = Guid.Parse(item);
                 var theUserAccess = UnitOfWork.UserAccessRepo.GetByIdAsync(userAccessId);
                 if (theUserAccess == null)
                 {
@@ -379,7 +426,7 @@ namespace CIB.BankAdmin.Controllers
 
     [HttpPost("AddCorporateRoleAccess")]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    public ActionResult<List<TblRoleUserAccess>> AddPermissionToCorporateRole(AddRoleAccessRequestDto model)
+    public ActionResult<List<TblRoleUserAccess>> AddPermissionToCorporateRole(GenericRequestDto model)
     {
       try
         {
@@ -393,18 +440,29 @@ namespace CIB.BankAdmin.Controllers
                 return StatusCode(400, errormsg);
             }
 
+            if(string.IsNullOrEmpty(model.Data))
+            {
+                return BadRequest("invalid request");
+            }
+            var requestData = JsonConvert.DeserializeObject<AddRoleAccessRequestDto>(Encryption.DecryptStrings(model.Data));
+            if(requestData == null)
+            {
+                return BadRequest("invalid request data");
+            }
+
             // super authorize
             // if (!UnitOfWork.UserRoleAccessRepo.IsSuperAdminAuthorizer(UserRoleId))
             // {
             //     return BadRequest("UnAuthorized Access");
             // }
+            
 
             if (!UnitOfWork.UserRoleAccessRepo.AccessesExist(UserRoleId, Permission.AddCorporateRolePermissions))
             {
                 return BadRequest("Aunthorized Access");
             }
             // //validate role
-            var roleId = Encryption.DecryptGuid(model.RoleId);
+            var roleId = Guid.Parse(requestData.RoleId);
             var tblRole = UnitOfWork.CorporateRoleRepo.GetByIdAsync(roleId);
             if (tblRole == null)
             {
@@ -418,9 +476,9 @@ namespace CIB.BankAdmin.Controllers
             // remove previouse one 
             var _previouseRoleUserAccess = UnitOfWork.CorporateUserRoleAccessRepo.GetCorporatePermissions(roleId);
             // create a permission with name
-            foreach (var item in model.AccessIds)
+            foreach (var item in requestData.AccessIds)
             {
-                var userAccessId = Encryption.DecryptGuid(item);
+                var userAccessId = Guid.Parse(item);
                 var theUserAccess = UnitOfWork.UserAccessRepo.GetByIdAsync(userAccessId);
                 if (theUserAccess == null)
                 {
@@ -477,11 +535,6 @@ namespace CIB.BankAdmin.Controllers
             UnitOfWork.AuditTrialRepo.Add(auditTrail);
             UnitOfWork.CorporateUserRoleAccessRepo.AddRange(userAccessList);
             UnitOfWork.Complete();
-
-
-
-
-
             return Ok(true);
         }
         catch (Exception ex)
@@ -490,6 +543,7 @@ namespace CIB.BankAdmin.Controllers
             {
                 _logger.LogError("SERVER ERROR {0}, {1}, {2}",Formater.JsonType(ex.StackTrace), Formater.JsonType(ex.Source), Formater.JsonType(ex.Message));
             }
+            _logger.LogError("SERVER ERROR {0}, {1}, {2}",Formater.JsonType(ex.StackTrace), Formater.JsonType(ex.Source), Formater.JsonType(ex.Message));
             return BadRequest(new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: Message.ServerError, responseStatus:false));
         }
     }

@@ -12,5 +12,6 @@ namespace CIB.Core.Modules.TempCorporateSalarySchedule._TempCorporateEmployee
     {
         CorporateEmployeeDuplicateStatus CheckDuplicate(TblTempCorporateCustomerEmployee employee,bool IsUpdate = false);
         void UpdateCorporateEmployee(TblTempCorporateCustomerEmployee request);
+        Task<List<TblTempCorporateCustomerEmployee>> GetPendingCorporateEmployee(Guid CorporateCustomerId);
     }
 }

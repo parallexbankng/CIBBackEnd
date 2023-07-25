@@ -1,28 +1,24 @@
-﻿using System;
-using System.IO;
-using System.Net.Http.Headers;
+﻿using System.Net.Http.Headers;
 using System.Reflection;
 using System.Text;
 using CIB.Core.Configuration;
-using CIB.Core.Modules.Authentication.Validation;
+using CIB.Core.Modules.CorporateProfile.Validation;
+using CIB.Core.Modules.Workflow.Validation;
 using CIB.Core.Services._2FA;
 using CIB.Core.Services.Api;
+using CIB.Core.Services.Authentication;
 using CIB.Core.Services.Email;
 using CIB.Core.Services.File;
 using CIB.Core.Services.Notification;
+using CIB.Core.Services.OnlendingApi;
+using CIB.Core.Services.OnlendingApi.Dto;
 using CIB.Core.Utils;
 using CIB.CorporateAdmin.Extensions;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.FileProviders;
-using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
@@ -39,9 +35,11 @@ namespace CIB.CorporateAdmin
     public void ConfigureServices(IServiceCollection services)
     {
       services.AddControllers();
-      services.AddCors(c => c.AddPolicy(Cors, cors => cors.WithOrigins("http://172.18.16.200:5050","https//172.18.16.200:5050").AllowAnyHeader().AllowAnyMethod()));
+      services.AddCors(c => c.AddPolicy(Cors, cors => cors.WithOrigins("*").AllowAnyHeader().AllowAnyMethod()));
+      //services.AddCors(c => c.AddPolicy(Cors, cors => cors.WithOrigins("*").AllowAnyHeader().AllowAnyMethod()));
       services.AddAdminServiceRegistration(Configuration);
-      var tokenValidationParameters = new TokenValidationParameters {
+      var tokenValidationParameters = new TokenValidationParameters
+      {
         ValidateIssuer = true,
         ValidateAudience = true,
         ValidateLifetime = true,
@@ -51,7 +49,8 @@ namespace CIB.CorporateAdmin
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Encryption.DecryptStrings(Configuration["Jwt:Key"])))
       };
       services.AddSingleton(tokenValidationParameters);
-      services.AddAuthentication(x =>{
+      services.AddAuthentication(x =>
+      {
         x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
         x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
         x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -62,10 +61,12 @@ namespace CIB.CorporateAdmin
       });
       services.AddAuthorization();
       services.AddHttpContextAccessor();
-      services.AddSwaggerGen(options =>{
+      services.AddSwaggerGen(options =>
+      {
         options.SwaggerDoc("v1", new OpenApiInfo { Title = "Corporate Admin Portal", Version = "v1" });
         // add JWT Authentication
-        var securityScheme = new OpenApiSecurityScheme{
+        var securityScheme = new OpenApiSecurityScheme
+        {
           Name = "Authorization",
           Description = "Enter JWT Bearer token **_only_**",
           In = ParameterLocation.Header,
@@ -77,27 +78,42 @@ namespace CIB.CorporateAdmin
         options.AddSecurityRequirement(new OpenApiSecurityRequirement { { securityScheme, Array.Empty<string>() } });
         options.OperationFilter<FileUploadFilter>();
       });
+
       services.AddHttpClient<IEmailService, EmailService>();
-      services.AddHttpClient("finnacleClient",c => {
+      services.AddHttpClient("finnacleClient", c =>
+      {
         c.Timeout = TimeSpan.FromMinutes(5);
         c.BaseAddress = new Uri(Configuration.GetValue<string>("TestApiUrl:baseUrl"));
         c.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         c.DefaultRequestHeaders.Add("client-id", Encryption.DecryptStrings($"{Configuration["RequestKey:client-id"]}"));
         c.DefaultRequestHeaders.Add("client-key", Encryption.DecryptStrings($"{Configuration["RequestKey:client-key"]}"));
       });
-      services.AddHttpClient("tokenClient",c => {
+      services.AddHttpClient("tokenClient", c =>
+      {
         c.Timeout = TimeSpan.FromMinutes(5);
         c.BaseAddress = new Uri(Configuration.GetValue<string>("TestApiUrl:baseUrl"));
         c.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
       });
+      services.AddHttpClient("testClient", c =>
+      {
+        c.Timeout = TimeSpan.FromMinutes(5);
+        c.BaseAddress = new Uri(Configuration.GetValue<string>("TestClient:baseUrl"));
+        c.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+      });
 
       services.TryAddSingleton<IActionContextAccessor, ActionContextAccessor>();
+
       services.AddTransient<IFileService, FileService>();
       services.AddTransient<IApiService, ApiService>();
+      services.AddTransient<IOnlendingServiceApi, OnlendingServiceApi>();
       services.AddTransient<IToken2faService, Token2faService>();
       services.AddTransient<INotificationService, NotificationService>();
+      services.AddTransient<IAuthenticationService, AuthenticationService>();
       services.AddAutoMapper(Assembly.GetExecutingAssembly());
-      services.AddValidatorsFromAssemblyContaining(typeof(CorporateLoginValidation));
+      services.AddValidatorsFromAssemblyContaining<CreateCorporateProfileValidation>();
+      services.AddValidatorsFromAssemblyContaining<UpdateCorporateProfileValidation>();
+      services.AddValidatorsFromAssemblyContaining<CreateCorporateWorkFlowValidation>();
+      services.AddValidatorsFromAssemblyContaining<UpdateWorkFlowValidation>();
     }
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
@@ -109,10 +125,10 @@ namespace CIB.CorporateAdmin
       }
 
       app.UseHttpsRedirection();
-      app.UseAuthentication();
       app.UseRouting();
       app.UseCors(Cors);
-      app.UseAuthorization();
+      app.UseAuthentication();
+      //app.UseAuthorization();
       app.UseApiKey();
       app.UseStaticFiles();
       app.UseStaticFiles(new StaticFileOptions()
@@ -120,16 +136,15 @@ namespace CIB.CorporateAdmin
         FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot")),
         RequestPath = new PathString("/bulkupload")
       });
-      // app.Use(async (context, next) =>
-      // {   
-      //   context.Response.Headers.Add("Content-Security-Policy", "default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self'; frame-src 'self'");
-      //   context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
-      //   context.Response.Headers.Add("X-Frame-Options", "DENY");
-      //   context.Response.Headers.Add("X-XSS-Protection", "1; mode=block");                
-      //   await next();
-      // });
+      app.Use(async (context, next) =>
+      {
+        context.Response.Headers.Add("Content-Security-Policy", "default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self'; frame-src 'self'");
+        context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
+        context.Response.Headers.Add("X-Frame-Options", "DENY");
+        context.Response.Headers.Add("X-XSS-Protection", "1; mode=block");
+        await next();
+      });
       app.UseEndpoints(endpoints => endpoints.MapControllers());
-    
     }
   }
 }

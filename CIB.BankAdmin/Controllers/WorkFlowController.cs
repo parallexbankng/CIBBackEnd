@@ -10,11 +10,13 @@ using CIB.Core.Entities;
 using CIB.Core.Enums;
 using CIB.Core.Modules.Workflow.Dto;
 using CIB.Core.Modules.Workflow.Validation;
+using CIB.Core.Services.Authentication;
 using CIB.Core.Services.Notification;
 using CIB.Core.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace CIB.BankAdmin.Controllers
 {
@@ -24,7 +26,7 @@ namespace CIB.BankAdmin.Controllers
     {
         private readonly ILogger<WorkFlowController> _logger;
         protected readonly INotificationService notify;
-        public WorkFlowController(INotificationService notify,ILogger<WorkFlowController> _logger,IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor accessor) : base(mapper, unitOfWork, accessor)
+        public WorkFlowController(INotificationService notify,ILogger<WorkFlowController> _logger,IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor accessor,IAuthenticationService authService):base(mapper,unitOfWork,accessor,authService)
         {
             this._logger = _logger;
             this.notify = notify;
@@ -113,8 +115,7 @@ namespace CIB.BankAdmin.Controllers
 
         [HttpPost("CreateWorkflow")]
         [ProducesResponseType(StatusCodes.Status201Created)]
-       
-        public ActionResult<ResponseDTO<WorkFlowResponseDto>> CreateWorkflow(CreateWorkflow model)
+        public ActionResult<ResponseDTO<WorkFlowResponseDto>> CreateWorkflow(GenericRequestDto model)
         {
             try
             {
@@ -122,32 +123,40 @@ namespace CIB.BankAdmin.Controllers
                 {
                     return StatusCode(401, "User is not authenticated");
                 }
-
-
                 if (!IsUserActive(out string errorMsg))
                 {
                     return StatusCode(400, errorMsg);
                 }
 
-                var payload = new CreateWorkflowDto
+                if(string.IsNullOrEmpty(model.Data))
                 {
-                    Name = Encryption.DecryptStrings(model.Name),
-                    Description = Encryption.DecryptStrings(model.Description),
-                    Date = Encryption.DecryptDateTime(model.Date),
-                    NoOfAuthorizers = Encryption.DecryptInt(model.NoOfAuthorizers),
-                    CorporateCustomerId = Encryption.DecryptGuid(model.CorporateCustomerId),
-                    ApprovalLimit = Encryption.DecryptDecimals(model.ApprovalLimit),
-                    TransactionType = Encryption.DecryptStrings(model.TransactionType),
-                    IPAddress = Encryption.DecryptStrings(model.IPAddress),
-                    ClientStaffIPAddress = Encryption.DecryptStrings(model.ClientStaffIPAddress),
-                    HostName = Encryption.DecryptStrings(model.HostName),
-                    MACAddress = Encryption.DecryptStrings(model.MACAddress)
-                };
+                    return BadRequest("invalid request");
+                }
+                var requestData = JsonConvert.DeserializeObject<CreateWorkflowDto>(Encryption.DecryptStrings(model.Data));
+                if(requestData == null)
+                {
+                    return BadRequest("invalid request data");
+                }
 
                 if (string.IsNullOrEmpty(UserRoleId) || !UnitOfWork.UserRoleAccessRepo.AccessesExist(UserRoleId, Permission.CreateWorkflow))
                 {
                     return BadRequest("UnAuthorized Access");
                 }
+
+                var payload = new CreateWorkflowDto
+                {
+                    Name = requestData.Name,
+                    Description = requestData.Description,
+                    Date = requestData.Date,
+                    NoOfAuthorizers = requestData.NoOfAuthorizers,
+                    CorporateCustomerId = requestData.CorporateCustomerId,
+                    ApprovalLimit = requestData.ApprovalLimit,
+                    TransactionType = requestData.TransactionType,
+                    IPAddress = Encryption.DecryptStrings(model.IPAddress),
+                    ClientStaffIPAddress = Encryption.DecryptStrings(model.ClientStaffIPAddress),
+                    HostName = Encryption.DecryptStrings(model.HostName),
+                    MACAddress = Encryption.DecryptStrings(model.MACAddress)
+                };
                 var validator = new CreateWorkFlowValidation();
                 var results =  validator.Validate(payload);
                 if (!results.IsValid)
@@ -224,9 +233,10 @@ namespace CIB.BankAdmin.Controllers
                 return BadRequest(new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: Message.ServerError, responseStatus:false));
             }
         }
-        [HttpPut("UpdateWorkflow")]
+
+        [HttpPost("UpdateWorkflow")]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public ActionResult<ResponseDTO<WorkFlowResponseDto>> UpdateWorkflow(UpdateWorkflow model)
+        public ActionResult<ResponseDTO<WorkFlowResponseDto>> UpdateWorkflow(GenericRequestDto model)
         {
             try
             {
@@ -241,24 +251,33 @@ namespace CIB.BankAdmin.Controllers
                     return StatusCode(400, errorMsg);
                 }
 
-                var payload = new UpdateWorkflowDto
+                if(string.IsNullOrEmpty(model.Data))
                 {
-                    Id = Encryption.DecryptGuid(model.Id),
-                    Name = Encryption.DecryptStrings(model.Name),
-                    Description = Encryption.DecryptStrings(model.Description),
-                    CorporateCustomerId = Encryption.DecryptGuid(model.CorporateCustomerId),
-                    NoOfAuthorizers = Encryption.DecryptInt(model.NoOfAuthorizers),
-                    ApprovalLimit = Encryption.DecryptInt(model.ApprovalLimit),
-                    IPAddress = Encryption.DecryptStrings(model.ClientStaffIPAddress),
-                    HostName = Encryption.DecryptStrings(model.HostName),
-                    MACAddress = Encryption.DecryptStrings(model.MACAddress)
-
-                };
+                    return BadRequest("invalid request");
+                }
+                var requestData = JsonConvert.DeserializeObject<CreateWorkflowDto>(Encryption.DecryptStrings(model.Data));
+                if(requestData == null)
+                {
+                    return BadRequest("invalid request data");
+                }
 
                 if (string.IsNullOrEmpty(UserRoleId) || !UnitOfWork.UserRoleAccessRepo.AccessesExist(UserRoleId, Permission.UpdateWorkflow))
                 {
                     return BadRequest("UnAuthorized Access");
                 }
+
+                var payload = new UpdateWorkflowDto
+                {
+                    Id = requestData.Id,
+                    Name = requestData.Name,
+                    Description = requestData.Description,
+                    CorporateCustomerId = requestData.CorporateCustomerId,
+                    NoOfAuthorizers = requestData.NoOfAuthorizers,
+                    ApprovalLimit = requestData.ApprovalLimit,
+                    IPAddress = Encryption.DecryptStrings(model.ClientStaffIPAddress),
+                    HostName = Encryption.DecryptStrings(model.HostName),
+                    MACAddress = Encryption.DecryptStrings(model.MACAddress)
+                };
 
                 var validator = new UpdateWorkFlowValidation();
                 var results =  validator.Validate(payload);
@@ -377,9 +396,9 @@ namespace CIB.BankAdmin.Controllers
             }
         }
 
-        [HttpPut("UpdateTempWorkflow")]
+        [HttpPost("UpdateTempWorkflow")]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public ActionResult<ResponseDTO<WorkFlowResponseDto>> UpdateTempWorkflow(UpdateWorkflow model)
+        public ActionResult<ResponseDTO<WorkFlowResponseDto>> UpdateTempWorkflow(GenericRequestDto model)
         {
             try
             {
@@ -393,14 +412,24 @@ namespace CIB.BankAdmin.Controllers
                     return StatusCode(400, errorMsg);
                 }
 
+                if(string.IsNullOrEmpty(model.Data))
+                {
+                    return BadRequest("invalid request");
+                }
+                var requestData = JsonConvert.DeserializeObject<UpdateWorkflowDto>(Encryption.DecryptStrings(model.Data));
+                if(requestData == null)
+                {
+                    return BadRequest("invalid request data");
+                }
+
                 var payload = new UpdateWorkflowDto
                 {
-                    Id = Encryption.DecryptGuid(model.Id),
-                    Name = Encryption.DecryptStrings(model.Name),
-                    Description = Encryption.DecryptStrings(model.Description),
-                    CorporateCustomerId = Encryption.DecryptGuid(model.CorporateCustomerId),
-                    NoOfAuthorizers = Encryption.DecryptInt(model.NoOfAuthorizers),
-                    ApprovalLimit = Encryption.DecryptDecimals(model.ApprovalLimit),
+                    Id = requestData.Id,
+                    Name = requestData.Name,
+                    Description = requestData.Description,
+                    CorporateCustomerId = requestData.CorporateCustomerId,
+                    NoOfAuthorizers = requestData.NoOfAuthorizers,
+                    ApprovalLimit = requestData.ApprovalLimit,
                     IPAddress = Encryption.DecryptStrings(model.ClientStaffIPAddress),
                     HostName = Encryption.DecryptStrings(model.HostName),
                     MACAddress = Encryption.DecryptStrings(model.MACAddress)
@@ -501,9 +530,9 @@ namespace CIB.BankAdmin.Controllers
             }
         }
 
-        [HttpPut("RequestWorkflowApproval")]
+        [HttpPost("RequestWorkflowApproval")]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public ActionResult<ResponseDTO<WorkFlowResponseDto>> RequestWorkflowApproval(SimpleActionDto model)
+        public ActionResult<ResponseDTO<WorkFlowResponseDto>> RequestWorkflowApproval(GenericRequestDto model)
         {
             try
             {
@@ -515,6 +544,15 @@ namespace CIB.BankAdmin.Controllers
                 {
                     return StatusCode(400, errorMsg);
                 }
+                if(string.IsNullOrEmpty(model.Data))
+                {
+                    return BadRequest("invalid request");
+                }
+                var requestData = JsonConvert.DeserializeObject<SimpleAction>(Encryption.DecryptStrings(model.Data));
+                if(requestData == null)
+                {
+                    return BadRequest("invalid request data");
+                }
                 if (string.IsNullOrEmpty(UserRoleId) || !UnitOfWork.UserRoleAccessRepo.AccessesExist(UserRoleId, Permission.RequestWorkflowApproval))
                 {
                     return BadRequest("UnAuthorized Access");
@@ -523,7 +561,7 @@ namespace CIB.BankAdmin.Controllers
                 //var workflowId = Encryption.DecryptGuid(id);
                 var payload = new SimpleAction
                 {
-                    Id = Encryption.DecryptGuid(model.Id),
+                    Id = requestData.Id,
                     IPAddress = Encryption.DecryptStrings(model.IPAddress),
                     HostName = Encryption.DecryptStrings(model.HostName),
                     ClientStaffIPAddress = Encryption.DecryptStrings(model.ClientStaffIPAddress),
@@ -591,9 +629,9 @@ namespace CIB.BankAdmin.Controllers
             }
         }
 
-        [HttpPut("ApproveWorkflow")]
+        [HttpPost("ApproveWorkflow")]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public ActionResult<ResponseDTO<TblWorkflow>> ApproveWorkflow(SimpleActionDto model)
+        public ActionResult<ResponseDTO<TblWorkflow>> ApproveWorkflow(GenericRequestDto model)
         {
             try
             {
@@ -608,6 +646,15 @@ namespace CIB.BankAdmin.Controllers
                 {
                     return StatusCode(400, errormsg);
                 }
+                if(string.IsNullOrEmpty(model.Data))
+                {
+                    return BadRequest("invalid request");
+                }
+                var requestData = JsonConvert.DeserializeObject<SimpleAction>(Encryption.DecryptStrings(model.Data));
+                if(requestData == null)
+                {
+                    return BadRequest("invalid request data");
+                }
 
                 if (string.IsNullOrEmpty(UserRoleId) || !UnitOfWork.UserRoleAccessRepo.AccessesExist(UserRoleId, Permission.ApproveWorkflow))
                 {
@@ -617,7 +664,7 @@ namespace CIB.BankAdmin.Controllers
             
                 var payload = new SimpleAction
                 {
-                    Id = Encryption.DecryptGuid(model.Id),
+                    Id = requestData.Id,
                     IPAddress = Encryption.DecryptStrings(model.IPAddress),
                     HostName = Encryption.DecryptStrings(model.HostName),
                     ClientStaffIPAddress = Encryption.DecryptStrings(model.ClientStaffIPAddress),
@@ -654,13 +701,14 @@ namespace CIB.BankAdmin.Controllers
                     _logger.LogError("SERVER ERROR {0}, {1}, {2}",Formater.JsonType(ex.StackTrace), Formater.JsonType(ex.Source), Formater.JsonType(ex.Message));
                 //return BadRequest(ex.InnerException.Message);
                 }
+                 _logger.LogError("SERVER ERROR {0}, {1}, {2}",Formater.JsonType(ex.StackTrace), Formater.JsonType(ex.Source), Formater.JsonType(ex.Message));
                 return BadRequest(new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: Message.ServerError, responseStatus:false));
             }
         }
 
-        [HttpPut("DeclineWorkflow")]
+        [HttpPost("DeclineWorkflow")]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public ActionResult<ResponseDTO<TblWorkflow>> DeclineWorkflow(AppAction model)
+        public ActionResult<ResponseDTO<TblWorkflow>> DeclineWorkflow(GenericRequestDto model)
         {
             try
             {
@@ -675,25 +723,34 @@ namespace CIB.BankAdmin.Controllers
                 {
                     return StatusCode(400, errormsg);
                 }
+                if(string.IsNullOrEmpty(model.Data))
+                {
+                    return BadRequest("invalid request");
+                }
+                var requestData = JsonConvert.DeserializeObject<AppActionDto>(Encryption.DecryptStrings(model.Data));
+                if(requestData == null)
+                {
+                    return BadRequest("invalid request data");
+                }
 
                 if (string.IsNullOrEmpty(UserRoleId) || !UnitOfWork.UserRoleAccessRepo.AccessesExist(UserRoleId, Permission.DeclineWorkflow))
                 {
                     return BadRequest("UnAuthorized Access");
                 }
-                if(string.IsNullOrEmpty(model.Reason))
-                {
-                    return BadRequest("Reason for declining workflow is required");
-                }
-
                 var payload = new AppActionDto
                 {
-                    Id = Encryption.DecryptGuid(model.Id),
-                    Reason = Encryption.DecryptStrings(model.Reason),
+                    Id = requestData.Id,
+                    Reason = requestData.Reason,
                     IPAddress = Encryption.DecryptStrings(model.IPAddress),
                     HostName = Encryption.DecryptStrings(model.HostName),
                     ClientStaffIPAddress = Encryption.DecryptStrings(model.ClientStaffIPAddress),
                     MACAddress = Encryption.DecryptStrings(model.MACAddress)
                 };
+
+                if(string.IsNullOrEmpty(payload.Reason))
+                {
+                    return BadRequest("Reason for declining workflow is required");
+                }
 
                 var entity = UnitOfWork.TempWorkflowRepo.GetByIdAsync(payload.Id);
                 if (entity == null)
@@ -710,36 +767,7 @@ namespace CIB.BankAdmin.Controllers
                 {
                     return Ok(new ResponseDTO<WorkFlowResponseDto>(_data:new WorkFlowResponseDto(),success:true, _message:Message.Success) );
                 }
-
-
                 var profile = UnitOfWork.WorkFlowRepo.GetByIdAsync((Guid)entity.WorkflowId);
-
-                // if (entity.Status != 0)
-                // {
-                //     return BadRequest("Workflow can nolonger be update as it is not awaiting approval");
-                // }
-                // entity.Status = 2;
-                // var auditTrail = new TblAuditTrail
-                // {
-                //     Id = Guid.NewGuid(),
-                //     ActionCarriedOut = nameof(AuditTrailAction.Decline).Replace("_", " "),
-                //     Ipaddress = payload.IPAddress,
-                //     Macaddress = payload.MACAddress,
-                //     HostName = payload.HostName,
-                //     NewFieldValue =   $"Workflow Name: {entity.Name}, Description: {entity.Description}, " +
-                //     $"Date: {entity.Date}, " + $"No Of Authorizers: {entity.NoOfAuthorizers}, CorporateCustomerId: {entity.CorporateCustomerId}, ApprovalLimit: {entity.ApprovalLimit}, " +
-                //     $"TransactionTypet: {entity.TransactionType}",
-                //     PreviousFieldValue ="",
-                //     TransactionId = "",
-                //     UserId = BankProfile.Id,
-                //     Username = UserName,
-                //     Description = "Decline Workflow",
-                //     TimeStamp = DateTime.Now
-                // };
-                // UnitOfWork.AuditTrialRepo.Add(auditTrail);
-                // entity.ReasonForDeclining = payload.Reason;
-                // UnitOfWork.WorkFlowRepo.UpdateWorkflow(entity);
-                // UnitOfWork.Complete();
                 return Ok(new ResponseDTO<TblWorkflow>(_data:profile,success:true, _message:Message.Success) );
             }
             catch (Exception ex)
@@ -792,6 +820,324 @@ namespace CIB.BankAdmin.Controllers
                 return BadRequest(new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: Message.ServerError, responseStatus:false));
            }
         }
+       
+        [HttpPost("BulkRequestApproved")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(List<BulkError>), StatusCodes.Status400BadRequest)]
+        public ActionResult<bool> BulkRequestApproved(GenericRequestDto model)
+        {
+            try
+            {
+                if (!IsAuthenticated)
+                {
+                    return StatusCode(401, "User is not authenticated");
+                }
+
+                string errormsg = string.Empty;
+
+                if (!IsUserActive(out errormsg))
+                {
+                    return StatusCode(400, errormsg);
+                }
+
+                if(string.IsNullOrEmpty(model.Data))
+                {
+                    return BadRequest("invalid request");
+                }
+
+                var requestData = JsonConvert.DeserializeObject<List<SimpleAction>>(Encryption.DecryptStrings(model.Data));
+                if(requestData == null)
+                {
+                    return BadRequest("invalid request data");
+                }
+               
+                if (string.IsNullOrEmpty(UserRoleId) || !UnitOfWork.UserRoleAccessRepo.AccessesExist(UserRoleId, Permission.ApproveCorporateUserProfile))
+                {
+                    return BadRequest("UnAuthorized Access");
+                }
+
+                var responseErrors = new List<BulkError>();
+                foreach(var item in requestData)
+                {
+
+                    var payload = new SimpleAction
+                    {
+                        Id = item.Id,
+                        IPAddress = Encryption.DecryptStrings(model.IPAddress),
+                        HostName = Encryption.DecryptStrings(model.HostName),
+                        ClientStaffIPAddress = Encryption.DecryptStrings(model.ClientStaffIPAddress),
+                        MACAddress = Encryption.DecryptStrings(model.MACAddress)
+                    };
+                    var entity = UnitOfWork.TempWorkflowRepo.GetByIdAsync(payload.Id);
+                    if (entity == null)
+                    {
+                        var bulkError = new BulkError
+                        {
+                            Message = "Invalid Id. Workflow does not exist",
+                            ActionInfo = $"WorkflowId : {payload.Id}"
+                        };
+                        responseErrors.Add(bulkError);
+                    }
+                    else
+                    {
+                        if (entity.Status != (int) ProfileStatus.Pending)
+                        {
+                            var bulkError = new BulkError
+                            {
+                                Message = "Workflow can not be Approved as it is not awaiting approval",
+                                ActionInfo = $"Workflow : {entity.Description}, Action: {entity.Action}"
+                            };
+                            responseErrors.Add(bulkError);
+                        }
+                        else
+                        {
+                            if(!ApprovedRequest(entity,payload, out string errorMessage))
+                            {
+                                var bulkError = new BulkError
+                                {
+                                    Message = errorMessage,
+                                    ActionInfo = $"Workflow : {entity.Description}, Action: {entity.Action}"
+                                };
+                                responseErrors.Add(bulkError);
+                            }
+                        }
+
+                    }
+                }
+                if(responseErrors.Any())
+                {
+                    return BadRequest(responseErrors);
+                }
+                return Ok(true);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("SERVER ERROR {0}, {1}, {2}",Formater.JsonType(ex.StackTrace), Formater.JsonType(ex.Source), Formater.JsonType(ex.Message));
+                return ex.InnerException != null ? BadRequest(new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: ex.InnerException.Message, responseStatus:false)) : StatusCode(500, new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: ex.InnerException != null ? ex.InnerException.Message : ex.Message, responseStatus:false));
+            }
+        }
+
+        [HttpPost("BulkRequestDecline")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(List<BulkError>), StatusCodes.Status400BadRequest)]
+        public ActionResult<bool> BulkRequestDecline(GenericRequestDto model)
+        {
+            try
+            {
+                if (!IsAuthenticated)
+                {
+                    return StatusCode(401, "User is not authenticated");
+                }
+
+                string errormsg = string.Empty;
+
+                if (!IsUserActive(out errormsg))
+                {
+                    return StatusCode(400, errormsg);
+                }
+
+                if(string.IsNullOrEmpty(model.Data))
+                {
+                    return BadRequest("invalid request");
+                }
+
+                var requestData = JsonConvert.DeserializeObject<List<SimpleAction>>(Encryption.DecryptStrings(model.Data));
+                if(requestData == null)
+                {
+                    return BadRequest("invalid request data");
+                }
+
+                if (string.IsNullOrEmpty(UserRoleId) || !UnitOfWork.UserRoleAccessRepo.AccessesExist(UserRoleId, Permission.DeclineWorkflow))
+                {
+                    return BadRequest("UnAuthorized Access");
+                }
+                var responseErrors = new List<BulkError>();
+                foreach(var item in requestData)
+                {
+                    var payload = new AppActionDto
+                    {
+                        Id = item.Id,
+                        Reason = item.Reason,
+                        IPAddress = Encryption.DecryptStrings(model.IPAddress),
+                        HostName = Encryption.DecryptStrings(model.HostName),
+                        ClientStaffIPAddress = Encryption.DecryptStrings(model.ClientStaffIPAddress),
+                        MACAddress = Encryption.DecryptStrings(model.MACAddress)
+                    };
+
+                    if(string.IsNullOrEmpty(payload.Reason))
+                    {
+                        var bulkError = new BulkError
+                        {
+                            Message = "Reason for declining workflow is required",
+                            ActionInfo = $"WorkflowId : {payload.Id}"
+                        };
+                        responseErrors.Add(bulkError);
+                    }
+
+                    var entity = UnitOfWork.TempWorkflowRepo.GetByIdAsync(payload.Id);
+                    if (entity == null)
+                    {
+                        var bulkError = new BulkError
+                        {
+                           Message = "Invalid Id. Workflow does not exist",
+                            ActionInfo = $"WorkflowId : {payload.Id}"
+                        };
+                        responseErrors.Add(bulkError);
+                    }
+                    else
+                    {              
+                        if(!DeclineRequest(entity,payload,out string errorMessage ))
+                        {
+                            var bulkError = new BulkError
+                            {
+                                Message = errorMessage,
+                                ActionInfo = $"Workflow : {entity.Description}, Action: {entity.Action}"
+                            };
+                            responseErrors.Add(bulkError);
+                        }         
+                    }
+                }
+                if(responseErrors.Any())
+                {
+                    return BadRequest(responseErrors);
+                }
+                return Ok(true);
+            }
+            catch (Exception ex)
+            {
+                
+                _logger.LogError("SERVER ERROR {0}, {1}, {2}",Formater.JsonType(ex.StackTrace), Formater.JsonType(ex.Source), Formater.JsonType(ex.Message));
+                return ex.InnerException != null ? BadRequest(new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: ex.InnerException.Message, responseStatus:false)) : StatusCode(500, new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: ex.InnerException != null ? ex.InnerException.Message : ex.Message, responseStatus:false));
+            }
+        }
+    
+        [HttpPost("BulkRequestApproval")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(List<BulkError>), StatusCodes.Status400BadRequest)]
+        public ActionResult<bool> BulkRequestApproval(GenericRequestDto model)
+        {
+            try
+            {
+                if (!IsAuthenticated)
+                {
+                    return StatusCode(401, "User is not authenticated");
+                }
+
+                string errormsg = string.Empty;
+
+                if (!IsUserActive(out errormsg))
+                {
+                    return StatusCode(400, errormsg);
+                }
+
+                if(string.IsNullOrEmpty(model.Data))
+                {
+                    return BadRequest("invalid request");
+                }
+
+                var requestData = JsonConvert.DeserializeObject<List<SimpleAction>>(Encryption.DecryptStrings(model.Data));
+                if(requestData == null)
+                {
+                    return BadRequest("invalid request data");
+                }
+                var responseErrors = new List<BulkError>();
+                foreach(var item in requestData)
+                {
+                    var payload = new SimpleAction
+                    {
+                        Id = item.Id,
+                        IPAddress = Encryption.DecryptStrings(model.IPAddress),
+                        HostName = Encryption.DecryptStrings(model.HostName),
+                        ClientStaffIPAddress = Encryption.DecryptStrings(model.ClientStaffIPAddress),
+                        MACAddress = Encryption.DecryptStrings(model.MACAddress)
+                    };
+                    var entity = UnitOfWork.TempWorkflowRepo.GetByIdAsync(payload.Id);
+                    if (entity == null)
+                    {
+                        var bulkError = new BulkError
+                        {
+                            Message = "Invalid Id. Workflow does not exist",
+                            ActionInfo = $"WorkflowId : {payload.Id}"
+                        };
+                        responseErrors.Add(bulkError);
+                    }
+                    else
+                    {
+                        if (entity.Status == 1)
+                        {
+                            var bulkError = new BulkError
+                            {
+                                Message = "Workflow approval cannot be requested as it is was not declined or modified",
+                                ActionInfo = $"Workflow : {entity.Description}, Action: {entity.Action}"
+                            };
+                            responseErrors.Add(bulkError);
+                        }
+                        else
+                        {
+
+                            if(entity.InitiatorId != BankProfile.Id)
+                            {
+                                var bulkError = new BulkError
+                                {
+                                    Message = "request was not initiated by you",
+                                    ActionInfo = $"Workflow : {entity.Description}, Action: {entity.Action}"
+                                };
+                                responseErrors.Add(bulkError);
+                            }
+                            else
+                            {
+                                var tblWorkflowHierarchies = UnitOfWork.TempWorkflowHierarchyRepo.GetTempWorkflowHierarchyByWorkflowId(entity.Id);
+                                if(tblWorkflowHierarchies?.Count == 0)
+                                {
+                                    var bulkError = new BulkError
+                                    {
+                                        Message = "No Workflow approval level has been added",
+                                         ActionInfo = $"Workflow : {entity.Description}, Action: {entity.Action}"
+                                    };
+                                    responseErrors.Add(bulkError);
+                                }
+                                else
+                                {
+                                    if(entity.NoOfAuthorizers != tblWorkflowHierarchies?.Count)
+                                    {
+                                        var bulkError = new BulkError
+                                        {
+                                            Message = "Number of authorizers specified in workflow must match the number of authorizers added",
+                                            ActionInfo = $"Workflow : {entity.Description}, Action: {entity.Action}"
+                                        };
+                                        responseErrors.Add(bulkError);
+                                    }
+                                    else
+                                    {
+                                        if(!RequestApproval(entity, payload, out string errorMessage))
+                                        {
+                                            var bulkError = new BulkError
+                                            {
+                                                Message = errorMessage,
+                                                ActionInfo = $"Workflow : {entity.Description}, Action: {entity.Action}"
+                                            };
+                                            responseErrors.Add(bulkError);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                if(responseErrors.Any())
+                {
+                    return BadRequest(responseErrors);
+                }
+                return Ok(true);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("SERVER ERROR {0}, {1}, {2}",Formater.JsonType(ex.StackTrace), Formater.JsonType(ex.Source), Formater.JsonType(ex.Message));
+                return ex.InnerException != null ? BadRequest(new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: ex.InnerException.Message, responseStatus:false)) : StatusCode(500, new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: ex.InnerException != null ? ex.InnerException.Message : ex.Message, responseStatus:false));
+            }
+        }
+    
+    
         private bool ApprovedRequest(TblTempWorkflow entity, SimpleAction payload, out string errorMessage)
         {
           if (entity.CorporateCustomerId != null)

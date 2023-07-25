@@ -50,5 +50,6 @@ namespace CIB.InterBankTransactionService.Entities
         public string ResponseCode { get; set; }
         public string ResponseDescription { get; set; }
         public string ErrorDetail { get; set; }
+         public string? SessionId { get; set; }
     }
 }

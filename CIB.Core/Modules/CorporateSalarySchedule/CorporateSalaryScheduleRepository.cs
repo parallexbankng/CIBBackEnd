@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using CIB.Core.Common.Repository;
 using CIB.Core.Entities;
 using CIB.Core.Modules.CorporateSalarySchedule.Dto;
+using Microsoft.EntityFrameworkCore;
 
 namespace CIB.Core.Modules.CorporateSalarySchedule
 {
@@ -42,6 +43,11 @@ namespace CIB.Core.Modules.CorporateSalarySchedule
         public void UpdateCorporateSalarySchedule(TblCorporateSalarySchedule request)
         {
           _context.Update(request).Property(x=>x.Sn).IsModified = false;
+        }
+
+        public async Task<List<TblCorporateSalarySchedule>> GetCorporateSalarySchedules(Guid CorporateCustomerId)
+        {
+            return await _context.TblCorporateSalarySchedules.Where(ctx => ctx.CorporateCustomerId != null && ctx.CorporateCustomerId == CorporateCustomerId).ToListAsync();
         }
   }
 }

@@ -48,9 +48,9 @@ namespace CIB.Core.Modules.CorporateProfile.Validation
             RuleFor(p => p.Id)
                 .NotEmpty().WithMessage("{PropertyName} is required.")
                 .NotNull();
-            RuleFor(p => p.CorporateRoleId)
-                .NotEmpty().WithMessage("{PropertyName} is required.")
-                .NotNull();
+            // RuleFor(p => p.CorporateRoleId)
+            //     .NotEmpty().WithMessage("{PropertyName} is required.")
+            //     .NotNull();
             RuleFor(p => p.CorporateCustomerId)
                 .NotEmpty().WithMessage("{PropertyName} is required.")
                 .NotNull();
@@ -69,9 +69,9 @@ namespace CIB.Core.Modules.CorporateProfile.Validation
             RuleFor(p => p.LastName.Trim())
                 .NotEmpty().WithMessage("{PropertyName} is required.")
                 .NotNull();
-            RuleFor(p => p.ApprovalLimit)
-                .NotEmpty().WithMessage("{PropertyName} is required.")
-                .NotNull();
+            // RuleFor(p => p.ApprovalLimit)
+            //     .NotEmpty().WithMessage("{PropertyName} is required.")
+            //     .NotNull();
         }
     }
 

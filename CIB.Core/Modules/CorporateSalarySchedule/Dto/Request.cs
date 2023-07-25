@@ -18,6 +18,7 @@ namespace CIB.Core.Modules.CorporateSalarySchedule.Dto
         public string Discription { get; set; }
         public string CreatedBy { get; set; }
         public string WorkFlowId { get; set; }
+        public string TransactionLocation { get; set; }
     }
 
     public class CreateCorporateCustomerSalaryDto : BaseDto
@@ -35,6 +36,7 @@ namespace CIB.Core.Modules.CorporateSalarySchedule.Dto
         public DateTime? CreatedAt { get; set; }
         public Guid? CreatedBy { get; set; }
         public Guid? WorkFlowId { get; set; }
+        public string TransactionLocation {get;set;}
     }
 
     public class UpdateCorporateCustomerSalaryDtoRequest : BaseDto

@@ -25,7 +25,7 @@ namespace CIB.Core.Services._2FA
         var myUserName = UserName.Trim().ToLower();
         var myToken = Token.Trim();
         var _httpClient = httpClient.CreateClient("tokenClient");
-        var url = _config.GetValue<string>("prodApiUrl:entrustToken");
+        var url = _config.GetValue<string>("TestApiUrl:entrustToken");
         var response = await _httpClient.GetAsync(url+$"?UserId={myUserName}&tokenResponse={myToken}").Result.Content.ReadAsStringAsync();
         if(string.IsNullOrEmpty(response))
         {

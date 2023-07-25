@@ -14,6 +14,7 @@ using CIB.Core.Common.Response;
 using CIB.Core.Enums;
 using Microsoft.Extensions.Logging;
 using CIB.Core.Common.Dto;
+using CIB.Core.Services.Authentication;
 
 namespace CIB.CorporateAdmin.Controllers
 {
@@ -24,7 +25,7 @@ namespace CIB.CorporateAdmin.Controllers
         private readonly IApiService _apiService;
         protected readonly IConfiguration _config;
         private readonly ILogger<BulkTransactionController> _logger;
-        public CorporateCustomerController(ILogger<BulkTransactionController> logger, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor accessor,IApiService apiService,IConfiguration config) : base( unitOfWork,mapper, accessor)
+        public CorporateCustomerController(ILogger<BulkTransactionController> logger, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor accessor,IApiService apiService,IConfiguration config,IAuthenticationService authService):base(unitOfWork,mapper,accessor,authService)
         {
             this._apiService = apiService;
             this._config = config;

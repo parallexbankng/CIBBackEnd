@@ -17,7 +17,7 @@ namespace CIB.Core.Modules.CorporateSalarySchedule._CorporateEmployee.Validation
                 .NotNull();
             RuleFor(p => p.FirstName)
                 .NotEmpty().WithMessage("{PropertyName} is required.")
-                .Matches(new ReqEx().AlphabetOnly).WithMessage("{PropertyName} is not valid.")
+                .Matches(new ReqEx().AlphabetOnly).WithMessage("FirstName is not valid.")
                 .NotNull();
             RuleFor(p => p.LastName.Trim())
                 .NotEmpty().WithMessage("{PropertyName} is required.")
@@ -27,14 +27,13 @@ namespace CIB.Core.Modules.CorporateSalarySchedule._CorporateEmployee.Validation
                 .NotNull();
             RuleFor(p => p.Department.Trim())
                 .NotEmpty().WithMessage("{PropertyName} is required.")
-                .EmailAddress().WithMessage("{PropertyName} is not valid.")
                 .NotNull();
             RuleFor(p => p.AccountName)
                 .NotEmpty().WithMessage("{PropertyName} is required.")
                 .NotNull();
             RuleFor(p => p.AccountNumber.Trim())
                 .NotEmpty().WithMessage("{PropertyName} is required.")
-                .Matches(new ReqEx().NumberOnly).WithMessage("{PropertyName} is not valid.")
+                .Matches(new ReqEx().NumberOnly).WithMessage("AccountNumber is not valid.")
                 .NotNull();
             RuleFor(p => p.BankCode)
                 .NotEmpty().WithMessage("{PropertyName} is required.")
@@ -59,7 +58,7 @@ namespace CIB.Core.Modules.CorporateSalarySchedule._CorporateEmployee.Validation
                 .NotNull();
             RuleFor(p => p.FirstName)
                 .NotEmpty().WithMessage("{PropertyName} is required.")
-                .Matches(new ReqEx().AlphabetOnly).WithMessage("{PropertyName} is not valid.")
+                .Matches(new ReqEx().AlphabetOnly).WithMessage("FirstName is not valid.")
                 .NotNull();
             RuleFor(p => p.LastName.Trim())
                 .NotEmpty().WithMessage("{PropertyName} is required.")
@@ -69,14 +68,14 @@ namespace CIB.Core.Modules.CorporateSalarySchedule._CorporateEmployee.Validation
                 .NotNull();
             RuleFor(p => p.Department.Trim())
                 .NotEmpty().WithMessage("{PropertyName} is required.")
-                .EmailAddress().WithMessage("{PropertyName} is not valid.")
+                .EmailAddress().WithMessage("Department is not valid.")
                 .NotNull();
             RuleFor(p => p.AccountName)
                 .NotEmpty().WithMessage("{PropertyName} is required.")
                 .NotNull();
             RuleFor(p => p.AccountNumber.Trim())
                 .NotEmpty().WithMessage("{PropertyName} is required.")
-                .Matches(new ReqEx().NumberOnly).WithMessage("{PropertyName} is not valid.")
+                .Matches(new ReqEx().NumberOnly).WithMessage("AccountNumber is not valid.")
                 .NotNull();
             RuleFor(p => p.BankCode)
                 .NotEmpty().WithMessage("{PropertyName} is required.")

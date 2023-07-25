@@ -8,6 +8,7 @@ using CIB.Core.Common.Interface;
 using CIB.Core.Common.Response;
 using CIB.Core.Entities;
 using CIB.Core.Modules.Role.Dto;
+using CIB.Core.Services.Authentication;
 using CIB.Core.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -20,7 +21,7 @@ namespace CIB.BankAdmin.Controllers
     public class RoleController : BaseAPIController
     {
         private readonly ILogger<RoleController> _logger;
-        public RoleController(ILogger<RoleController> logger,IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor accessor) : base(mapper, unitOfWork, accessor)
+        public RoleController(ILogger<RoleController> logger,IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor accessor,IAuthenticationService authService):base(mapper,unitOfWork,accessor,authService)
         {
             this._logger = logger;
         }
@@ -180,7 +181,7 @@ namespace CIB.BankAdmin.Controllers
             }
         }
 
-        [HttpPut("RequestRoleApproval")]
+        [HttpPost("RequestRoleApproval")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         public ActionResult<ResponseDTO<RoleResponseDto>> RequestRoleApproval(string id)
         {
@@ -230,7 +231,7 @@ namespace CIB.BankAdmin.Controllers
             }
         }
 
-        [HttpPut("ApproveRole")]
+        [HttpPost("ApproveRole")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         public ActionResult<ResponseDTO<RoleResponseDto>> ApproveRole(string id)
         {
@@ -278,7 +279,7 @@ namespace CIB.BankAdmin.Controllers
             }
         }
 
-        [HttpPut("ActivateRole")]
+        [HttpPost("ActivateRole")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         public ActionResult<ResponseDTO<RoleResponseDto>> ActivateRole(string id)
         {
@@ -322,7 +323,7 @@ namespace CIB.BankAdmin.Controllers
             }
         }
 
-        [HttpPut("DeclineRole")]
+        [HttpPost("DeclineRole")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         public ActionResult<ResponseDTO<RoleResponseDto>> DeclineRole(string id, string reason)
         {
@@ -372,7 +373,7 @@ namespace CIB.BankAdmin.Controllers
             }
         }
 
-        [HttpPut("DeactivateRole")]
+        [HttpPost("DeactivateRole")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         public ActionResult<ResponseDTO<RoleResponseDto>> DeactivateRole(string id, string reason)
         {

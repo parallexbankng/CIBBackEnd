@@ -1,5 +1,6 @@
 {
     "yaml.schemas": {
         "https://www.asyncapi.com/schema-store/all.schema-store.json": "untitled:Untitled-1"
-    }
+    },
+    "dotnet.defaultSolution": "CIB.BankAdmin.sln"
 }

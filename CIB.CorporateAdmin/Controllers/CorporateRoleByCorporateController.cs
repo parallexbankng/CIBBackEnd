@@ -12,6 +12,7 @@ using CIB.Core.Modules.Authentication.Dto;
 using CIB.Core.Modules.CorporateRole.Dto;
 using CIB.Core.Modules.CorporateRole.Validation;
 using CIB.Core.Modules.UserAccess.Dto;
+using CIB.Core.Services.Authentication;
 using CIB.Core.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -24,7 +25,7 @@ namespace CIB.CorporateAdmin.Controllers
     public class CorporateRoleByCorporateController : BaseAPIController
     {
         private readonly ILogger<CorporateRoleByCorporateController> _logger;
-        public CorporateRoleByCorporateController(ILogger<CorporateRoleByCorporateController> logger,IUnitOfWork unitOfWork,IMapper mapper,IHttpContextAccessor accessor) : base(unitOfWork,mapper,accessor)
+        public CorporateRoleByCorporateController(ILogger<CorporateRoleByCorporateController> logger,IUnitOfWork unitOfWork,IMapper mapper,IHttpContextAccessor accessor,IAuthenticationService authService):base(unitOfWork,mapper,accessor,authService)
         {
             _logger = logger;
         }
@@ -274,7 +275,7 @@ namespace CIB.CorporateAdmin.Controllers
             }
         }
 
-        [HttpPut("RequestRoleApproval")]
+        [HttpPost("RequestRoleApproval")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         public ActionResult<TblCorporateRole> RequestRoleApproval(string id)
         {
@@ -325,7 +326,7 @@ namespace CIB.CorporateAdmin.Controllers
             }
         }
 
-        [HttpPut("ApproveRole")]
+        [HttpPost("ApproveRole")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         public ActionResult<TblCorporateRole> ApproveRole(string id)
         {
@@ -377,7 +378,7 @@ namespace CIB.CorporateAdmin.Controllers
             }
         }
 
-        [HttpPut("ActivateRole")]
+        [HttpPost("ActivateRole")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         public ActionResult<TblCorporateRole> ActivateRole(string id)
         {
@@ -429,7 +430,7 @@ namespace CIB.CorporateAdmin.Controllers
             }
         }
 
-        [HttpPut("DeclineRole")]
+        [HttpPost("DeclineRole")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         public ActionResult<ResponseDTO<TblCorporateRole>> DeclineRole(string id, string reason)
         {
@@ -488,7 +489,7 @@ namespace CIB.CorporateAdmin.Controllers
             }
         }
 
-        [HttpPut("DeactivateRole")]
+        [HttpPost("DeactivateRole")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         public ActionResult<ResponseDTO<TblCorporateRole>> DeactivateRole(string id, string reason)
         {
@@ -658,7 +659,7 @@ namespace CIB.CorporateAdmin.Controllers
 
                     if (theUserAccess == null)
                     {
-                    return BadRequest($"No user access with the id {accessId} exist");
+                        return BadRequest($"No user access with the id {accessId} exist");
                     }
                     var _tblRoleUserAccess = UnitOfWork.CorporateUserRoleAccessRepo.GetCorporateRoleUserAccesses(roleId.ToString(), accessId.ToString());
                     if (_tblRoleUserAccess != null)
