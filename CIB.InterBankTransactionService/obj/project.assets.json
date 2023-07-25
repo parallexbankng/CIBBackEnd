@@ -7795,20 +7795,20 @@
     ]
   },
   "packageFolders": {
-    "/Users/kufregodwin/.nuget/packages/": {}
+    "/Users/macbook/.nuget/packages/": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/kufregodwin/Projects/CIBBackEnd/CIB.InterBankTransactionService/CIB.InterBankTransactionService.csproj",
+      "projectUniqueName": "/Users/macbook/Projects/CIBBackEnd/CIB.InterBankTransactionService/CIB.InterBankTransactionService.csproj",
       "projectName": "CIB.InterBankTransactionService",
-      "projectPath": "/Users/kufregodwin/Projects/CIBBackEnd/CIB.InterBankTransactionService/CIB.InterBankTransactionService.csproj",
-      "packagesPath": "/Users/kufregodwin/.nuget/packages/",
-      "outputPath": "/Users/kufregodwin/Projects/CIBBackEnd/CIB.InterBankTransactionService/obj/",
+      "projectPath": "/Users/macbook/Projects/CIBBackEnd/CIB.InterBankTransactionService/CIB.InterBankTransactionService.csproj",
+      "packagesPath": "/Users/macbook/.nuget/packages/",
+      "outputPath": "/Users/macbook/Projects/CIBBackEnd/CIB.InterBankTransactionService/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "/Users/kufregodwin/Projects/NuGet.Config",
-        "/Users/kufregodwin/.nuget/NuGet/NuGet.Config"
+        "/Users/macbook/Projects/NuGet.Config",
+        "/Users/macbook/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net6.0"
@@ -7893,7 +7893,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/6.0.403/RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/6.0.412/RuntimeIdentifierGraph.json"
       }
     }
   }

@@ -8303,20 +8303,20 @@
     ]
   },
   "packageFolders": {
-    "/Users/kufregodwin/.nuget/packages/": {}
+    "/Users/macbook/.nuget/packages/": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/kufregodwin/Projects/CIBBackEnd/CIB.BankAdmin/CIB.BankAdmin.csproj",
+      "projectUniqueName": "/Users/macbook/Projects/CIBBackEnd/CIB.BankAdmin/CIB.BankAdmin.csproj",
       "projectName": "CIB.BankAdmin",
-      "projectPath": "/Users/kufregodwin/Projects/CIBBackEnd/CIB.BankAdmin/CIB.BankAdmin.csproj",
-      "packagesPath": "/Users/kufregodwin/.nuget/packages/",
-      "outputPath": "/Users/kufregodwin/Projects/CIBBackEnd/CIB.BankAdmin/obj/",
+      "projectPath": "/Users/macbook/Projects/CIBBackEnd/CIB.BankAdmin/CIB.BankAdmin.csproj",
+      "packagesPath": "/Users/macbook/.nuget/packages/",
+      "outputPath": "/Users/macbook/Projects/CIBBackEnd/CIB.BankAdmin/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "/Users/kufregodwin/Projects/NuGet.Config",
-        "/Users/kufregodwin/.nuget/NuGet/NuGet.Config"
+        "/Users/macbook/Projects/NuGet.Config",
+        "/Users/macbook/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net5.0"
@@ -8328,8 +8328,8 @@
         "net5.0": {
           "targetAlias": "net5.0",
           "projectReferences": {
-            "/Users/kufregodwin/Projects/CIBBackEnd/CIB.Core/CIB.Core.csproj": {
-              "projectPath": "/Users/kufregodwin/Projects/CIBBackEnd/CIB.Core/CIB.Core.csproj"
+            "/Users/macbook/Projects/CIBBackEnd/CIB.Core/CIB.Core.csproj": {
+              "projectPath": "/Users/macbook/Projects/CIBBackEnd/CIB.Core/CIB.Core.csproj"
             }
           }
         }
@@ -8400,6 +8400,20 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
+        "downloadDependencies": [
+          {
+            "name": "Microsoft.AspNetCore.App.Ref",
+            "version": "[5.0.0, 5.0.0]"
+          },
+          {
+            "name": "Microsoft.NETCore.App.Host.osx-x64",
+            "version": "[5.0.17, 5.0.17]"
+          },
+          {
+            "name": "Microsoft.NETCore.App.Ref",
+            "version": "[5.0.0, 5.0.0]"
+          }
+        ],
         "frameworkReferences": {
           "Microsoft.AspNetCore.App": {
             "privateAssets": "none"
@@ -8408,7 +8422,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/6.0.403/RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/6.0.412/RuntimeIdentifierGraph.json"
       }
     }
   }
