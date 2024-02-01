@@ -1,20 +1,21 @@
-using System.Security.Cryptography;
+using System.Runtime.Serialization;
+using System.Collections.Immutable;
+using System.Net;
 
 namespace CIB.IntraBankTransactionService.Utils;
 public static class Transactions
 {
   public static string Ref()
   {
-    var unixTime = CreateDigitString(6);
-    var result = DateTime.Now.ToString("yyyyMMddHHmmss");
-    return $"{result}{unixTime}";
+    var dateTime = DateTime.Now;
+    var unixTime = ((DateTimeOffset)dateTime).ToUnixTimeSeconds().ToString();
+    var date = DateTime.Now.ToString("yyyyMMddHHmmss");
+    return date + unixTime[^2..];
   }
-  public static string CreateDigitString(int num)
+  public static string GetHostIp()
   {
-    RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider();
-    byte[] randomNumber = new byte[num];//4 for int32
-    rng.GetBytes(randomNumber);
-    int value = BitConverter.ToInt32(randomNumber, 0);
-    return value.ToString().Replace("-", "");
+    string hostName = Dns.GetHostName();
+    string myIP = Dns.GetHostByName(hostName).AddressList[1].ToString();
+    return myIP;
   }
 }

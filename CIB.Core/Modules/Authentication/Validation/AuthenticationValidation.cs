@@ -25,12 +25,29 @@ namespace CIB.Core.Modules.Authentication.Validation
                 .Matches(new ReqEx().NumberOnly).WithMessage("{PropertyName} is not valid.");
         }
     }
-
+    public class CorporateLoginValidation : AbstractValidator<CustomerLoginParam>
+    {
+        public CorporateLoginValidation()
+        {
+            RuleFor(p => p.Username.Trim())
+                .NotEmpty().WithMessage("{PropertyName} is required.")
+                .NotNull()
+                .Matches(new ReqEx().AlphaNumeric).WithMessage("{PropertyName} is not valid.");
+            RuleFor(p => p.Password.Trim())
+                .NotEmpty().WithMessage("{PropertyName} is required.")
+                .NotNull()
+                .MinimumLength(5).WithMessage("{PropertyName} must be more than 5 characters.");
+            // RuleFor(p => p.CustomerID.Trim())
+            //     .NotEmpty().WithMessage("{PropertyName} is required.")
+            //     .NotNull()
+            //     .Matches(new ReqEx().AlphaNumeric).WithMessage("{PropertyName} is not valid.");
+        }
+    }
 
 
     public class ResetPasswordValidation : AbstractValidator<ResetPasswordModel>
     {
-         public ResetPasswordValidation()
+        public ResetPasswordValidation()
         {
             RuleFor(p => p.Email.Trim())
                 .NotEmpty().WithMessage("{PropertyName} is required.")
@@ -52,7 +69,7 @@ namespace CIB.Core.Modules.Authentication.Validation
 
     public class ForgotPasswordValidation : AbstractValidator<ForgetPassword>
     {
-         public ForgotPasswordValidation()
+        public ForgotPasswordValidation()
         {
             RuleFor(p => p.Email.Trim())
                 .NotEmpty().WithMessage("{PropertyName} is required.")
@@ -79,7 +96,7 @@ namespace CIB.Core.Modules.Authentication.Validation
 
 
 
-         public SetSecurityQuestionValidation()
+        public SetSecurityQuestionValidation()
         {
             RuleFor(p => p.UserName.Trim())
                 .NotEmpty().WithMessage("{PropertyName} is required.")
@@ -100,7 +117,7 @@ namespace CIB.Core.Modules.Authentication.Validation
 
     public class FirstLoginPasswordChangeValidation : AbstractValidator<FirstLoginPasswordChangeModel>
     {
-         public FirstLoginPasswordChangeValidation()
+        public FirstLoginPasswordChangeValidation()
         {
             RuleFor(p => p.UserName.Trim())
                 .NotEmpty().WithMessage("{PropertyName} is required.")
@@ -114,16 +131,16 @@ namespace CIB.Core.Modules.Authentication.Validation
                 .NotEmpty().WithMessage("{PropertyName} is required.")
                 .NotNull()
                 .MinimumLength(5).WithMessage("{PropertyName} must be more than 5 characters.");
-            RuleFor(p => p.CustomerId.Trim())
-                .NotEmpty().WithMessage("{PropertyName} is required.")
-                .NotNull()
-                .Matches(new ReqEx().AlphaNumeric).WithMessage("{PropertyName} is not valid.");
+            // RuleFor(p => p.CustomerId.Trim())
+            //     .NotEmpty().WithMessage("{PropertyName} is required.")
+            //     .NotNull()
+            //     .Matches(new ReqEx().AlphaNumeric).WithMessage("{PropertyName} is not valid.");
         }
     }
 
     public class ChangeUserPasswordValidation : AbstractValidator<CustomerLoginParam>
     {
-         public ChangeUserPasswordValidation()
+        public ChangeUserPasswordValidation()
         {
             RuleFor(p => p.Username.Trim())
                 .NotEmpty().WithMessage("{PropertyName} is required.")
@@ -141,16 +158,16 @@ namespace CIB.Core.Modules.Authentication.Validation
     }
 
 
-    
 
 
 
 
-    
 
 
 
-    
+
+
+
 
 
 

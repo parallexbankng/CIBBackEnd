@@ -8,4 +8,5 @@ public interface IApiService
   Task<TransferResponse> PostIntraBankTransfer(PostIntraBankTransaction transaction);
   AuthTokenResponse GetAuthToken();
   Task<RequeryTransactionResponse> QueryTransferTransaction(RequeryTransaction query);
+
 }

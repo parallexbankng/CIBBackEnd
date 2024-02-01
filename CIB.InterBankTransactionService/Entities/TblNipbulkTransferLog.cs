@@ -50,9 +50,7 @@ namespace CIB.InterBankTransactionService.Entities
         public string ResponseCode { get; set; }
         public string ResponseDescription { get; set; }
         public string ErrorDetail { get; set; }
-        public decimal? TotalFee { get; set; }
-        public decimal? TotalVat { get; set; }
-        public decimal? IntraBankTotalAmount { get; set; }
-        public decimal? InterBankTotalAmount { get; set; }
+        public string? SessionId { get; set; }
+        public string ServerIp { get; set; }
     }
 }

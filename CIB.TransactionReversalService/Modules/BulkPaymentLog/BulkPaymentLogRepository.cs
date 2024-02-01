@@ -1,4 +1,3 @@
-
 using CIB.TransactionReversalService.Entities;
 using CIB.TransactionReversalService.Modules.Common.Repository;
 
@@ -10,12 +9,13 @@ namespace CIB.TransactionReversalService.Modules.BulkPaymentLog;
     {
     }
     //public new ParallexCIBContext Context { get { return base.Context as ParallexCIBContext; }}
-     public ParallexCIBContext Context { get { return _context as ParallexCIBContext; }}
+    // public ParallexCIBContext Context { get { return _context as ParallexCIBContext; }}
+    public new ParallexCIBContext Context { get { return base.Context as ParallexCIBContext; }}
 
 
     public List<TblNipbulkTransferLog> GetPendingTransferItems(int status,int perProcess, int TryCount, DateTime proccessDate)
     {
-      return _context.TblNipbulkTransferLogs.Where(ctx => 
+      return  base.Context.TblNipbulkTransferLogs.Where(ctx => 
       ctx.TransactionStatus == status && 
       ctx.ApprovalStatus == 1 && 
       ctx.DateProccessed.Value.Date == proccessDate &&
@@ -24,7 +24,7 @@ namespace CIB.TransactionReversalService.Modules.BulkPaymentLog;
 
     public AccountInfo GetAccountInfo(Guid tranId)
     {
-      var record = _context.TblNipbulkTransferLogs.FirstOrDefault(ctx => ctx.Id == tranId);
+      var record =  base.Context.TblNipbulkTransferLogs.FirstOrDefault(ctx => ctx.Id == tranId);
       return new AccountInfo{  
         SuspenseAccountName= record?.SuspenseAccountName,
         SuspenseAccountNumber = record?.SuspenseAccountNumber,  
@@ -40,11 +40,11 @@ namespace CIB.TransactionReversalService.Modules.BulkPaymentLog;
 
     public List<TblNipbulkTransferLog> CheckInterBankStatus(Guid? tranId, int isPending)
     {
-      return _context.TblNipbulkTransferLogs.Where(ctx => ctx.Id == tranId && ctx.ApprovalStatus == 1 && ctx.IntraBankStatus == 0).ToList();
+      return  base.Context.TblNipbulkTransferLogs.Where(ctx => ctx.Id == tranId && ctx.ApprovalStatus == 1 && ctx.IntraBankStatus == 0).ToList();
     }
     public void UpdateStatus(TblNipbulkTransferLog status)
     {
-      _context.Update(status).Property(x=>x.Sn).IsModified = false;
+       base.Context.Update(status).Property(x=>x.Sn).IsModified = false;
     }
 
   public List<TblNipbulkTransferLog> GetPendingTransferItems(int status, int perProcess)
@@ -52,3 +52,6 @@ namespace CIB.TransactionReversalService.Modules.BulkPaymentLog;
     throw new NotImplementedException();
   }
 }
+
+
+

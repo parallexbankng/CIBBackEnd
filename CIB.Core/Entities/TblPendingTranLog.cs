@@ -35,6 +35,6 @@ namespace CIB.Core.Entities
         public Guid? BatchId { get; set; }
         public decimal? Vat { get; set; }
         public decimal? Fee { get; set; }
-        public string? SessionId { get; set; }
+        public string SessionId { get; set; }
     }
 }

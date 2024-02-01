@@ -32,15 +32,15 @@ namespace CIB.BankAdmin.Extensions
 
         public Tokens JWTAuthentication(CorporateUserModel userInfo, BankUserLoginParam bankuse)
         {
-            var payLoadData = JsonConvert.SerializeObject(new {phone=userInfo.Phone1,Email =userInfo.Email, UserName = userInfo.Username});
+            var payLoadData = JsonConvert.SerializeObject(new { phone = userInfo.Phone1, Email = userInfo.Email, UserName = userInfo.Username });
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Encryption.DecryptStrings(_config["Jwt:Key"])));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
             var claims = new[] {
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(ClaimTypes.NameIdentifier, userInfo.UserId),
-                new Claim("data", Encryption.EncryptStrings(payLoadData))
-            };
-        
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new Claim(ClaimTypes.NameIdentifier, userInfo.UserId),
+            new Claim("data", Encryption.EncryptStrings(payLoadData))
+        };
+
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Issuer = Encryption.DecryptStrings(_config["Jwt:Issuer"]),
@@ -48,14 +48,16 @@ namespace CIB.BankAdmin.Extensions
                 Subject = new ClaimsIdentity(claims),
                 Expires = DateTime.UtcNow.AddMinutes(15),
                 SigningCredentials = credentials,
-                
+
             };
             var tokenHandler = new JwtSecurityTokenHandler();
             var token = tokenHandler.CreateToken(tokenDescriptor);
-            return new Tokens { Token = tokenHandler.WriteToken(token)};
+
+            //var content = ComputeContentHash();
+            return new Tokens { Token = tokenHandler.WriteToken(token) };
         }
 
-        public  ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
+        public ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
         {
             var tokenValidationParameters = new TokenValidationParameters
             {
@@ -78,12 +80,40 @@ namespace CIB.BankAdmin.Extensions
             }
             catch (Exception)
             {
-                
+
                 return null;
             }
         }
 
-        
+        public string GenerateAccessToken(CorporateUserModel userInfo)
+        {
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Encryption.DecryptStrings(_config["Jwt:Key"])));
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
+            var claims = new[] {
+            new Claim(JwtRegisteredClaimNames.Sub, userInfo.Username),
+            new Claim(JwtRegisteredClaimNames.Email, userInfo.Email),
+            new Claim(ClaimTypes.NameIdentifier, userInfo.UserId),
+            new Claim(ClaimTypes.Name, userInfo.UserId),
+            new Claim("phone", userInfo.Phone1),
+            new Claim("CustomerID", userInfo.CustomerID ?? ""),
+            new Claim("Fullname", userInfo.FullName ?? ""),
+            new Claim("CorporateCustomerId", userInfo.CorporateCustomerId ?? ""),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+        };
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Issuer = Encryption.DecryptStrings(_config["Jwt:Issuer"]),
+                Audience = Encryption.DecryptStrings(_config["Jwt:Audience"]),
+                Subject = new ClaimsIdentity(claims),
+                Expires = DateTime.UtcNow.AddMinutes(15),
+                SigningCredentials = credentials
+            };
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var createToken = tokenHandler.CreateToken(tokenDescriptor);
+            var newToken = tokenHandler.WriteToken(createToken);
+            return newToken.ToString();
+        }
+
         public string ComputeContentHash(string content)
         {
             using var sha256 = SHA256.Create();

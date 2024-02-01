@@ -1,9 +1,5 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using CIB.Core.Common.Interface;
-using CIB.Core.Common.Repository;
 using CIB.Core.Entities;
 using CIB.Core.Modules.CorporateCustomer.Dto;
 using CIB.Core.Modules.CorporateProfile.Dto;
@@ -17,6 +13,9 @@ namespace CIB.Core.Modules.CorporateCustomer
         TblCorporateCustomer GetCorporateCustomerByCustomerID(string id);
         TblCorporateCustomer GetCustomerByCustomerId(string customerId);
         CorporateUserStatus CheckDuplicate(TblCorporateCustomer profile, bool IsUpdate = false);
+        TblCorporateCustomer CheckDuplicateCorporateShortName(string corporateShortName);
         void UpdateCorporateCustomer(TblCorporateCustomer update);
+        IEnumerable<ChangeSignatoryDto> Search(string CompanyName, string Signatory);
+        IEnumerable<ChangeSignatoryDto> GetCorporateCustomerWhoChangeSigntory();
     }
 }

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using CIB.Core.Common;
@@ -19,7 +18,7 @@ namespace CIB.Core.Templates.Corporate.profile
                 {
                     subject = $"parallexbank corporate banking request approval for corporate profile",
                     recipient = receiverEmail,
-                    sender = "e-statement@parallexbank.com",
+                    sender = "no-reply@parallexbank.com",
                     message = Onboarding(notify, "Kindly approval request for newly onboarded corporate profile")
                 };
                 return declineTemplate;
@@ -30,7 +29,7 @@ namespace CIB.Core.Templates.Corporate.profile
                 {
                     subject = $"parallexbank corporate banking request approval for corporate profile update ",
                     recipient = receiverEmail,
-                    sender = "e-statement@parallexbank.com",
+                    sender = "no-reply@parallexbank.com",
                     message = Onboarding(notify, "Kindly approval pending request for corporate profile update")
                 };
                 return declineTemplate;
@@ -41,7 +40,7 @@ namespace CIB.Core.Templates.Corporate.profile
                 {
                     subject = $"parallexbank corporate banking request approval for corporate profile role change ",
                     recipient = receiverEmail,
-                    sender = "e-statement@parallexbank.com",
+                    sender = "no-reply@parallexbank.com",
                     message = RoleUpdate(notify, "Kindly approval pending request for corporate profile role change")
                 };
                 return template;
@@ -56,7 +55,7 @@ namespace CIB.Core.Templates.Corporate.profile
                 {
                     subject = $"parallexbank corporate banking approval request decline for corporate profile onboarded",
                     recipient = receiverEmail,
-                    sender = "e-statement@parallexbank.com",
+                    sender = "no-reply@parallexbank.com",
                     message = Onboarding(notify, "Your request to approve newly onboarded corporate profile has been decline")
                 };
                 return declineTemplate;
@@ -67,7 +66,7 @@ namespace CIB.Core.Templates.Corporate.profile
                 {
                     subject = $"parallexbank corporate banking approval request decline for corporate profile update",
                     recipient = receiverEmail,
-                    sender = "e-statement@parallexbank.com",
+                    sender = "no-reply@parallexbank.com",
                     message = Onboarding(notify, "Your Request to approve Corporate Profile Update has been decline")
                 };
                 return declineTemplate;
@@ -78,7 +77,7 @@ namespace CIB.Core.Templates.Corporate.profile
                 {
                     subject = $"parallexbank Corporate Banking Approval Request Decline for Corporate profile role change",
                     recipient = receiverEmail,
-                    sender = "e-statement@parallexbank.com",
+                    sender = "no-reply@parallexbank.com",
                     message = RoleUpdate(notify, "Your Request to approve corporate profile role change, has been decline")
                 };
                 return declineTemplate;
@@ -89,7 +88,7 @@ namespace CIB.Core.Templates.Corporate.profile
                 {
                     subject = $"parallexbank Corporate Banking Approval Request Decline for Corporate profile log out enable",
                     recipient = receiverEmail,
-                    sender = "e-statement@parallexbank.com",
+                    sender = "no-reply@parallexbank.com",
                     message = Onboarding(notify, "Your Request to approve Corporate profile log out enable has been decline")
                 };
                 return declineTemplate;
@@ -100,7 +99,7 @@ namespace CIB.Core.Templates.Corporate.profile
                 {
                     subject = $"parallexbank Corporate Banking Approval Request Decline for Corporate Profile Reactivation",
                     recipient = receiverEmail,
-                    sender = "e-statement@parallexbank.com",
+                    sender = "no-reply@parallexbank.com",
                     message = Onboarding(notify, "Your Request to approve Corporate Profile Reactivation has been decline")
                 };
                 return declineTemplate;
@@ -158,38 +157,6 @@ namespace CIB.Core.Templates.Corporate.profile
             $"</body>" +
             $"</html>";
             return message;
-        }
-
-
-        public static string Test(EmailNotification notify, string headLine)
-        {
-            string body = string.Empty;
-            //using streamreader for reading my htmltemplate  
-            var path = "../CustomerProfileOnbording.html";
-            using (StreamReader reader = new(path))
-            {
-                body = reader.ReadToEnd();
-
-            }
-            body = body.Replace("[Name]", notify.FullName); //replacing the required things  
-            body = body.Replace("{UserName}", notify.UserName);
-            body = body.Replace("{CorporateId}", notify.CustomerId);
-            body = body.Replace("{Password}", notify.Password);
-            return body;
-        }
-
-        public static string TestLogin(EmailNotification notify, string headLine)
-        {
-            string body = string.Empty;
-            //using streamreader for reading my htmltemplate  
-            var path = "../CustomerLogin.html";
-            using (StreamReader reader = new(path))
-            {
-                body = reader.ReadToEnd();
-
-            }
-            body = body.Replace("[Name]", notify.FullName); //replacing the required things  
-            return body;
         }
     }
 }

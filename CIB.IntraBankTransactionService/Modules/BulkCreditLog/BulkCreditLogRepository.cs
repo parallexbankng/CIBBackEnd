@@ -13,19 +13,12 @@ public class BulkCreditLogRepository : Repository<TblNipbulkCreditLog>, IBulkCre
 
   public List<TblNipbulkCreditLog> GetPendingCredit(Guid tranLogId, int status, string bankCode, DateTime processDate)
   {
-    return _context.TblNipbulkCreditLogs.Where(ctx =>
-    ctx.InitiateDate != null &&
-    ctx.TranLogId == tranLogId &&
-    ctx.CreditStatus == status &&
-    ctx.NameEnquiryStatus == 1 &&
-    ctx.CreditBankCode == bankCode &&
-    ctx.InitiateDate.Value.Date == processDate &&
-    ctx.TryCount <= 5).ToList();
+    return _context.TblNipbulkCreditLogs.Where(ctx => ctx.TranLogId == tranLogId && ctx.CreditStatus == status && ctx.NameEnquiryStatus == 1 && ctx.CreditBankCode == bankCode && ctx.TryCount <= 5).ToList();
   }
 
   public List<TblNipbulkCreditLog> CheckForPendingCredit(Guid tranLogId, int status, DateTime processDate)
   {
-    return _context.TblNipbulkCreditLogs.Where(ctx => ctx.InitiateDate != null && ctx.TranLogId == tranLogId && ctx.CreditStatus != 1 && ctx.NameEnquiryStatus == 1 && ctx.InitiateDate.Value.Date == processDate).ToList();
+    return _context.TblNipbulkCreditLogs.Where(ctx => ctx.InitiateDate != null && ctx.TranLogId == tranLogId && ctx.CreditStatus != 0 && ctx.NameEnquiryStatus == 1 && ctx.InitiateDate.Value.Date == processDate).ToList();
   }
 
   public void UpdateCreditStatus(TblNipbulkCreditLog status)

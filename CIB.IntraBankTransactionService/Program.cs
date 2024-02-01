@@ -40,12 +40,14 @@ namespace CIB.IntraBankTransactionService
     public static IHostBuilder CreateHostBuilder(string[] args) =>
       Host.CreateDefaultBuilder(args)
         .UseWindowsService()
-        .ConfigureServices((hostContext, services) => {
+        .ConfigureServices((hostContext, services) =>
+        {
           IConfiguration configuration = hostContext.Configuration;
-          var con = Encryption.DecryptStrings(configuration.GetConnectionString("ParallexCIBCon"));
+          var con = Encryption.DecryptStrings(configuration.GetConnectionString("parallaxCIBCon"));
           services.AddDbContext<ParallexCIBContext>(options => options.UseSqlServer(con));
           services.AddScoped<IUnitOfWork, UnitOfWork>();
-          services.AddHttpClient("tokenClient",c => {
+          services.AddHttpClient("tokenClient", c =>
+          {
             c.BaseAddress = new Uri(configuration.GetValue<string>("prodApiUrl:baseUrl"));
             c.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
           });
@@ -53,11 +55,10 @@ namespace CIB.IntraBankTransactionService
           services.AddScoped<IApiService, ApiService>();
           services.AddHostedService<Worker>();
         })
-        .ConfigureLogging((hostingContext,logging) =>
+        .ConfigureLogging((hostingContext, logging) =>
         {
-          logging.AddNLog(hostingContext.Configuration.GetSection("Logging")); 
+          logging.AddNLog(hostingContext.Configuration.GetSection("Logging"));
           logging.SetMinimumLevel(LogLevel.Information);
         });
-
   }
 }

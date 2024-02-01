@@ -4,10 +4,10 @@ using CIB.IntraBankTransactionService.Modules.Common.Interface;
 
 namespace CIB.IntraBankTransactionService.Modules.BulkPaymentLog;
 
-  public interface IBulkPaymentLogRepository : IRepository<TblNipbulkTransferLog>
-  {
-      List<TblNipbulkTransferLog> GetPendingTransferItems(int status, int perProcess,int tryCount,DateTime processDate);
-      void UpdateStatus(TblNipbulkTransferLog status);
-      List<TblNipbulkTransferLog> CheckInterBankStatus(Guid? tranId, int isPending);
-      int GetInterBankTotalCredit(Guid tranLogId,string bankCode, DateTime processDate);
-  }
+public interface IBulkPaymentLogRepository : IRepository<TblNipbulkTransferLog>
+{
+  List<TblNipbulkTransferLog> GetPendingTransferItems(int status, int perProcess, DateTime? processDate, int tryCount);
+  void UpdateStatus(TblNipbulkTransferLog status);
+  List<TblNipbulkTransferLog> CheckInterBankStatus(Guid? tranId, int isPending);
+  int GetInterBankTotalCredit(Guid tranLogId, string bankCode, DateTime processDate);
+}

@@ -11,7 +11,8 @@ namespace CIB.Core.Modules.TemCorporateProfile
     public interface ITemCorporateProfileRepository : IRepository<TblTempCorporateProfile>
     {
         List<TblTempCorporateProfile> GetCorporateProfilePendingApproval(int isTreated, Guid CorporateCustormerId);
-         List<TblTempCorporateProfile> GetCorporateProfilePendingApproval(int isTreated);
+        List<TblTempCorporateProfile> GetCorporateProfilePendingApproval(int isTreated);
+        TblTempCorporateProfile CheckDuplicateUserName(string userName);
         void UpdateTempCorporateProfile(TblTempCorporateProfile update);
         CorporateUserStatus CheckDuplicate(TblTempCorporateProfile profile, Guid CorporateCustomerId, bool isUpdate = false);
     }

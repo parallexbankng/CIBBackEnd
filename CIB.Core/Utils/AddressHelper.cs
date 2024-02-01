@@ -9,10 +9,9 @@ namespace CIB.Core.Utils
     {
         public static string GetMacAddress()
         {
-            var macAddr = ( from nic in NetworkInterface.GetAllNetworkInterfaces()
-                        where nic.OperationalStatus == OperationalStatus.Up
-                        select nic.GetPhysicalAddress().ToString()
-                    ).FirstOrDefault();
+            var macAddr = (from nic in NetworkInterface.GetAllNetworkInterfaces()
+                           where nic.OperationalStatus == OperationalStatus.Up
+                           select nic.GetPhysicalAddress().ToString()).FirstOrDefault();
             return macAddr;
         }
     }

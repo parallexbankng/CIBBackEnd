@@ -1,3 +1,0 @@
-2023-07-25 01:08:32.4072||ERROR|CIB.Core.Services._2FA.Token2faService|2FA API ERROR {"ResponseCode":"19","ResponseMessage":"Value cannot be null. (Parameter 'uriString')"} 
-2023-07-25 01:11:28.4041||ERROR|CIB.BankAdmin.Controllers.AccountController|2FA API ERROR blessing.boms:{"ResponseCode":"44","ResponseMessage":"User blessing.boms was not found and cannot be used for authentication."} 
-2023-07-25 01:14:11.8603||ERROR|CIB.BankAdmin.Controllers.AccountController|2FA API ERROR blessing.boms:{"ResponseCode":"44","ResponseMessage":"User blessing.boms was not found and cannot be used for authentication."} 

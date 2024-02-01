@@ -1,6 +1,7 @@
 /Users/macbook/Projects/parallex-backend/CIB.BankAdmin/bin/Debug/net6.0/nlog.config
 /Users/macbook/Projects/parallex-backend/CIB.BankAdmin/bin/Debug/net6.0/appsettings.Development.json
 /Users/macbook/Projects/parallex-backend/CIB.BankAdmin/bin/Debug/net6.0/appsettings.json
+/Users/macbook/Projects/parallex-backend/CIB.BankAdmin/bin/Debug/net6.0/.DS_Store
 /Users/macbook/Projects/parallex-backend/CIB.BankAdmin/bin/Debug/net6.0/CIB.BankAdmin
 /Users/macbook/Projects/parallex-backend/CIB.BankAdmin/bin/Debug/net6.0/CIB.BankAdmin.deps.json
 /Users/macbook/Projects/parallex-backend/CIB.BankAdmin/bin/Debug/net6.0/CIB.BankAdmin.runtimeconfig.json
@@ -75,6 +76,11 @@
 /Users/macbook/Projects/parallex-backend/CIB.BankAdmin/obj/Debug/net6.0/CIB.BankAdmin.csproj.CoreCompileInputs.cache
 /Users/macbook/Projects/parallex-backend/CIB.BankAdmin/obj/Debug/net6.0/CIB.BankAdmin.MvcApplicationPartsAssemblyInfo.cs
 /Users/macbook/Projects/parallex-backend/CIB.BankAdmin/obj/Debug/net6.0/CIB.BankAdmin.MvcApplicationPartsAssemblyInfo.cache
+/Users/macbook/Projects/parallex-backend/CIB.BankAdmin/obj/Debug/net6.0/staticwebassets/msbuild.CIB.BankAdmin.Microsoft.AspNetCore.StaticWebAssets.props
+/Users/macbook/Projects/parallex-backend/CIB.BankAdmin/obj/Debug/net6.0/staticwebassets/msbuild.build.CIB.BankAdmin.props
+/Users/macbook/Projects/parallex-backend/CIB.BankAdmin/obj/Debug/net6.0/staticwebassets/msbuild.buildMultiTargeting.CIB.BankAdmin.props
+/Users/macbook/Projects/parallex-backend/CIB.BankAdmin/obj/Debug/net6.0/staticwebassets/msbuild.buildTransitive.CIB.BankAdmin.props
+/Users/macbook/Projects/parallex-backend/CIB.BankAdmin/obj/Debug/net6.0/staticwebassets.pack.json
 /Users/macbook/Projects/parallex-backend/CIB.BankAdmin/obj/Debug/net6.0/staticwebassets.build.json
 /Users/macbook/Projects/parallex-backend/CIB.BankAdmin/obj/Debug/net6.0/staticwebassets.development.json
 /Users/macbook/Projects/parallex-backend/CIB.BankAdmin/obj/Debug/net6.0/scopedcss/bundle/CIB.BankAdmin.styles.css
@@ -84,4 +90,9 @@
 /Users/macbook/Projects/parallex-backend/CIB.BankAdmin/obj/Debug/net6.0/CIB.BankAdmin.pdb
 /Users/macbook/Projects/parallex-backend/CIB.BankAdmin/obj/Debug/net6.0/CIB.BankAdmin.genruntimeconfig.cache
 /Users/macbook/Projects/parallex-backend/CIB.BankAdmin/obj/Debug/net6.0/ref/CIB.BankAdmin.dll
-/Users/macbook/Projects/parallex-backend/CIB.BankAdmin/bin/Debug/net6.0/test.json
+/Users/macbook/Projects/parallex-backend/CIB.BankAdmin/bin/Debug/net6.0/deployed/nlog.config
+/Users/macbook/Projects/parallex-backend/CIB.BankAdmin/bin/Debug/net6.0/deployed/web.config
+/Users/macbook/Projects/parallex-backend/CIB.BankAdmin/bin/Debug/net6.0/deployed/appsettings.Development.json
+/Users/macbook/Projects/parallex-backend/CIB.BankAdmin/bin/Debug/net6.0/deployed/appsettings.json
+/Users/macbook/Projects/parallex-backend/CIB.BankAdmin/bin/Debug/net6.0/deployed/CIB.BankAdmin.deps.json
+/Users/macbook/Projects/parallex-backend/CIB.BankAdmin/bin/Debug/net6.0/deployed/CIB.BankAdmin.runtimeconfig.json

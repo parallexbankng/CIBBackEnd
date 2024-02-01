@@ -9,11 +9,12 @@ using Microsoft.EntityFrameworkCore;
 using NLog.Extensions.Logging;
 using NLog.Web;
 
+
 namespace CIB.TransactionReversalService;
 
 public class Program
 {
- [Obsolete]
+  [Obsolete]
   public static void Main(string[] args)
   {
 
@@ -40,11 +41,11 @@ public class Program
       .UseWindowsService()
       .ConfigureServices((hostContext, services) => {
         IConfiguration configuration = hostContext.Configuration;
-        var con = Encryption.DecryptStrings(configuration.GetConnectionString("ParallexCIBCon"));
+        var con = Encryption.DecryptStrings(configuration.GetConnectionString("parallaxCIBCon"));
         services.AddDbContext<ParallexCIBContext>(options => options.UseSqlServer(con));
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddHttpClient("tokenClient",c => {
-          c.BaseAddress = new Uri(configuration.GetValue<string>("prodApiUrl:baseUrl"));
+          c.BaseAddress = new Uri(configuration.GetValue<string>("TestApiUrl:baseUrl"));
           c.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         });
         services.AddSingleton<ITransactionReversal, TransactionReversal>();

@@ -34,7 +34,7 @@ namespace CIB.TransactionReversalService.Entities
         public decimal? Fee { get; set; }
         public decimal? Vat { get; set; }
         public string? SessionId { get; set; }
-        public string? TransactionResponseCode { get; set; }
-        public string? TransactionResponseMessage { get; set; }
+        public string TransactionResponseCode { get; set; }
+        public string TransactionResponseMessage { get; set; }
     }
 }

@@ -8,12 +8,13 @@ using CIB.Core.Modules.Authentication.Dto;
 
 namespace CIB.Core.Modules.CorporateUserRoleAccess
 {
-    public interface ICorporateUserRoleAccess:IRepository<TblCorporateRoleUserAccess>
-    {
-      bool AccessesExist(string roleId, string accessName);
-      List<UserAccessModel> GetCorporateUserPermissions(string corporateRoleId);
-      List<TblCorporateRoleUserAccess> GetCorporatePermissions(Guid corporateRoleId);
-      TblCorporateRoleUserAccess GetCorporateRoleUserAccesses(string corporateRoleId, string userAccess);
-      bool IsCorporateAdmin(string roleId);
-    }
+  public interface ICorporateUserRoleAccess : IRepository<TblCorporateRoleUserAccess>
+  {
+    bool AccessesExist(string roleId, string accessName);
+    List<UserAccessModel> GetCorporateUserPermissions(string corporateRoleId);
+    List<TblCorporateRoleUserAccess> GetCorporatePermissions(Guid corporateRoleId);
+    TblCorporateRoleUserAccess GetCorporateRoleUserAccesses(string corporateRoleId, string userAccess);
+    bool IsCorporateAdmin(string roleId);
+    List<TblUserAccess> GetPermissions();
+  }
 }

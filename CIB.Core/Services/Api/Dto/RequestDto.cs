@@ -92,10 +92,7 @@ namespace CIB.Core.Services.Api.Dto
         public string Password { get; set; }
         public string Otp { get; set; }
     }
-
-    
-
-    public class ADData : BaseUpdateDto
+    public class ADLoginDto : BaseUpdateDto
     {
         public string Data { get; set; }
     }

@@ -19,14 +19,19 @@ namespace CIB.Core.Modules.UserAccess.Dto
         public string IsCorporate { get; set; }
     }
 
-    public class SetPermissionCreateRequestDto : BaseUpdateDto
+    public class SetPermissionCreateRequestDto: BaseUpdateDto
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
         public bool IsCorporate { get; set; }
     }
 
-    public class UpdateRequestDto : CreateRequestDto { }
+    public class UpdateRequestDto: CreateRequestDto{}
+
+    // public class SetPermissionRequestDto: BaseUpdateDto
+    // {
+    //     public List<>
+    // }
 
     public class AddRoleAccessRequestDto : BaseUpdateDto
     {

@@ -6,49 +6,53 @@ using CIB.Core.Modules.Authentication.Dto;
 
 namespace CIB.Core.Modules.Authentication
 {
-  public class BankAuthenticationRepository : Repository<TblBankProfile>, IBankAuthenticationRepository
-  {
+	public class BankAuthenticationRepository : Repository<TblBankProfile>, IBankAuthenticationRepository
+	{
 
-    public BankAuthenticationRepository(ParallexCIBContext context) : base(context)
-    {
+		public BankAuthenticationRepository(ParallexCIBContext context) : base(context)
+		{
 
-    }
-    public ParallexCIBContext context
-    {
-        get { return _context as ParallexCIBContext; }
-    }
+		}
+		public ParallexCIBContext context
+		{
+			get { return _context as ParallexCIBContext; }
+		}
 
-    public TblBankProfile BankUserLogin(BankUserLoginParam model)
-    {
-      return _context.TblBankProfiles.Where(a => a.Username == model.Username).FirstOrDefault();
-    }
+		public TblBankProfile BankUserLogin(BankUserLoginParam model)
+		{
+			return _context.TblBankProfiles.Where(a => a.Username == model.Username).FirstOrDefault();
+		}
 
-    public LoginResponsedata BankUserLoginWithActiveDirectory(BankUserLoginParam login)
-    {
-      throw new NotImplementedException();
-    }
+		public LoginResponsedata BankUserLoginWithActiveDirectory(BankUserLoginParam login)
+		{
+			throw new NotImplementedException();
+		}
 
-  }
+	}
 
- public class CustomerAuthenticationRepository : Repository<TblCorporateProfile>, ICustomerAuthenticationRepository
-  {
-    public CustomerAuthenticationRepository(ParallexCIBContext context) : base(context)
-    {
-    }
-    public ParallexCIBContext context
-    {
-      get { return _context as ParallexCIBContext; }
-    }
+	public class CustomerAuthenticationRepository : Repository<TblCorporateProfile>, ICustomerAuthenticationRepository
+	{
+		public CustomerAuthenticationRepository(ParallexCIBContext context) : base(context)
+		{
+		}
+		public ParallexCIBContext context
+		{
+			get { return _context as ParallexCIBContext; }
+		}
 
-    public TblCorporateCustomer VerifyCorporateProfileByCustomerId(string id)
-    {
-      return  _context.TblCorporateCustomers.Where(a => a.CustomerId == id).FirstOrDefault();
-    }
+		public TblCorporateCustomer VerifyCorporateProfileByCustomerId(string id)
+		{
+			return _context.TblCorporateCustomers.Where(a => a.CustomerId.Trim() == id.Trim()).FirstOrDefault();
+		}
+		public TblCorporateCustomer VerifyCorporateCustomerById(Guid corporateCustomerId)
+		{
+			return _context.TblCorporateCustomers.Where(a => a.Id == corporateCustomerId).FirstOrDefault();
+		}
 
-    public TblCorporateProfile VerifyCorporateProfileUserName(CustomerLoginParam login, Guid CorporateCustomerId)
-    {
-      return  _context.TblCorporateProfiles.Where(a => a.Username.ToLower().Trim() == login.Username.ToLower().Trim() && a.CorporateCustomerId == CorporateCustomerId).FirstOrDefault();
-    }
-    
-  }
+		public TblCorporateProfile VerifyCorporateProfileUserName(CustomerLoginParam login, Guid CorporateCustomerId)
+		{
+			return _context.TblCorporateProfiles.Where(a => a.Username.ToLower().Trim() == login.Username.ToLower().Trim() && a.CorporateCustomerId == CorporateCustomerId).FirstOrDefault();
+		}
+
+	}
 }

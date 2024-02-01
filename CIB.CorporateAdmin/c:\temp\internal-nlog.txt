@@ -1,0 +1,15 @@
+2024-01-25 17:26:13.0892 Info Message Template Auto Format enabled
+2024-01-25 17:26:13.1040 Info Loading assembly: NLog.Web.AspNetCore
+2024-01-25 17:26:13.1401 Info Adding target FileTarget(Name=allfile)
+2024-01-25 17:26:13.1485 Warn Error has been raised. Exception: NLog.NLogConfigurationException: Target 'ownFile-web' not found for logging rule: *.
+2024-01-25 17:26:13.2491 Info Validating config: TargetNames=allfile, ConfigItems=26, FilePath=/Users/macbook/Projects/parallex-backend/CIB.CorporateAdmin/bin/Debug/net6.0/nlog.config
+2024-01-25 17:26:24.5477 Info Message Template Auto Format enabled
+2024-01-25 17:26:24.5633 Info Loading assembly: NLog.Web.AspNetCore
+2024-01-25 17:26:24.5903 Info Adding target FileTarget(Name=allfile)
+2024-01-25 17:26:24.5979 Warn Error has been raised. Exception: NLog.NLogConfigurationException: Target 'ownFile-web' not found for logging rule: *.
+2024-01-25 17:26:24.6815 Info Validating config: TargetNames=allfile, ConfigItems=26, FilePath=/Users/macbook/Projects/parallex-backend/CIB.CorporateAdmin/bin/Debug/net6.0/nlog.config
+2024-01-31 10:22:16.0140 Info Message Template Auto Format enabled
+2024-01-31 10:22:16.0303 Info Loading assembly: NLog.Web.AspNetCore
+2024-01-31 10:22:16.0780 Info Adding target FileTarget(Name=allfile)
+2024-01-31 10:22:16.0863 Warn Error has been raised. Exception: NLog.NLogConfigurationException: Target 'ownFile-web' not found for logging rule: *.
+2024-01-31 10:22:16.1562 Info Validating config: TargetNames=allfile, ConfigItems=26, FilePath=/Users/macbook/Projects/parallex-backend/CIB.CorporateAdmin/bin/Debug/net6.0/nlog.config

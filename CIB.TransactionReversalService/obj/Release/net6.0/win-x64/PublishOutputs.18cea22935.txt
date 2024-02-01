@@ -353,7 +353,7 @@
 /Users/macbook/Projects/parallex-backend/CIB.TransactionReversalService/bin/Release/net6.0/win-x64/publish/hostfxr.dll
 /Users/macbook/Projects/parallex-backend/CIB.TransactionReversalService/bin/Release/net6.0/win-x64/publish/hostpolicy.dll
 /Users/macbook/Projects/parallex-backend/CIB.TransactionReversalService/bin/Release/net6.0/win-x64/publish/mscordaccore.dll
-/Users/macbook/Projects/parallex-backend/CIB.TransactionReversalService/bin/Release/net6.0/win-x64/publish/mscordaccore_amd64_amd64_6.0.2023.32017.dll
+/Users/macbook/Projects/parallex-backend/CIB.TransactionReversalService/bin/Release/net6.0/win-x64/publish/mscordaccore_amd64_amd64_6.0.2123.36311.dll
 /Users/macbook/Projects/parallex-backend/CIB.TransactionReversalService/bin/Release/net6.0/win-x64/publish/mscordbi.dll
 /Users/macbook/Projects/parallex-backend/CIB.TransactionReversalService/bin/Release/net6.0/win-x64/publish/mscorrc.dll
 /Users/macbook/Projects/parallex-backend/CIB.TransactionReversalService/bin/Release/net6.0/win-x64/publish/msquic.dll

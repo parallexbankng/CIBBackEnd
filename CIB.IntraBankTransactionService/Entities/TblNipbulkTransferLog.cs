@@ -47,5 +47,7 @@ namespace CIB.IntraBankTransactionService.Entities
         public string IntreBankSuspenseAccountName { get; set; }
         public int? InterBankTryCount { get; set; }
         public int? InterBankTotalCredits { get; set; }
+        public string? SessionId { get; set; }
+        public string ServerIp { get; set; }
     }
 }

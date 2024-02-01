@@ -9,24 +9,22 @@ namespace CIB.TransactionReversalService.Modules.BulkCreditLog;
       public BulkCreditLogRepository(ParallexCIBContext context) : base(context)
       {
       }
-      public ParallexCIBContext Context { get { return _context as ParallexCIBContext; }}
-
-      // public List<TblNipbulkCreditLog> GetFailedTransaction(int status, int retryCount, int totalPerProcess, DateTime processDate)
-      // {
-      //   return base.Context.TblNipbulkCreditLogs.Where(ctx => 
-      //   ctx.TranLogId ==
-      //   ctx.CreditDate != null && 
-      //   ctx.CreditStatus == status && 
-      //   ctx.NameEnquiryStatus == 1 && 
-      //   ctx.TryCount == retryCount && 
-      //   ctx.CreditDate.Value.Date == processDate
-      //   ).Take(totalPerProcess).ToList();
-      // }
+      public new ParallexCIBContext Context { get { return base.Context as ParallexCIBContext; }}
+      public List<TblNipbulkCreditLog> GetFailedTransaction(int status, int retryCount, int totalPerProcess, DateTime processDate)
+      {
+        return base.Context.TblNipbulkCreditLogs.Where(ctx => 
+        ctx.CreditDate != null && 
+        ctx.CreditStatus == status && 
+        ctx.NameEnquiryStatus == 1 && 
+        ctx.TryCount == retryCount && 
+        ctx.CreditDate.Value.Date == processDate
+        ).OrderBy(a => a.TryCount).Take(totalPerProcess).ToList();
+      }
 
   public List<TblNipbulkCreditLog> GetFailedTransaction(Guid tranId, int status, int retryCount, int totalPerProcess, DateTime processDate)
   {
-    return _context.TblNipbulkCreditLogs.Where(ctx => 
-       ctx.TranLogId == tranId &&
+    return base.Context.TblNipbulkCreditLogs.Where(ctx => 
+    ctx.TranLogId == tranId &&
         ctx.CreditDate != null && 
         ctx.CreditStatus == status && 
         ctx.NameEnquiryStatus == 1 && 
@@ -36,6 +34,6 @@ namespace CIB.TransactionReversalService.Modules.BulkCreditLog;
 
   public void UpdateCreditStatus(TblNipbulkCreditLog status)
       {
-          _context.Update(status).Property(x=>x.Sn).IsModified = false;
+          base.Context.Update(status).Property(x=>x.Sn).IsModified = false;
       }
 }

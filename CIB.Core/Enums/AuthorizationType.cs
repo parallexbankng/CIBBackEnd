@@ -6,11 +6,17 @@ namespace CIB.Core.Enums
         /// Single Signatory
         /// </summary>
         Single_Signatory,
-
         /// <summary>
         /// Multiple Signatory
         /// </summary>
         Multiple_Signatory
+    }
+    public enum SpecialFeature
+    {
+        /// <summary>
+        /// OnLending
+        /// </summary>
+        OnLending
     }
     public enum AuthorizationStatus
     {

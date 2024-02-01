@@ -9,6 +9,7 @@ using CIB.Core.Common.Response;
 using CIB.Core.Entities;
 using CIB.Core.Enums;
 using CIB.Core.Modules.WorkflowHierarchy.Dto;
+using CIB.Core.Services.Authentication;
 using CIB.Core.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -16,444 +17,409 @@ using Microsoft.Extensions.Logging;
 
 namespace CIB.CorporateAdmin.Controllers
 {
-    [ApiController]
-    [Route("api/CorporateAdmin/v1/[controller]")]
-    public class WorkflowHierarchyController : BaseAPIController
-    {
-        private readonly ILogger<WorkflowHierarchyController> _logger;
-        public WorkflowHierarchyController(ILogger<WorkflowHierarchyController> logger,IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor accessor) : base( unitOfWork,mapper, accessor)
-        {
-            _logger = logger;
-        }
+	[ApiController]
+	[Route("api/CorporateAdmin/v1/[controller]")]
+	public class WorkflowHierarchyController : BaseAPIController
+	{
+		private readonly ILogger<WorkflowHierarchyController> _logger;
+		public WorkflowHierarchyController(ILogger<WorkflowHierarchyController> logger, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor accessor, IAuthenticationService authService) : base(unitOfWork, mapper, accessor, authService)
+		{
+			_logger = logger;
+		}
 
-        [HttpGet("GetWorkflowHierarchy{id}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public ActionResult<ResponseDTO<WorkflowHierarchyResponseDto>> GetWorkflowHierarchy(string id)
-        {
-            if (!IsAuthenticated)
-            {
-                return StatusCode(401, "User is not authenticated");
-            }
+		[HttpGet("GetWorkflowHierarchy{id}")]
+		[ProducesResponseType(StatusCodes.Status200OK)]
+		[ProducesResponseType(StatusCodes.Status204NoContent)]
+		public ActionResult<ResponseDTO<WorkflowHierarchyResponseDto>> GetWorkflowHierarchy(string id)
+		{
+			if (!IsAuthenticated)
+			{
+				return StatusCode(401, "User is not authenticated");
+			}
 
-            if (!IsUserActive(out string errormsg))
-            {
-                return StatusCode(400, errormsg);
-            }
+			if (!IsUserActive(out string errormsg))
+			{
+				return StatusCode(400, errormsg);
+			}
 
-            if (string.IsNullOrEmpty(UserRoleId) || !UnitOfWork.CorporateUserRoleAccessRepo.AccessesExist(UserRoleId, Permission.ViewWorkflow))
-            {
-               return BadRequest("UnAuthorized Access");
-            }
-            var workflowId = Encryption.DecryptGuid(id);
-            var WorkflowHierarchy = UnitOfWork.WorkFlowHierarchyRepo.GetByIdAsync(workflowId);
-            if (WorkflowHierarchy == null)
-            {
-                return BadRequest("Invalid id. Workflow hierarchy not found");
-            }
-            return Ok(new ResponseDTO<WorkflowHierarchyResponseDto>(_data:Mapper.Map<WorkflowHierarchyResponseDto>(WorkflowHierarchy),success:true, _message:Message.Success) );
-        }
+			if (string.IsNullOrEmpty(UserRoleId) || !UnitOfWork.CorporateUserRoleAccessRepo.AccessesExist(UserRoleId, Permission.ViewWorkflow))
+			{
+				return BadRequest("UnAuthorized Access");
+			}
+			var workflowId = Encryption.DecryptGuid(id);
+			var WorkflowHierarchy = UnitOfWork.WorkFlowHierarchyRepo.GetByIdAsync(workflowId);
+			if (WorkflowHierarchy == null)
+			{
+				return BadRequest("Invalid id. Workflow hierarchy not found");
+			}
+			return Ok(new ResponseDTO<WorkflowHierarchyResponseDto>(_data: Mapper.Map<WorkflowHierarchyResponseDto>(WorkflowHierarchy), success: true, _message: Message.Success));
+		}
 
-        [HttpGet("GetWorkflowHierarchies")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public ActionResult<ResponseDTO<List<WorkflowHierarchyResponseDto>>> GetWorkflowHierarchiesByWorkflowID(string workflowId)
-        {
-            if (!IsAuthenticated)
-            {
-                return StatusCode(401, "User is not authenticated");
-            }
-            if (!IsUserActive(out string errormsg))
-            {
-                return StatusCode(400, errormsg);
-            }
+		[HttpGet("GetWorkflowHierarchies")]
+		[ProducesResponseType(StatusCodes.Status200OK)]
+		[ProducesResponseType(StatusCodes.Status204NoContent)]
+		public ActionResult<ResponseDTO<List<WorkflowHierarchyResponseDto>>> GetWorkflowHierarchiesByWorkflowID(string workflowId)
+		{
+			if (!IsAuthenticated)
+			{
+				return StatusCode(401, "User is not authenticated");
+			}
+			if (!IsUserActive(out string errormsg))
+			{
+				return StatusCode(400, errormsg);
+			}
 
-            if (string.IsNullOrEmpty(UserRoleId) || !UnitOfWork.CorporateUserRoleAccessRepo.AccessesExist(UserRoleId, Permission.ViewWorkflow))
-            {
-               return BadRequest("UnAuthorized Access");
-            }
-            var id = Encryption.DecryptStrings(workflowId);
-            var WorkflowHierarchy = UnitOfWork.WorkFlowHierarchyRepo.GetWorkflowHierarchiesByWorkflowId(Guid.Parse(id));
-          
-            return Ok(new ListResponseDTO<WorkflowHierarchyResponseDto>(_data:Mapper.Map<List<WorkflowHierarchyResponseDto>>(WorkflowHierarchy),success:true, _message:Message.Success) );
-        }
+			if (string.IsNullOrEmpty(UserRoleId) || !UnitOfWork.CorporateUserRoleAccessRepo.AccessesExist(UserRoleId, Permission.ViewWorkflow))
+			{
+				return BadRequest("UnAuthorized Access");
+			}
+			var id = Encryption.DecryptStrings(workflowId);
+			var WorkflowHierarchy = UnitOfWork.WorkFlowHierarchyRepo.GetWorkflowHierarchiesByWorkflowId(Guid.Parse(id));
 
-        [HttpPost("CreateWorkflowHierarchies")]
-        [ProducesResponseType(StatusCodes.Status201Created)]
-        public ActionResult<ResponseDTO<WorkflowHierarchyResponseDto>> CreateWorkflowHierarchies(List<CreateWorkflowHierarchy> model)
-        {
-            try
-            {
-                if (!IsAuthenticated)
-                {
-                    return StatusCode(401, "User is not authenticated");
-                }
+			return Ok(new ListResponseDTO<WorkflowHierarchyResponseDto>(_data: Mapper.Map<List<WorkflowHierarchyResponseDto>>(WorkflowHierarchy), success: true, _message: Message.Success));
+		}
 
-                string errormsg = string.Empty;
+		[HttpPost("CreateWorkflowHierarchies")]
+		[ProducesResponseType(StatusCodes.Status201Created)]
+		public ActionResult<ResponseDTO<WorkflowHierarchyResponseDto>> CreateWorkflowHierarchies(List<CreateWorkflowHierarchy> model)
+		{
+			try
+			{
+				if (!IsAuthenticated)
+				{
+					return StatusCode(401, "User is not authenticated");
+				}
 
-                if (!IsUserActive(out errormsg))
-                {
-                    return StatusCode(400, errormsg);
-                }
+				string errormsg = string.Empty;
 
-                if (string.IsNullOrEmpty(UserRoleId) || !UnitOfWork.CorporateUserRoleAccessRepo.AccessesExist(UserRoleId, Permission.ViewWorkflow))
-                {
-                 return BadRequest("UnAuthorized Access");
-                }
+				if (!IsUserActive(out errormsg))
+				{
+					return StatusCode(400, errormsg);
+				}
 
-                var data = model.FirstOrDefault();
-                var payload = new SimpleActionDto
-                {
-                    IPAddress = Encryption.DecryptStrings(data.IPAddress),
-                    ClientStaffIPAddress = Encryption.DecryptStrings(data.ClientStaffIPAddress),
-                    HostName = Encryption.DecryptStrings(data.HostName),
-                    MACAddress = Encryption.DecryptStrings(data.MACAddress)
-                };
-                var workflowId = Encryption.DecryptGuid(model.FirstOrDefault().WorkflowId);
-                var tblWorkflow = UnitOfWork.TempWorkflowRepo.GetByIdAsync(workflowId);
+				if (string.IsNullOrEmpty(UserRoleId) || !UnitOfWork.CorporateUserRoleAccessRepo.AccessesExist(UserRoleId, Permission.ViewWorkflow))
+				{
+					return BadRequest("UnAuthorized Access");
+				}
 
-                if(tblWorkflow == null)
-                {
-                    return BadRequest("Invalid workflow id. Workflow info not found");
-                }
+				var data = model.FirstOrDefault();
+				var payload = new SimpleActionDto
+				{
+					IPAddress = Encryption.DecryptStrings(data.IPAddress),
+					ClientStaffIPAddress = Encryption.DecryptStrings(data.ClientStaffIPAddress),
+					HostName = Encryption.DecryptStrings(data.HostName),
+					MACAddress = Encryption.DecryptStrings(data.MACAddress)
+				};
+				var workflowId = Encryption.DecryptGuid(model.FirstOrDefault().WorkflowId);
+				var tblWorkflow = UnitOfWork.TempWorkflowRepo.GetByIdAsync(workflowId);
 
-                if(tblWorkflow.NoOfAuthorizers != model.Count)
-                {
-                    return BadRequest("Number of authorizers specified in workflow must match the number of authorizers added");
-                }
+				if (tblWorkflow == null)
+				{
+					return BadRequest("Invalid workflow id. Workflow info not found");
+				}
 
-                if (tblWorkflow.Status == (int)ProfileStatus.Pending)
-                {
-                    return BadRequest("A pending approval has been detected. Update is not permitted until approval is completed");
-                }
+				if (tblWorkflow.NoOfAuthorizers != model.Count)
+				{
+					return BadRequest("Number of authorizers specified in workflow must match the number of authorizers added");
+				}
 
-                var tblCorporateCustomer = UnitOfWork.CorporateCustomerRepo.GetByIdAsync((Guid)tblWorkflow.CorporateCustomerId);
-                if (tblCorporateCustomer == null)
-                {
-                    return BadRequest("Corporate customer was not found");
-                }
+				if (tblWorkflow.Status == (int)ProfileStatus.Pending)
+				{
+					return BadRequest("A pending approval has been detected. Update is not permitted until approval is completed");
+				}
 
-                var tblWorkflowHierarchies = new List<TblTempWorkflowHierarchy>();
-                foreach (var item in model)
-                {
-                    var approvalId = Encryption.DecryptGuid(item.ApproverId);
-                    var approvalName = Encryption.DecryptStrings(item.ApproverName);
+				var tblCorporateCustomer = UnitOfWork.CorporateCustomerRepo.GetByIdAsync((Guid)tblWorkflow?.CorporateCustomerId);
+				if (tblCorporateCustomer == null)
+				{
+					return BadRequest("Corporate customer was not found");
+				}
 
-                    var corporateProfile = UnitOfWork.CorporateProfileRepo.GetByIdAsync(approvalId);
-                    if(corporateProfile == null)
-                    {
-                       return BadRequest($"Approver {approvalName} was not found");
-                    }
+				var tblWorkflowHierarchies = new List<TblTempWorkflowHierarchy>();
+				foreach (var item in model)
+				{
+					var approvalId = Encryption.DecryptGuid(item.ApproverId);
+					var approvalName = Encryption.DecryptStrings(item.ApproverName);
 
-                    var corporateRole = UnitOfWork.CorporateRoleRepo.GetByIdAsync((Guid)corporateProfile.CorporateRole);
-                    if(corporateRole == null)
-                    {
-                       return BadRequest($"Approver {corporateRole.RoleName} was not found");
-                    }
+					var corporateProfile = UnitOfWork.CorporateProfileRepo.GetByIdAsync(approvalId);
+					if (corporateProfile == null)
+					{
+						return BadRequest($"Approver {approvalName} was not found");
+					}
 
-                    if(corporateRole.RoleName != nameof(UserRole.Corporate_Authorizer).Replace("_", " ") )
-                    {
-                       return BadRequest($"Only Corporate Authorizer can be added to workflow");
-                    }
-                    
-                    var newWorkFlow = new TblTempWorkflowHierarchy
-                    {
-                        Id = Guid.NewGuid(),
-                        WorkflowId = workflowId,
-                        AuthorizationLevel = Encryption.DecryptInt(item.AuthorizationLevel),
-                        ApproverId = approvalId,
-                        ApproverName = approvalName,
-                        RoleId = corporateRole.Id,
-                        RoleName = corporateRole.RoleName
-                    };
+					var corporateRole = UnitOfWork.CorporateRoleRepo.GetByIdAsync((Guid)corporateProfile?.CorporateRole);
+					if (corporateRole == null)
+					{
+						return BadRequest($"Approver {corporateRole?.RoleName} was not found");
+					}
 
-                    if (!ValidateWorkflowDropDowns(corporateProfile,tblWorkflow,out errormsg))
-                    {
-                        return BadRequest(errormsg);
-                    }
-                    
-                    if(tblWorkflowHierarchies.Any(ctx => ctx.ApproverId.ToString() == item.ApproverId))
-                    {
-                        return BadRequest($"Approver {corporateProfile.FullName} has been added multiple times. Please reactify");
-                    }
-                    tblWorkflowHierarchies.Add(newWorkFlow);
-                }
-                
-                string newRecords = string.Empty;
-                string oldRecords = string.Empty;
-                var deleteWorkflowHierarchiesList = UnitOfWork.TempWorkflowHierarchyRepo.GetTempWorkflowHierarchyByWorkflowId(tblWorkflow.Id).ToList();
+					if (corporateRole.RoleName != nameof(UserRole.Corporate_Authorizer).Replace("_", " "))
+					{
+						return BadRequest($"Only Corporate Authorizer can be added to workflow");
+					}
 
-                if(deleteWorkflowHierarchiesList?.Count != 0 && deleteWorkflowHierarchiesList != null)
-                {
-                    foreach (var item in deleteWorkflowHierarchiesList)
-                    {
-                        oldRecords += $"Approver: {item.ApproverName}, Level: {item.AuthorizationLevel} \n";
-                    }
-                    UnitOfWork.TempWorkflowHierarchyRepo.RemoveRange(deleteWorkflowHierarchiesList);
-                }
+					var newWorkFlow = new TblTempWorkflowHierarchy
+					{
+						Id = Guid.NewGuid(),
+						WorkflowId = workflowId,
+						AuthorizationLevel = Encryption.DecryptInt(item.AuthorizationLevel),
+						ApproverId = approvalId,
+						ApproverName = corporateProfile.FullName,
+						RoleId = corporateRole.Id,
+						RoleName = corporateRole.RoleName
+					};
 
-                foreach(var item in tblWorkflowHierarchies)
-                {
-                    newRecords += $"Approver: {item.ApproverName}, Level: {item.AuthorizationLevel} \n";
-                }
+					if (!ValidateWorkflowDropDowns(corporateProfile, tblWorkflow, out errormsg))
+					{
+						return BadRequest(errormsg);
+					}
 
-                var auditTrail = new TblAuditTrail
-                {
-                    Id = Guid.NewGuid(),
-                    ActionCarriedOut = nameof(AuditTrailAction.Create).Replace("_", " "),
-                    Ipaddress = payload.IPAddress,
-                    Macaddress = payload.MACAddress,
-                    HostName = payload.HostName,
-                    NewFieldValue =   $"Company Name: {tblCorporateCustomer.CompanyName}, Customer ID: {tblCorporateCustomer.CustomerId}, Workflow Name: {tblWorkflow.Name}, Approvers: {newRecords}, Status: {ProfileStatus.Modified.ToString()}",
-                    PreviousFieldValue =$"Company Name: {tblCorporateCustomer.CompanyName}, Customer ID: {tblCorporateCustomer.CustomerId},Workflow Name: {tblWorkflow.Name}, Approvers: {oldRecords}, Status: {ProfileStatus.Modified.ToString()}",
-                    TransactionId = "",
-                    UserId = CorporateProfile.Id,
-                    Username = UserName,
-                    Description = "Create/Update Workflow Hierarch by Bank Admin User Access",
-                    TimeStamp = DateTime.Now
-                };
-    
-                tblWorkflow.Status = (int)ProfileStatus.Modified;
-                UnitOfWork.TempWorkflowRepo.UpdateTempWorkflow(tblWorkflow);
-                UnitOfWork.TempWorkflowHierarchyRepo.AddRange(tblWorkflowHierarchies);
-                UnitOfWork.Complete();
-                return CreatedAtRoute("", tblWorkflowHierarchies);
-            }
-            catch (Exception ex)
-            {
-               _logger.LogError("SERVER ERROR {0}, {1}, {2}",Formater.JsonType(ex.StackTrace), Formater.JsonType(ex.Source), Formater.JsonType(ex.Message));
-                return ex.InnerException != null ? BadRequest(new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: ex.InnerException.Message, responseStatus:false)) : StatusCode(500, new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: ex.InnerException != null ? ex.InnerException.Message : ex.Message, responseStatus:false));
-            }
-        }
-   
-        [HttpPost("ModifyWorkflowHierarchies")]
-        [ProducesResponseType(StatusCodes.Status201Created)]
-        public ActionResult<ResponseDTO<WorkflowHierarchyResponseDto>> UpdateWorkflowHierarchies(List<CreateWorkflowHierarchy> model)
-        {
-            try
-            {
-                if (!IsAuthenticated)
-                {
-                    return StatusCode(401, "User is not authenticated");
-                }
+					if (tblWorkflowHierarchies.Any(ctx => ctx.ApproverId.ToString() == item.ApproverId))
+					{
+						return BadRequest($"Approver {corporateProfile.FullName} has been added multiple times. Please reactify");
+					}
+					tblWorkflowHierarchies.Add(newWorkFlow);
+				}
 
-                string errormsg = string.Empty;
+				string newRecords = string.Empty;
+				string oldRecords = string.Empty;
+				var deleteWorkflowHierarchiesList = UnitOfWork.TempWorkflowHierarchyRepo.GetTempWorkflowHierarchyByWorkflowId(tblWorkflow.Id).ToList();
 
-                if (!IsUserActive(out errormsg))
-                {
-                    return StatusCode(400, errormsg);
-                }
+				if (deleteWorkflowHierarchiesList?.Count != 0 && deleteWorkflowHierarchiesList != null)
+				{
+					foreach (var item in deleteWorkflowHierarchiesList)
+					{
+						oldRecords += $"Approver: {item.ApproverName}, Level: {item.AuthorizationLevel} \n";
+					}
+					UnitOfWork.TempWorkflowHierarchyRepo.RemoveRange(deleteWorkflowHierarchiesList);
+				}
 
-                if (string.IsNullOrEmpty(UserRoleId) || !UnitOfWork.CorporateUserRoleAccessRepo.AccessesExist(UserRoleId, Permission.ViewWorkflow))
-                {
-                 return BadRequest("UnAuthorized Access");
-                }
-                //validate workflow id
-                var data = model.FirstOrDefault();
-                var payload = new SimpleActionDto
-                {
-                    IPAddress = Encryption.DecryptStrings(data.IPAddress),
-                    ClientStaffIPAddress = Encryption.DecryptStrings(data.ClientStaffIPAddress),
-                    HostName = Encryption.DecryptStrings(data.HostName),
-                    MACAddress = Encryption.DecryptStrings(data.MACAddress)
-                };
-                var workflowId = Encryption.DecryptGuid(model.FirstOrDefault().WorkflowId);
-                var tblWorkflow = UnitOfWork.WorkFlowRepo.GetByIdAsync(workflowId);
+				foreach (var item in tblWorkflowHierarchies)
+				{
+					newRecords += $"Approver: {item.ApproverName}, Level: {item.AuthorizationLevel} \n";
+				}
 
-                if(tblWorkflow == null)
-                {
-                    return BadRequest("Invalid workflow id. Workflow info not found");
-                }
+				var auditTrail = new TblAuditTrail
+				{
+					Id = Guid.NewGuid(),
+					ActionCarriedOut = nameof(AuditTrailAction.Create).Replace("_", " "),
+					Ipaddress = payload.IPAddress,
+					Macaddress = payload.MACAddress,
+					HostName = payload.HostName,
+					NewFieldValue = $"Company Name: {tblCorporateCustomer.CompanyName}, Customer ID: {tblCorporateCustomer.CustomerId}, Workflow Name: {tblWorkflow.Name}, Approvers: {newRecords}, Status: {ProfileStatus.Modified.ToString()}",
+					PreviousFieldValue = $"Company Name: {tblCorporateCustomer.CompanyName}, Customer ID: {tblCorporateCustomer.CustomerId},Workflow Name: {tblWorkflow.Name}, Approvers: {oldRecords}, Status: {ProfileStatus.Modified.ToString()}",
+					TransactionId = "",
+					UserId = CorporateProfile?.Id,
+					Username = UserName,
+					Description = "Create/Update Workflow Hierarch by Bank Admin User Access",
+					TimeStamp = DateTime.Now
+				};
 
-                if (tblWorkflow.Status == (int)ProfileStatus.Pending || tblWorkflow.Status == (int)ProfileStatus.Modified)
-                {
-                    return BadRequest("There is either a pending modification or approval for this workflow");
-                }
+				tblWorkflow.Status = (int)ProfileStatus.Modified;
+				UnitOfWork.TempWorkflowRepo.UpdateTempWorkflow(tblWorkflow);
+				UnitOfWork.TempWorkflowHierarchyRepo.AddRange(tblWorkflowHierarchies);
+				UnitOfWork.Complete();
+				return CreatedAtRoute("", tblWorkflowHierarchies);
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError("SERVER ERROR {0}, {1}, {2}", Formater.JsonType(ex.StackTrace), Formater.JsonType(ex.Source), Formater.JsonType(ex.Message));
+				return ex.InnerException != null ? BadRequest(new ErrorResponse(responsecode: ResponseCode.SERVER_ERROR, responseDescription: ex.InnerException.Message, responseStatus: false)) : StatusCode(500, new ErrorResponse(responsecode: ResponseCode.SERVER_ERROR, responseDescription: ex.InnerException != null ? ex.InnerException.Message : ex.Message, responseStatus: false));
+			}
+		}
 
-                if(tblWorkflow.NoOfAuthorizers != model.Count)
-                {
-                    return BadRequest("Number of authorizers specified in workflow must match the number of authorizers added");
-                }
-                
-                var tblCorporateCustomer = UnitOfWork.CorporateCustomerRepo.GetByIdAsync((Guid)tblWorkflow.CorporateCustomerId);
-                if (tblCorporateCustomer == null)
-                {
-                    return BadRequest("Corporate customer was not found");
-                }
-                var mapTempWorkFlow = Mapper.Map<TblTempWorkflow>(tblWorkflow);
-                mapTempWorkFlow.Id = Guid.NewGuid();
+		[HttpPost("ModifyWorkflowHierarchies")]
+		[ProducesResponseType(StatusCodes.Status201Created)]
+		public ActionResult<ResponseDTO<WorkflowHierarchyResponseDto>> UpdateWorkflowHierarchies(List<CreateWorkflowHierarchy> model)
+		{
+			try
+			{
+				if (!IsAuthenticated)
+				{
+					return StatusCode(401, "User is not authenticated");
+				}
 
-                var tblWorkflowHierarchies = new List<TblTempWorkflowHierarchy>();
-                foreach (var item in model)
-                {
-                    var approvalId = Encryption.DecryptGuid(item.ApproverId);
-                    var approvalName = Encryption.DecryptStrings(item.ApproverName);
+				string errormsg = string.Empty;
 
-                    var corporateProfile = UnitOfWork.CorporateProfileRepo.GetByIdAsync(approvalId);
-                    if(corporateProfile == null)
-                    {
-                       return BadRequest($"Approver {approvalName} was not found");
-                    }
+				if (!IsUserActive(out errormsg))
+				{
+					return StatusCode(400, errormsg);
+				}
 
-                    var corporateRole = UnitOfWork.CorporateRoleRepo.GetByIdAsync((Guid)corporateProfile.CorporateRole);
-                    if(corporateRole == null)
-                    {
-                       return BadRequest($"Approver {corporateRole.RoleName} was not found");
-                    }
+				if (string.IsNullOrEmpty(UserRoleId) || !UnitOfWork.CorporateUserRoleAccessRepo.AccessesExist(UserRoleId, Permission.ViewWorkflow))
+				{
+					return BadRequest("UnAuthorized Access");
+				}
+				//validate workflow id
+				var data = model.FirstOrDefault();
+				var payload = new SimpleActionDto
+				{
+					IPAddress = Encryption.DecryptStrings(data.IPAddress),
+					ClientStaffIPAddress = Encryption.DecryptStrings(data.ClientStaffIPAddress),
+					HostName = Encryption.DecryptStrings(data.HostName),
+					MACAddress = Encryption.DecryptStrings(data.MACAddress)
+				};
+				var workflowId = Encryption.DecryptGuid(model?.FirstOrDefault()?.WorkflowId);
+				var tblWorkflow = UnitOfWork.WorkFlowRepo.GetByIdAsync(workflowId);
 
-                    if(corporateRole.RoleName.ToLower().Trim() != nameof(UserRole.Corporate_Authorizer).Replace("_", " ").ToLower().Trim() )
-                    {
-                       return BadRequest($"Only Corporate Authorizer can be added to workflow");
-                    }
-                    
-                    var newWorkFlow = new TblTempWorkflowHierarchy
-                    {
-                        Id = Guid.NewGuid(),
-                        Sn = 0,
-                        WorkflowId = mapTempWorkFlow.Id,
-                        AuthorizationLevel = Encryption.DecryptInt(item.AuthorizationLevel),
-                        ApproverId = approvalId,
-                        ApproverName = approvalName, 
-                        RoleId = corporateRole.Id,
-                        RoleName = corporateRole.RoleName,
-                        CorporateCustomerId = CorporateProfile.CorporateCustomerId,
-                    };
+				if (tblWorkflow == null)
+				{
+					return BadRequest("Invalid workflow id. Workflow info not found");
+				}
 
-                   
-                    if (!ValidateWorkflowDropDowns(corporateProfile,tblWorkflow,out errormsg))
-                    {
-                        return BadRequest(errormsg);
-                    }
-                    tblWorkflowHierarchies.Add(newWorkFlow);
-                }
-                
-                //var toBeDeleted = UnitOfWork.WorkFlowHierarchyRepo.GetByIdAsync(tblWorkflow.Id);
-                // string newRecords = string.Empty;
-                // string oldRecords = string.Empty;
-                // var deleteWorkflowHierarchiesList = UnitOfWork.TempWorkflowHierarchyRepo.GetTempWorkflowHierarchyByWorkflowId(tblWorkflow.Id).ToList();
+				if (tblWorkflow.Status == (int)ProfileStatus.Pending || tblWorkflow.Status == (int)ProfileStatus.Modified)
+				{
+					return BadRequest("There is either a pending modification or approval for this workflow");
+				}
 
-                // if(deleteWorkflowHierarchiesList?.Count != 0 && deleteWorkflowHierarchiesList != null)
-                // {
-                //     foreach (var item in deleteWorkflowHierarchiesList)
-                //     {
-                //         oldRecords += $"Approver: {item.ApproverName}, Level: {item.AuthorizationLevel} \n";
-                //     }
-                //     UnitOfWork.TempWorkflowHierarchyRepo.RemoveRange(deleteWorkflowHierarchiesList);
-                // }
+				if (tblWorkflow.NoOfAuthorizers != model.Count)
+				{
+					return BadRequest("Number of authorizers specified in workflow must match the number of authorizers added");
+				}
 
-                // foreach(var item in tblWorkflowHierarchies)
-                // {
-                //     newRecords += $"Approver: {item.ApproverName}, Level: {item.AuthorizationLevel} \n";
-                // }
+				var tblCorporateCustomer = UnitOfWork.CorporateCustomerRepo.GetByIdAsync((Guid)tblWorkflow?.CorporateCustomerId);
+				if (tblCorporateCustomer == null)
+				{
+					return BadRequest("Corporate customer was not found");
+				}
+				var mapTempWorkFlow = Mapper.Map<TblTempWorkflow>(tblWorkflow);
+				mapTempWorkFlow.Id = Guid.NewGuid();
 
-                // var auditTrail = new TblAuditTrail
-                // {
-                //     Id = Guid.NewGuid(),
-                //     ActionCarriedOut = nameof(AuditTrailAction.Create).Replace("_", " "),
-                //     Ipaddress = payload.IPAddress,
-                //     Macaddress = payload.MACAddress,
-                //     HostName = payload.HostName,
-                //     NewFieldValue =   $"Company Name: {tblCorporateCustomer.CompanyName}, Customer ID: {tblCorporateCustomer.CustomerId}, Workflow Name: {tblWorkflow.Name}, Approvers: {newRecords}, Status: {ProfileStatus.Modified.ToString()}",
-                //     PreviousFieldValue =$"Company Name: {tblCorporateCustomer.CompanyName}, Customer ID: {tblCorporateCustomer.CustomerId},Workflow Name: {tblWorkflow.Name}, Approvers: {oldRecords}, Status: {ProfileStatus.Modified.ToString()}",
-                //     TransactionId = "",
-                //     UserId = BankProfile.Id,
-                //     Username = UserName,
-                //     Description = "Create/Update Workflow Hierarch by Bank Admin User Access",
-                //     TimeStamp = DateTime.Now
-                // };
+				var tblWorkflowHierarchies = new List<TblTempWorkflowHierarchy>();
+				foreach (var item in model)
+				{
+					var approvalId = Encryption.DecryptGuid(item.ApproverId);
+					var approvalName = Encryption.DecryptStrings(item.ApproverName);
 
-                mapTempWorkFlow.Sn = 0;
-                mapTempWorkFlow.Status =(int)ProfileStatus.Modified;
-                mapTempWorkFlow.WorkflowId = tblWorkflow.Id;
-                mapTempWorkFlow.DateRequested = DateTime.Now;
-                mapTempWorkFlow.Action = nameof(TempTableAction.Update).Replace("_", " ");
-                mapTempWorkFlow.InitiatorId = CorporateProfile.Id;
-                mapTempWorkFlow.InitiatorUsername = UserName;
-                
-                tblWorkflow.Status = (int)ProfileStatus.Modified;
-                mapTempWorkFlow.IsTreated = (int)ProfileStatus.Pending;
-                UnitOfWork.WorkFlowRepo.UpdateWorkflow(tblWorkflow);
-                UnitOfWork.TempWorkflowRepo.Add(mapTempWorkFlow);
-                UnitOfWork.TempWorkflowHierarchyRepo.AddRange(tblWorkflowHierarchies);
-                UnitOfWork.Complete();
-                return CreatedAtRoute("", tblWorkflowHierarchies);
-            }
-             catch (Exception ex)
-            {
-                _logger.LogError("SERVER ERROR {0}, {1}, {2}",Formater.JsonType(ex.StackTrace), Formater.JsonType(ex.Source), Formater.JsonType(ex.Message));
-                return ex.InnerException != null ? BadRequest(new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: ex.InnerException.Message, responseStatus:false)) : StatusCode(500, new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: ex.InnerException != null ? ex.InnerException.Message : ex.Message, responseStatus:false));
-            }
-        }
-    
-    
-        [HttpGet("GetTempWorkflowHierarchies")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public ActionResult<ResponseDTO<List<WorkflowHierarchyResponseDto>>> GetTempWorkflowHierarchies(string workflowId)
-        {
-           try
-           {
-                if (!IsAuthenticated)
-                {
-                    return StatusCode(401, "User is not authenticated");
-                }
-                if (!IsUserActive(out string errormsg))
-                {
-                    return StatusCode(400, errormsg);
-                }
+					var corporateProfile = UnitOfWork.CorporateProfileRepo.GetByIdAsync(approvalId);
+					if (corporateProfile == null)
+					{
+						return BadRequest($"Approver {approvalName} was not found");
+					}
 
-                if (string.IsNullOrEmpty(UserRoleId) || !UnitOfWork.CorporateUserRoleAccessRepo.AccessesExist(UserRoleId, Permission.ViewWorkflow))
-                {
-                return BadRequest("UnAuthorized Access");
-                }
-                var id = Encryption.DecryptStrings(workflowId);
-                var WorkflowHierarchy = UnitOfWork.TempWorkflowHierarchyRepo.GetTempWorkflowHierarchyByWorkflowId(Guid.Parse(id));
-                return Ok(new ListResponseDTO<TblTempWorkflowHierarchy>(_data:Mapper.Map<List<TblTempWorkflowHierarchy>>(WorkflowHierarchy),success:true, _message:Message.Success) );
-           }
-            catch (Exception ex)
-            {
-                _logger.LogError("SERVER ERROR {0}, {1}, {2}",Formater.JsonType(ex.StackTrace), Formater.JsonType(ex.Source), Formater.JsonType(ex.Message));
-                return ex.InnerException != null ? BadRequest(new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: ex.InnerException.Message, responseStatus:false)) : StatusCode(500, new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: ex.InnerException != null ? ex.InnerException.Message : ex.Message, responseStatus:false));
-            }
-        }
+					var corporateRole = UnitOfWork.CorporateRoleRepo.GetByIdAsync((Guid)corporateProfile?.CorporateRole);
+					if (corporateRole == null)
+					{
+						return BadRequest($"Approver {corporateRole?.RoleName} was not found");
+					}
 
-        public static bool ValidateWorkflowDropDowns(TblCorporateProfile theCorporateProfile,TblTempWorkflow tblWorkflow, out string errormsg)
-        {
-            errormsg = string.Empty;
-            if (theCorporateProfile.ApprovalLimit < tblWorkflow.ApprovalLimit)
-            {
-                decimal appLimit = (decimal)tblWorkflow.ApprovalLimit;
-                decimal formattedAppLimit = decimal.Round(appLimit, 2, MidpointRounding.AwayFromZero);
+					if (corporateRole.RoleName.ToLower().Trim() != nameof(UserRole.Corporate_Authorizer).Replace("_", " ").ToLower().Trim())
+					{
+						return BadRequest($"Only Corporate Authorizer can be added to workflow");
+					}
 
-                decimal corpAppLimit = (decimal)theCorporateProfile.ApprovalLimit;
-                decimal corpFormattedAppLimit = decimal.Round(corpAppLimit, 2, MidpointRounding.AwayFromZero);
+					var newWorkFlow = new TblTempWorkflowHierarchy
+					{
+						Id = Guid.NewGuid(),
+						Sn = 0,
+						WorkflowId = mapTempWorkFlow.Id,
+						AuthorizationLevel = Encryption.DecryptInt(item.AuthorizationLevel),
+						ApproverId = approvalId,
+						ApproverName = corporateProfile.FullName,
+						RoleId = corporateRole.Id,
+						RoleName = corporateRole.RoleName,
+						CorporateCustomerId = CorporateProfile?.CorporateCustomerId,
+					};
 
-                string fullName = theCorporateProfile.FirstName + " " + theCorporateProfile.LastName;
 
-                errormsg = $"Workflow approval limit {formattedAppLimit} is higher than {fullName.ToUpper()} approval limit {corpFormattedAppLimit}";
-                return false;
-            }
-            return true;
-        }
+					if (!ValidateWorkflowDropDowns(corporateProfile, tblWorkflow, out errormsg))
+					{
+						return BadRequest(errormsg);
+					}
+					tblWorkflowHierarchies.Add(newWorkFlow);
+				}
 
-        public static bool ValidateWorkflowDropDowns(TblCorporateProfile theCorporateProfile,TblWorkflow tblWorkflow, out string errormsg)
-        {
-            errormsg = string.Empty;
-            if (theCorporateProfile.ApprovalLimit < tblWorkflow.ApprovalLimit)
-            {
-                decimal appLimit = (decimal)tblWorkflow.ApprovalLimit;
-                decimal formattedAppLimit = decimal.Round(appLimit, 2, MidpointRounding.AwayFromZero);
+				mapTempWorkFlow.Sn = 0;
+				mapTempWorkFlow.Status = (int)ProfileStatus.Modified;
+				mapTempWorkFlow.WorkflowId = tblWorkflow.Id;
+				mapTempWorkFlow.DateRequested = DateTime.Now;
+				mapTempWorkFlow.Action = nameof(TempTableAction.Update).Replace("_", " ");
+				mapTempWorkFlow.InitiatorId = CorporateProfile?.Id;
+				mapTempWorkFlow.InitiatorUsername = UserName;
 
-                decimal corpAppLimit = (decimal)theCorporateProfile.ApprovalLimit;
-                decimal corpFormattedAppLimit = decimal.Round(corpAppLimit, 2, MidpointRounding.AwayFromZero);
+				tblWorkflow.Status = (int)ProfileStatus.Modified;
+				mapTempWorkFlow.IsTreated = (int)ProfileStatus.Pending;
+				UnitOfWork.WorkFlowRepo.UpdateWorkflow(tblWorkflow);
+				UnitOfWork.TempWorkflowRepo.Add(mapTempWorkFlow);
+				UnitOfWork.TempWorkflowHierarchyRepo.AddRange(tblWorkflowHierarchies);
+				UnitOfWork.Complete();
+				return CreatedAtRoute("", tblWorkflowHierarchies);
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError("SERVER ERROR {0}, {1}, {2}", Formater.JsonType(ex.StackTrace), Formater.JsonType(ex.Source), Formater.JsonType(ex.Message));
+				return ex.InnerException != null ? BadRequest(new ErrorResponse(responsecode: ResponseCode.SERVER_ERROR, responseDescription: ex.InnerException.Message, responseStatus: false)) : StatusCode(500, new ErrorResponse(responsecode: ResponseCode.SERVER_ERROR, responseDescription: ex.InnerException != null ? ex.InnerException.Message : ex.Message, responseStatus: false));
+			}
+		}
 
-                string fullName = theCorporateProfile.FirstName + " " + theCorporateProfile.LastName;
 
-                errormsg = $"Workflow approval limit {formattedAppLimit} is higher than {fullName.ToUpper()} approval limit {corpFormattedAppLimit}";
-                return false;
-            }
-            return true;
-        }
+		[HttpGet("GetTempWorkflowHierarchies")]
+		[ProducesResponseType(StatusCodes.Status200OK)]
+		[ProducesResponseType(StatusCodes.Status204NoContent)]
+		public ActionResult<ResponseDTO<List<WorkflowHierarchyResponseDto>>> GetTempWorkflowHierarchies(string workflowId)
+		{
+			try
+			{
+				if (!IsAuthenticated)
+				{
+					return StatusCode(401, "User is not authenticated");
+				}
+				if (!IsUserActive(out string errormsg))
+				{
+					return StatusCode(400, errormsg);
+				}
 
-    }
+				if (string.IsNullOrEmpty(UserRoleId) || !UnitOfWork.CorporateUserRoleAccessRepo.AccessesExist(UserRoleId, Permission.ViewWorkflow))
+				{
+					return BadRequest("UnAuthorized Access");
+				}
+				var id = Encryption.DecryptStrings(workflowId);
+				var WorkflowHierarchy = UnitOfWork.TempWorkflowHierarchyRepo.GetTempWorkflowHierarchyByWorkflowId(Guid.Parse(id));
+				return Ok(new ListResponseDTO<TblTempWorkflowHierarchy>(_data: Mapper.Map<List<TblTempWorkflowHierarchy>>(WorkflowHierarchy), success: true, _message: Message.Success));
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError("SERVER ERROR {0}, {1}, {2}", Formater.JsonType(ex.StackTrace), Formater.JsonType(ex.Source), Formater.JsonType(ex.Message));
+				return ex.InnerException != null ? BadRequest(new ErrorResponse(responsecode: ResponseCode.SERVER_ERROR, responseDescription: ex.InnerException.Message, responseStatus: false)) : StatusCode(500, new ErrorResponse(responsecode: ResponseCode.SERVER_ERROR, responseDescription: ex.InnerException != null ? ex.InnerException.Message : ex.Message, responseStatus: false));
+			}
+		}
+
+		public static bool ValidateWorkflowDropDowns(TblCorporateProfile theCorporateProfile, TblTempWorkflow tblWorkflow, out string errormsg)
+		{
+			errormsg = string.Empty;
+			if (theCorporateProfile.ApprovalLimit < tblWorkflow.ApprovalLimit)
+			{
+				decimal appLimit = (decimal)tblWorkflow.ApprovalLimit;
+				decimal formattedAppLimit = decimal.Round(appLimit, 2, MidpointRounding.AwayFromZero);
+
+				decimal corpAppLimit = (decimal)theCorporateProfile.ApprovalLimit;
+				decimal corpFormattedAppLimit = decimal.Round(corpAppLimit, 2, MidpointRounding.AwayFromZero);
+
+				string fullName = theCorporateProfile.FirstName + " " + theCorporateProfile.LastName;
+
+				errormsg = $"Workflow approval limit {formattedAppLimit} is higher than {fullName.ToUpper()} approval limit {corpFormattedAppLimit}";
+				return false;
+			}
+			return true;
+		}
+
+		public static bool ValidateWorkflowDropDowns(TblCorporateProfile theCorporateProfile, TblWorkflow tblWorkflow, out string errormsg)
+		{
+			errormsg = string.Empty;
+			if (theCorporateProfile.ApprovalLimit < tblWorkflow.ApprovalLimit)
+			{
+				decimal appLimit = (decimal)tblWorkflow.ApprovalLimit;
+				decimal formattedAppLimit = decimal.Round(appLimit, 2, MidpointRounding.AwayFromZero);
+
+				decimal corpAppLimit = (decimal)theCorporateProfile.ApprovalLimit;
+				decimal corpFormattedAppLimit = decimal.Round(corpAppLimit, 2, MidpointRounding.AwayFromZero);
+
+				string fullName = theCorporateProfile.FirstName + " " + theCorporateProfile.LastName;
+
+				errormsg = $"Workflow approval limit {formattedAppLimit} is higher than {fullName.ToUpper()} approval limit {corpFormattedAppLimit}";
+				return false;
+			}
+			return true;
+		}
+
+	}
 }

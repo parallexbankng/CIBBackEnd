@@ -2,6 +2,7 @@
 /Users/macbook/Projects/parallex-backend/CIB.CorporateAdmin/deployed/nlog.config
 /Users/macbook/Projects/parallex-backend/CIB.CorporateAdmin/deployed/appsettings.Development.json
 /Users/macbook/Projects/parallex-backend/CIB.CorporateAdmin/deployed/appsettings.json
+/Users/macbook/Projects/parallex-backend/CIB.CorporateAdmin/deployed/.DS_Store
 /Users/macbook/Projects/parallex-backend/CIB.CorporateAdmin/deployed/CIB.CorporateAdmin.dll
 /Users/macbook/Projects/parallex-backend/CIB.CorporateAdmin/deployed/CIB.CorporateAdmin.deps.json
 /Users/macbook/Projects/parallex-backend/CIB.CorporateAdmin/deployed/CIB.CorporateAdmin.runtimeconfig.json

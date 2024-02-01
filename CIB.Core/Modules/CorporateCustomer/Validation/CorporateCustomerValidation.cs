@@ -5,13 +5,16 @@ using FluentValidation;
 
 namespace CIB.Core.Modules.CorporateCustomer.Mapper
 {
-    public class CorporateCustomerValidation :  AbstractValidator<CreateCorporateCustomerRequestDto>
+    public class CorporateCustomerValidation : AbstractValidator<CreateCorporateCustomerRequestDto>
     {
         public CorporateCustomerValidation()
         {
             RuleFor(p => p.CompanyName.Trim())
                 .NotEmpty().WithMessage("{PropertyName} is required.")
                 .NotNull();
+            RuleFor(p => p.CorporateShortName.Trim())
+              .NotEmpty().WithMessage("{PropertyName} is required.")
+              .NotNull();
             RuleFor(p => p.CustomerId)
                 .NotEmpty().WithMessage("{PropertyName} is required.")
                 .NotNull();
@@ -32,13 +35,16 @@ namespace CIB.Core.Modules.CorporateCustomer.Mapper
                 .NotNull();
         }
     }
-    public class UpdateCorporateCustomerValidation :  AbstractValidator<UpdateCorporateCustomerRequestDto>
+    public class UpdateCorporateCustomerValidation : AbstractValidator<UpdateCorporateCustomerRequestDto>
     {
         public UpdateCorporateCustomerValidation()
         {
             RuleFor(p => p.CompanyName)
                 .NotEmpty().WithMessage("{PropertyName} is required.")
                 .NotNull();
+            RuleFor(p => p.CorporateShortName)
+               .NotEmpty().WithMessage("{PropertyName} is required.")
+               .NotNull();
             RuleFor(p => p.CustomerId)
                 .NotEmpty().WithMessage("{PropertyName} is required.")
                 .NotNull();
@@ -49,7 +55,6 @@ namespace CIB.Core.Modules.CorporateCustomer.Mapper
                 .NotEmpty().WithMessage("{PropertyName} is required.")
                 .NotNull();
             RuleFor(p => p.Email1)
-                .NotEmpty().WithMessage("{PropertyName} is required.")
                 .Matches(new ReqEx().EmailValidation).WithMessage("{PropertyName} Email is not valid.")
                 .NotNull();
             RuleFor(p => p.AuthorizationType)
@@ -57,7 +62,21 @@ namespace CIB.Core.Modules.CorporateCustomer.Mapper
                 .NotNull();
         }
     }
-    public class CreateLimitCorporateCustomerValidation :  AbstractValidator<UpdateAccountLimitRequestDto>
+
+    public class UpdateCorporateCustomerShortNameValidation : AbstractValidator<UpdateCorporateCustomerShortNameRequestDto>
+    {
+        public UpdateCorporateCustomerShortNameValidation()
+        {
+            RuleFor(p => p.CorporateShortName)
+               .NotEmpty().WithMessage("{PropertyName} is required.")
+               .NotNull();
+            RuleFor(p => p.Id)
+                .NotEmpty().WithMessage("{PropertyName} is required.")
+                .NotNull();
+        }
+    }
+
+    public class CreateLimitCorporateCustomerValidation : AbstractValidator<UpdateAccountLimitRequestDto>
     {
         public CreateLimitCorporateCustomerValidation()
         {
@@ -78,7 +97,7 @@ namespace CIB.Core.Modules.CorporateCustomer.Mapper
                 .NotNull();
         }
     }
-    public class ValidateCorporateCustomerValidation :  AbstractValidator<ValidateCorporateCustomerRequestDto>
+    public class ValidateCorporateCustomerValidation : AbstractValidator<ValidateCorporateCustomerRequestDto>
     {
         public ValidateCorporateCustomerValidation()
         {
@@ -105,7 +124,7 @@ namespace CIB.Core.Modules.CorporateCustomer.Mapper
                 .NotNull();
         }
     }
-    public class OnboardCorporateCustomerValidation :  AbstractValidator<OnboardCorporateCustomer>
+    public class OnboardCorporateCustomerValidation : AbstractValidator<OnboardCorporateCustomer>
     {
         public OnboardCorporateCustomerValidation()
         {
@@ -123,6 +142,10 @@ namespace CIB.Core.Modules.CorporateCustomer.Mapper
                 .NotEmpty().WithMessage("{PropertyName} is required.")
                 .Matches(new ReqEx().NumberOnly).WithMessage("{PropertyName} is not a valid Account Number.")
                 .NotNull();
+            RuleFor(p => p.Email.Trim())
+                .NotEmpty().WithMessage("{PropertyName} is required.")
+                .Matches(new ReqEx().EmailValidation).WithMessage("{PropertyName} Email is not valid.")
+                .NotNull();
             RuleFor(p => p.AuthorizationType)
                 .NotEmpty().WithMessage("{PropertyName} is required.")
                 .NotNull();
@@ -131,19 +154,15 @@ namespace CIB.Core.Modules.CorporateCustomer.Mapper
                 .NotNull();
             RuleFor(p => p.PhoneNumber.Trim())
                 .NotEmpty().WithMessage("{PropertyName} is required.")
-                .Matches(new ReqEx().NumberOnly).WithMessage("{PropertyName} PhoneNumber is not valid.")
-                .NotNull();
-            RuleFor(p => p.Email.Trim())
-                .NotEmpty().WithMessage("{PropertyName} is required.")
-                .Matches(new ReqEx().EmailValidation).WithMessage("{PropertyName} Email is not valid.")
+                .Matches(new ReqEx().NumberOnly).WithMessage("{PropertyName} is not valid.")
                 .NotNull();
             RuleFor(p => p.FirstName.Trim())
                 .NotEmpty().WithMessage("{PropertyName} is required.")
-                .Matches(new ReqEx().AlphabetOnly).WithMessage("{PropertyName} FirstName is not valid.")
+                .Matches(new ReqEx().AlphabetOnly).WithMessage("{PropertyName} is not valid.")
                 .NotNull();
             RuleFor(p => p.LastName.Trim())
                 .NotEmpty().WithMessage("{PropertyName} is required.")
-                .Matches(new ReqEx().AlphabetOnly).WithMessage("{PropertyName} LastName is not valid.")
+                .Matches(new ReqEx().AlphabetOnly).WithMessage("{PropertyName} is not valid.")
                 .NotNull();
             RuleFor(p => p.MinAccountLimit)
                 .NotEmpty().WithMessage("{PropertyName} is required.")

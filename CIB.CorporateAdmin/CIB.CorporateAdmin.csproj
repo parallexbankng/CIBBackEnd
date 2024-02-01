@@ -1,15 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
-  <PropertyGroup>
-  <OutputType>Exe</OutputType>
-
-<TargetFramework>net5.0</TargetFramework>
-
-     <LangVersion>latest</LangVersion>
-
-<ImplicitUsings>enable</ImplicitUsings>
-
-<Nullable>enable</Nullable>
+   <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
  <ItemGroup>
     <ProjectReference Include="..\CIB.Core\CIB.Core.csproj">
@@ -25,7 +19,6 @@
     <None Remove="Microsoft.AspNetCore.Authentication.JwtBearer" />
     <None Remove="Newtonsoft.Json" />
     <None Remove="htmlTemplate\" />
-    <None Remove="htmlTemplate\htmlTemplate\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="DocumentFormat.OpenXml" Version="2.18.0" />
@@ -38,9 +31,14 @@
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.17" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.1" />
   </ItemGroup>
-
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="deployed\web.config" />
+    <_ContentIncludedByDefault Remove="deployed\appsettings.Development.json" />
+    <_ContentIncludedByDefault Remove="deployed\appsettings.json" />
+    <_ContentIncludedByDefault Remove="deployed\CIB.CorporateAdmin.deps.json" />
+    <_ContentIncludedByDefault Remove="deployed\CIB.CorporateAdmin.runtimeconfig.json" />
+  </ItemGroup>
   <ItemGroup>
     <Folder Include="htmlTemplate\" />
-    <Folder Include="htmlTemplate\htmlTemplate\" />
   </ItemGroup>
 </Project>

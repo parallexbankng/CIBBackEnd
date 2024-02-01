@@ -28,21 +28,23 @@ public class IntraBankJob : IIntraBankJob
 			var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 			var config = scope.ServiceProvider.GetRequiredService<IConfiguration>();
 			var apiService = scope.ServiceProvider.GetRequiredService<IApiService>();
-			string prallexBankCode = config.GetValue<string>("ParralexBankCode");
+			string prallexBankCode = config.GetValue<string>("parralexBankCode");
 			int maxTryCount = int.Parse(config.GetValue<string>("maxTryCount"));
 			var processDuration = DateTime.Now.Date;
-			var pendingTransfers = unitOfWork.BulkPaymentLogRepo.GetPendingTransferItems(0, 50, maxTryCount, processDuration);
-			if (pendingTransfers.Count != 0)
+
+			var pendingTransfers = unitOfWork.BulkPaymentLogRepo.GetPendingTransferItems(0, 50, processDuration, maxTryCount);
+			if (pendingTransfers.Any())
 			{
 				//var processDuration = DateTime.Now.Date;
 				foreach (var i in pendingTransfers)
 				{
-
+					int intraBankTotalCredit = 0;
 					var pendingCreditItemList = unitOfWork.BulkCreditLogRepo.GetPendingCredit(i.Id, i.TryCount > 0 ? 2 : 0, prallexBankCode, processDuration);
-					if (pendingCreditItemList.Count != 0)
+					if (pendingCreditItemList.Any())
 					{
 						foreach (var creditLog in pendingCreditItemList)
 						{
+
 							var date = DateTime.Now;
 							decimal creditAmount = creditLog.CreditAmount ?? 0;
 							var transaction = new TblTransaction
@@ -52,35 +54,26 @@ public class IntraBankJob : IIntraBankJob
 								TranDate = DateTime.Now,
 								SourceAccountNo = i.IntreBankSuspenseAccountNumber,
 								SourceAccountName = i.IntreBankSuspenseAccountName,
-								SourceBank = "Parallex Bank",
-								TranType = "Intrabank transfer",
+								SourceBank = prallexBankCode,
+								TranType = "Interbank transfer",
 								Narration = i.Narration,
-								Channel = "2",
-								DesctionationBank = creditLog.CreditBankName,
+								Channel = "WEB",
+								DesctionationBank = creditLog.CreditBankCode,
 								DestinationAcctNo = creditLog.CreditAccountNumber,
-								DestinationAcctName = creditLog.CreditAccountName,
+								DestinationAcctName = creditLog.CreditBankName,
 								CorporateCustomerId = i.CompanyId,
 								BatchId = i.BatchId
 							};
 
 							var tranRef = creditLog.TryCount == 0 ? creditLog.TransactionReference : Transactions.Ref();
-							if (creditLog.TryCount > 0 && creditLog.SessionId != null)
+							if (creditLog.TryCount > 0)
 							{
-								var newSessionId = "";
-								if (!creditLog.SessionId.Contains('|'))
-								{
-									newSessionId = creditLog.SessionId;
-								}
-								else
-								{
-									string[]? sessionIds = creditLog.SessionId.Split('|');
-									newSessionId = sessionIds.Last();
-								}
-
+								string[]? sessionIds = creditLog?.SessionId.Split('|');
+								var getLastSessionId = sessionIds.Last();
 								var query = new RequeryTransaction()
 								{
 									UserName = i.InitiatorUserName,
-									TransactionReference = newSessionId,
+									TransactionReference = getLastSessionId,
 									BeneficiaryAccountNumber = creditLog.CreditAccountNumber,
 									BeneficiaryBankCode = creditLog.CreditBankCode,
 									AccountToDebit = i.SuspenseAccountNumber,
@@ -137,26 +130,14 @@ public class IntraBankJob : IIntraBankJob
 										unitOfWork.BulkCreditLogRepo.UpdateCreditStatus(creditLog);
 										unitOfWork.TransactionRepo.Add(transaction);
 										unitOfWork.Complete();
+										intraBankTotalCredit++;
 									}
 								}
 								else
 								{
-									// string[]? transactionRef = creditLog?.TransactionReference.Split('|');
-									// var lastTransactionRef = transactionRef.Last();
-
-									var oldTranRef = "";
-									if ((bool)!creditLog?.TransactionReference.Contains('|'))
-									{
-										oldTranRef = creditLog?.TransactionReference;
-									}
-									else
-									{
-										string[]? sessionIds = creditLog?.TransactionReference.Split('|');
-										oldTranRef = sessionIds.Last();
-									}
-
-
-									transaction.TransactionReference = oldTranRef;
+									string[]? transactionRef = creditLog?.TransactionReference.Split('|');
+									var lastTransactionRef = transactionRef.Last();
+									transaction.TransactionReference = lastTransactionRef;
 									transaction.SessionId = queryResult.TransactionReference;
 									transaction.TransactionStatus = nameof(TransactionStatus.Successful);
 									creditLog.CreditStatus = 1;
@@ -164,7 +145,6 @@ public class IntraBankJob : IIntraBankJob
 									unitOfWork.TransactionRepo.Add(transaction);
 									unitOfWork.Complete();
 								}
-
 							}
 							else
 							{
@@ -215,26 +195,26 @@ public class IntraBankJob : IIntraBankJob
 									unitOfWork.BulkCreditLogRepo.UpdateCreditStatus(creditLog);
 									unitOfWork.TransactionRepo.Add(transaction);
 									unitOfWork.Complete();
+									intraBankTotalCredit++;
 								}
 							}
 						}
 					}
 					if (i.TryCount < maxTryCount)
 					{
-						var totalCredit = unitOfWork.BulkPaymentLogRepo.GetInterBankTotalCredit(i.Id, prallexBankCode, processDuration);
-						i.TotalCredits = totalCredit;
-						if (pendingCreditItemList.Count == 0)
+						var getTotalCredit = unitOfWork.BulkPaymentLogRepo.GetInterBankTotalCredit(i.Id, prallexBankCode, processDuration);
+						if (pendingCreditItemList.Count == intraBankTotalCredit)
 						{
-							var checkFailedTransaction = unitOfWork.BulkCreditLogRepo.CheckForPendingCredit(i.Id, 2, processDuration);
-							if (checkFailedTransaction.Count == 0 && i.InterBankStatus != 0)
+							i.IntraBankStatus = 1;
+							i.TotalCredits = getTotalCredit;
+							if (getTotalCredit == i.NoOfCredits)
 							{
 								i.TransactionStatus = 1;
-								i.IntraBankStatus = 1;
 							}
-							else
-							{
-								i.IntraBankStatus = 1;
-							}
+						}
+						else
+						{
+							i.TotalCredits = getTotalCredit;
 						}
 						i.TryCount++;
 						unitOfWork.BulkPaymentLogRepo.UpdateStatus(i);
@@ -242,7 +222,6 @@ public class IntraBankJob : IIntraBankJob
 					}
 				}
 			}
-
 		}
 		catch (Exception ex)
 		{

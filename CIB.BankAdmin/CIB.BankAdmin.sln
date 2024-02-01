@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.002.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CIB.BankAdmin", "CIB.BankAdmin.csproj", "{A8C90B79-6C49-4E42-8E56-B2D89C00554B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CIB.BankAdmin", "CIB.BankAdmin.csproj", "{87BBB66B-41D0-498C-AFDF-4ECBC75E4623}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{A8C90B79-6C49-4E42-8E56-B2D89C00554B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A8C90B79-6C49-4E42-8E56-B2D89C00554B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A8C90B79-6C49-4E42-8E56-B2D89C00554B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A8C90B79-6C49-4E42-8E56-B2D89C00554B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{87BBB66B-41D0-498C-AFDF-4ECBC75E4623}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{87BBB66B-41D0-498C-AFDF-4ECBC75E4623}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{87BBB66B-41D0-498C-AFDF-4ECBC75E4623}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{87BBB66B-41D0-498C-AFDF-4ECBC75E4623}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {BDCFE8DF-CDD9-4198-84A1-DC6EE2ED4F5A}
+		SolutionGuid = {0D115F8B-83A5-4EF5-AC08-CC7C3AC50FE8}
 	EndGlobalSection
 EndGlobal

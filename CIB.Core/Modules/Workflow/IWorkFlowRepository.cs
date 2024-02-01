@@ -13,6 +13,7 @@ namespace CIB.Core.Modules.Workflow
     void UpdateWorkflow(TblWorkflow update);
     IEnumerable<TblWorkflow> GetAllWorkflows();
     IEnumerable<TblWorkflow> GetAllWorkflow(Guid corporateCustomerId);
+    List<TblWorkflow> GetActiveWorkflow(Guid corporateCustomerId);
     TblWorkflow GetWorkflowByID(Guid id);
     DuplicateStatus CheckDuplicate(TblWorkflow profile, bool IsUpdate = false);
     TblWorkflow GetWorkflowByCorporateCustomerId(Guid id);

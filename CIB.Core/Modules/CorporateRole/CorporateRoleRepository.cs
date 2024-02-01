@@ -7,7 +7,7 @@ using CIB.Core.Entities;
 
 namespace CIB.Core.Modules.CorporateRole
 {
-    public class CorporateRoleRepository : Repository<TblCorporateRole>,ICorporateRoleRepository
+    public class CorporateRoleRepository : Repository<TblCorporateRole>, ICorporateRoleRepository
     {
         public CorporateRoleRepository(ParallexCIBContext context) : base(context)
         {
@@ -15,13 +15,13 @@ namespace CIB.Core.Modules.CorporateRole
         }
         public ParallexCIBContext context
         {
-        get { return _context as ParallexCIBContext; }
+            get { return _context as ParallexCIBContext; }
         }
 
         public IEnumerable<TblCorporateRole> GetAllCorporateRolesByCorporateId(Guid corporateCustomerId)
         {
             return _context.TblCorporateRoles.Where(x => x.CorporateCustomerId == corporateCustomerId || x.CorporateCustomerId == null);
-        }   
+        }
 
         public string GetCorporateRoleName(string roleId)
         {
@@ -30,7 +30,7 @@ namespace CIB.Core.Modules.CorporateRole
 
         public void UpdateCorporateRole(TblCorporateRole update)
         {
-            _context.Update(update).Property(x=>x.Sn).IsModified = false;
+            _context.Update(update).Property(x => x.Sn).IsModified = false;
         }
-  }
+    }
 }

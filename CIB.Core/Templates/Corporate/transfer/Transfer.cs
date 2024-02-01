@@ -15,7 +15,7 @@ namespace CIB.Core.Templates.Corporate.transfer
             {
                 subject = $"parallexbank Corporate Banking Approval Request",
                 recipient = receiverEmail,
-                sender = "e-statement@parallexbank.com",
+                sender = "no-reply@parallexbank.com",
                 message = $"<!DOCTYPE html>" +
                 $" <html>" +
                 $"<head>" +
@@ -37,7 +37,7 @@ namespace CIB.Core.Templates.Corporate.transfer
             {
                 subject = $"parallexbank Corporate Banking Approval Request",
                 recipient = receiverEmail,
-                sender = "e-statement@parallexbank.com",
+                sender = "no-reply@parallexbank.com",
                 message = $"<!DOCTYPE html>" +
                 $" <html>" +
                 $"<head>" +
@@ -46,7 +46,7 @@ namespace CIB.Core.Templates.Corporate.transfer
                 $"</head>" +
                 $"<body>" +
                     $"<p>Dear Sir/Madam,</p>" +
-                    $"<p> A fund transfer of {notify.Amount} initiated by {notify.FullName} requires your approval, please login to the parallex bank corporate internet banking to approve.<br /> </p>" +
+                    $"<p> A fund transfer of {notify.Amount} initiated by {notify.FullName} require your approval, please login to the parallex bank corporate internet banking to approve.<br /> </p>" +
                     $"<p> Thank you for banking with parallex bank  </p>" +
                 $"</body>" +
                 $"</html>"

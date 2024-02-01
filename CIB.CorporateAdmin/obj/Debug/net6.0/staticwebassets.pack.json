@@ -1,0 +1,153 @@
+{
+  "Files": [
+    {
+      "Id": "/Users/macbook/Projects/CIBBackEnd/CIB.CorporateAdmin/wwwroot/.DS_Store",
+      "PackagePath": "staticwebassets/.DS_Store"
+    },
+    {
+      "Id": "/Users/macbook/Projects/CIBBackEnd/CIB.CorporateAdmin/wwwroot/bulkupload/.DS_Store",
+      "PackagePath": "staticwebassets/bulkupload/.DS_Store"
+    },
+    {
+      "Id": "/Users/macbook/Projects/CIBBackEnd/CIB.CorporateAdmin/wwwroot/bulkupload/C000000250/C000000250-3-14-2023-6-58-PM.xlsx",
+      "PackagePath": "staticwebassets/bulkupload/C000000250/C000000250-3-14-2023-6-58-PM.xlsx"
+    },
+    {
+      "Id": "/Users/macbook/Projects/CIBBackEnd/CIB.CorporateAdmin/wwwroot/bulkupload/C000000250/C000000250-3-14-2023-6-59-PM.xlsx",
+      "PackagePath": "staticwebassets/bulkupload/C000000250/C000000250-3-14-2023-6-59-PM.xlsx"
+    },
+    {
+      "Id": "/Users/macbook/Projects/CIBBackEnd/CIB.CorporateAdmin/wwwroot/bulkupload/C000000250/C000000250-3-15-2023-6-56-AM.xlsx",
+      "PackagePath": "staticwebassets/bulkupload/C000000250/C000000250-3-15-2023-6-56-AM.xlsx"
+    },
+    {
+      "Id": "/Users/macbook/Projects/CIBBackEnd/CIB.CorporateAdmin/wwwroot/bulkupload/C000000250/C000000250-3-15-2023-9-35-AM.xlsx",
+      "PackagePath": "staticwebassets/bulkupload/C000000250/C000000250-3-15-2023-9-35-AM.xlsx"
+    },
+    {
+      "Id": "/Users/macbook/Projects/CIBBackEnd/CIB.CorporateAdmin/wwwroot/bulkupload/C000000250/C000000250-3-15-2023-9-41-AM.xlsx",
+      "PackagePath": "staticwebassets/bulkupload/C000000250/C000000250-3-15-2023-9-41-AM.xlsx"
+    },
+    {
+      "Id": "/Users/macbook/Projects/CIBBackEnd/CIB.CorporateAdmin/wwwroot/bulkupload/C000000258/C000000258-07-11-2023-06-30.xlsx",
+      "PackagePath": "staticwebassets/bulkupload/C000000258/C000000258-07-11-2023-06-30.xlsx"
+    },
+    {
+      "Id": "/Users/macbook/Projects/CIBBackEnd/CIB.CorporateAdmin/wwwroot/bulkupload/C000000258/C000000258-07-11-2023-07-10.xlsx",
+      "PackagePath": "staticwebassets/bulkupload/C000000258/C000000258-07-11-2023-07-10.xlsx"
+    },
+    {
+      "Id": "/Users/macbook/Projects/CIBBackEnd/CIB.CorporateAdmin/wwwroot/bulkupload/C000000258/C000000258-07-11-2023-07-44.xlsx",
+      "PackagePath": "staticwebassets/bulkupload/C000000258/C000000258-07-11-2023-07-44.xlsx"
+    },
+    {
+      "Id": "/Users/macbook/Projects/CIBBackEnd/CIB.CorporateAdmin/wwwroot/bulkupload/C000000258/C000000258-07-11-2023-07-55.xlsx",
+      "PackagePath": "staticwebassets/bulkupload/C000000258/C000000258-07-11-2023-07-55.xlsx"
+    },
+    {
+      "Id": "/Users/macbook/Projects/CIBBackEnd/CIB.CorporateAdmin/wwwroot/bulkupload/C000000258/C000000258-07-11-2023-07-58.xlsx",
+      "PackagePath": "staticwebassets/bulkupload/C000000258/C000000258-07-11-2023-07-58.xlsx"
+    },
+    {
+      "Id": "/Users/macbook/Projects/CIBBackEnd/CIB.CorporateAdmin/wwwroot/bulkupload/C000000258/C000000258-07-11-2023-08-03.xlsx",
+      "PackagePath": "staticwebassets/bulkupload/C000000258/C000000258-07-11-2023-08-03.xlsx"
+    },
+    {
+      "Id": "/Users/macbook/Projects/CIBBackEnd/CIB.CorporateAdmin/wwwroot/bulkupload/C000000258/C000000258-3-15-2023-3-08-PM.xlsx",
+      "PackagePath": "staticwebassets/bulkupload/C000000258/C000000258-3-15-2023-3-08-PM.xlsx"
+    },
+    {
+      "Id": "/Users/macbook/Projects/CIBBackEnd/CIB.CorporateAdmin/wwwroot/bulkupload/C000000258/C000000258-3-15-2023-3-27-PM.xlsx",
+      "PackagePath": "staticwebassets/bulkupload/C000000258/C000000258-3-15-2023-3-27-PM.xlsx"
+    },
+    {
+      "Id": "/Users/macbook/Projects/CIBBackEnd/CIB.CorporateAdmin/wwwroot/bulkupload/C000000258/C000000258-3-15-2023-3-35-PM.xlsx",
+      "PackagePath": "staticwebassets/bulkupload/C000000258/C000000258-3-15-2023-3-35-PM.xlsx"
+    },
+    {
+      "Id": "/Users/macbook/Projects/CIBBackEnd/CIB.CorporateAdmin/wwwroot/bulkupload/C000000258/C000000258-3-15-2023-4-00-PM.xlsx",
+      "PackagePath": "staticwebassets/bulkupload/C000000258/C000000258-3-15-2023-4-00-PM.xlsx"
+    },
+    {
+      "Id": "/Users/macbook/Projects/CIBBackEnd/CIB.CorporateAdmin/wwwroot/bulkupload/C000000312/C000000312-11-13-2023-1-01PM.xlsx",
+      "PackagePath": "staticwebassets/bulkupload/C000000312/C000000312-11-13-2023-1-01PM.xlsx"
+    },
+    {
+      "Id": "/Users/macbook/Projects/CIBBackEnd/CIB.CorporateAdmin/wwwroot/bulkupload/C000000312/C000000312-11-13-2023-1-02PM.xlsx",
+      "PackagePath": "staticwebassets/bulkupload/C000000312/C000000312-11-13-2023-1-02PM.xlsx"
+    },
+    {
+      "Id": "/Users/macbook/Projects/CIBBackEnd/CIB.CorporateAdmin/wwwroot/bulkupload/C000000312/C000000312-11-13-2023-1-59PM.xlsx",
+      "PackagePath": "staticwebassets/bulkupload/C000000312/C000000312-11-13-2023-1-59PM.xlsx"
+    },
+    {
+      "Id": "/Users/macbook/Projects/CIBBackEnd/CIB.CorporateAdmin/wwwroot/bulkupload/C000000312/C000000312-11-13-2023-11-06AM.xlsx",
+      "PackagePath": "staticwebassets/bulkupload/C000000312/C000000312-11-13-2023-11-06AM.xlsx"
+    },
+    {
+      "Id": "/Users/macbook/Projects/CIBBackEnd/CIB.CorporateAdmin/wwwroot/bulkupload/C000000312/C000000312-11-13-2023-12-39PM.xlsx",
+      "PackagePath": "staticwebassets/bulkupload/C000000312/C000000312-11-13-2023-12-39PM.xlsx"
+    },
+    {
+      "Id": "/Users/macbook/Projects/CIBBackEnd/CIB.CorporateAdmin/wwwroot/bulkupload/C000000312/C000000312-11-13-2023-2-29PM.xlsx",
+      "PackagePath": "staticwebassets/bulkupload/C000000312/C000000312-11-13-2023-2-29PM.xlsx"
+    },
+    {
+      "Id": "/Users/macbook/Projects/CIBBackEnd/CIB.CorporateAdmin/wwwroot/bulkupload/C000000312/C000000312-11-13-2023-4-33PM.xlsx",
+      "PackagePath": "staticwebassets/bulkupload/C000000312/C000000312-11-13-2023-4-33PM.xlsx"
+    },
+    {
+      "Id": "/Users/macbook/Projects/CIBBackEnd/CIB.CorporateAdmin/wwwroot/bulkupload/C000000312/C000000312-11-13-2023-4-35PM.xlsx",
+      "PackagePath": "staticwebassets/bulkupload/C000000312/C000000312-11-13-2023-4-35PM.xlsx"
+    },
+    {
+      "Id": "/Users/macbook/Projects/CIBBackEnd/CIB.CorporateAdmin/wwwroot/bulkupload/C000000312/C000000312-11-23-2023-6-03PM.xlsx",
+      "PackagePath": "staticwebassets/bulkupload/C000000312/C000000312-11-23-2023-6-03PM.xlsx"
+    },
+    {
+      "Id": "/Users/macbook/Projects/CIBBackEnd/CIB.CorporateAdmin/wwwroot/bulkupload/bankcodetemplate.xlsx",
+      "PackagePath": "staticwebassets/bulkupload/bankcodetemplate.xlsx"
+    },
+    {
+      "Id": "/Users/macbook/Projects/CIBBackEnd/CIB.CorporateAdmin/wwwroot/bulkupload/sample.xlsx",
+      "PackagePath": "staticwebassets/bulkupload/sample.xlsx"
+    },
+    {
+      "Id": "/Users/macbook/Projects/CIBBackEnd/CIB.CorporateAdmin/wwwroot/bvn.json",
+      "PackagePath": "staticwebassets/bvn.json"
+    },
+    {
+      "Id": "/Users/macbook/Projects/CIBBackEnd/CIB.CorporateAdmin/wwwroot/employeetemplate.xlsx",
+      "PackagePath": "staticwebassets/employeetemplate.xlsx"
+    },
+    {
+      "Id": "/Users/macbook/Projects/CIBBackEnd/CIB.CorporateAdmin/wwwroot/onlendingtemplate.xls",
+      "PackagePath": "staticwebassets/onlendingtemplate.xls"
+    },
+    {
+      "Id": "/Users/macbook/Projects/CIBBackEnd/CIB.CorporateAdmin/wwwroot/state.json",
+      "PackagePath": "staticwebassets/state.json"
+    },
+    {
+      "Id": "/Users/macbook/Projects/CIBBackEnd/CIB.CorporateAdmin/wwwroot/stateTest.json",
+      "PackagePath": "staticwebassets/stateTest.json"
+    },
+    {
+      "Id": "obj/Debug/net6.0/staticwebassets/msbuild.CIB.CorporateAdmin.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj/Debug/net6.0/staticwebassets/msbuild.build.CIB.CorporateAdmin.props",
+      "PackagePath": "build\\CIB.CorporateAdmin.props"
+    },
+    {
+      "Id": "obj/Debug/net6.0/staticwebassets/msbuild.buildMultiTargeting.CIB.CorporateAdmin.props",
+      "PackagePath": "buildMultiTargeting\\CIB.CorporateAdmin.props"
+    },
+    {
+      "Id": "obj/Debug/net6.0/staticwebassets/msbuild.buildTransitive.CIB.CorporateAdmin.props",
+      "PackagePath": "buildTransitive\\CIB.CorporateAdmin.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

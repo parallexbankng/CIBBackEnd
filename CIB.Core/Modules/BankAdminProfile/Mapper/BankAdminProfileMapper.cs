@@ -8,12 +8,13 @@ using CIB.Core.Modules.BankAdminProfile.Dto;
 
 namespace CIB.Core.Modules.BankAdminProfile.Mapper
 {
-    public class BankAdminProfileMapper : Profile
-    {   
-        public BankAdminProfileMapper()
-        {
-            CreateMap<CreateBankAdminProfileDTO, TblBankProfile>();
-            CreateMap<TblBankProfile, BankAdminProfileResponse>();
-        }
-    }
+	public class BankAdminProfileMapper : Profile
+	{
+		public BankAdminProfileMapper()
+		{
+			CreateMap<CreateBankAdminProfileDTO, TblBankProfile>();
+			CreateMap<TblBankProfile, BankAdminProfileResponse>();
+			CreateMap<TblTempCorporateAccountAggregation, BankAdminProfileResponse>();
+		}
+	}
 }

@@ -1,7 +1,7 @@
 {
   "version": 3,
   "targets": {
-    "net5.0": {
+    "net6.0": {
       "AutoMapper/10.1.1": {
         "type": "package",
         "dependencies": {
@@ -65,12 +65,12 @@
       "FluentValidation/10.3.6": {
         "type": "package",
         "compile": {
-          "lib/net5.0/FluentValidation.dll": {
+          "lib/net6.0/FluentValidation.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net5.0/FluentValidation.dll": {
+          "lib/net6.0/FluentValidation.dll": {
             "related": ".xml"
           }
         }
@@ -82,12 +82,12 @@
           "FluentValidation.DependencyInjectionExtensions": "10.3.6"
         },
         "compile": {
-          "lib/net5.0/FluentValidation.AspNetCore.dll": {
+          "lib/net6.0/FluentValidation.AspNetCore.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net5.0/FluentValidation.AspNetCore.dll": {
+          "lib/net6.0/FluentValidation.AspNetCore.dll": {
             "related": ".xml"
           }
         },
@@ -995,11 +995,11 @@
           }
         }
       },
-      "Microsoft.Win32.Registry/5.0.0": {
+      "Microsoft.Win32.Registry/4.7.0": {
         "type": "package",
         "dependencies": {
-          "System.Security.AccessControl": "5.0.0",
-          "System.Security.Principal.Windows": "5.0.0"
+          "System.Security.AccessControl": "4.7.0",
+          "System.Security.Principal.Windows": "4.7.0"
         },
         "compile": {
           "ref/netstandard2.0/Microsoft.Win32.Registry.dll": {
@@ -1012,6 +1012,10 @@
           }
         },
         "runtimeTargets": {
+          "runtimes/unix/lib/netstandard2.0/Microsoft.Win32.Registry.dll": {
+            "assetType": "runtime",
+            "rid": "unix"
+          },
           "runtimes/win/lib/netstandard2.0/Microsoft.Win32.Registry.dll": {
             "assetType": "runtime",
             "rid": "win"
@@ -1021,12 +1025,12 @@
       "Microsoft.Win32.SystemEvents/6.0.0": {
         "type": "package",
         "compile": {
-          "lib/netcoreapp3.1/Microsoft.Win32.SystemEvents.dll": {
+          "lib/net6.0/Microsoft.Win32.SystemEvents.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/netcoreapp3.1/Microsoft.Win32.SystemEvents.dll": {
+          "lib/net6.0/Microsoft.Win32.SystemEvents.dll": {
             "related": ".xml"
           }
         },
@@ -1034,7 +1038,7 @@
           "buildTransitive/netcoreapp3.1/_._": {}
         },
         "runtimeTargets": {
-          "runtimes/win/lib/netcoreapp3.1/Microsoft.Win32.SystemEvents.dll": {
+          "runtimes/win/lib/net6.0/Microsoft.Win32.SystemEvents.dll": {
             "assetType": "runtime",
             "rid": "win"
           }
@@ -1112,12 +1116,12 @@
           "Microsoft.OpenApi": "1.2.3"
         },
         "compile": {
-          "lib/net5.0/Swashbuckle.AspNetCore.Swagger.dll": {
+          "lib/net6.0/Swashbuckle.AspNetCore.Swagger.dll": {
             "related": ".pdb;.xml"
           }
         },
         "runtime": {
-          "lib/net5.0/Swashbuckle.AspNetCore.Swagger.dll": {
+          "lib/net6.0/Swashbuckle.AspNetCore.Swagger.dll": {
             "related": ".pdb;.xml"
           }
         },
@@ -1131,12 +1135,12 @@
           "Swashbuckle.AspNetCore.Swagger": "6.4.0"
         },
         "compile": {
-          "lib/net5.0/Swashbuckle.AspNetCore.SwaggerGen.dll": {
+          "lib/net6.0/Swashbuckle.AspNetCore.SwaggerGen.dll": {
             "related": ".pdb;.xml"
           }
         },
         "runtime": {
-          "lib/net5.0/Swashbuckle.AspNetCore.SwaggerGen.dll": {
+          "lib/net6.0/Swashbuckle.AspNetCore.SwaggerGen.dll": {
             "related": ".pdb;.xml"
           }
         }
@@ -1144,12 +1148,12 @@
       "Swashbuckle.AspNetCore.SwaggerUI/6.4.0": {
         "type": "package",
         "compile": {
-          "lib/net5.0/Swashbuckle.AspNetCore.SwaggerUI.dll": {
+          "lib/net6.0/Swashbuckle.AspNetCore.SwaggerUI.dll": {
             "related": ".pdb;.xml"
           }
         },
         "runtime": {
-          "lib/net5.0/Swashbuckle.AspNetCore.SwaggerUI.dll": {
+          "lib/net6.0/Swashbuckle.AspNetCore.SwaggerUI.dll": {
             "related": ".pdb;.xml"
           }
         },
@@ -1332,12 +1336,12 @@
           "System.Security.Permissions": "6.0.0"
         },
         "compile": {
-          "lib/netstandard2.0/System.Configuration.ConfigurationManager.dll": {
+          "lib/net6.0/System.Configuration.ConfigurationManager.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/netstandard2.0/System.Configuration.ConfigurationManager.dll": {
+          "lib/net6.0/System.Configuration.ConfigurationManager.dll": {
             "related": ".xml"
           }
         },
@@ -1348,19 +1352,16 @@
       "System.Data.OleDb/6.0.0": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Win32.Registry": "5.0.0",
           "System.Configuration.ConfigurationManager": "6.0.0",
-          "System.Diagnostics.PerformanceCounter": "6.0.0",
-          "System.Memory": "4.5.4",
-          "System.Security.Principal.Windows": "5.0.0"
+          "System.Diagnostics.PerformanceCounter": "6.0.0"
         },
         "compile": {
-          "lib/netstandard2.0/System.Data.OleDb.dll": {
+          "lib/net6.0/System.Data.OleDb.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/netstandard2.0/System.Data.OleDb.dll": {
+          "lib/net6.0/System.Data.OleDb.dll": {
             "related": ".xml"
           }
         },
@@ -1368,7 +1369,7 @@
           "buildTransitive/netcoreapp3.1/_._": {}
         },
         "runtimeTargets": {
-          "runtimes/win/lib/netstandard2.0/System.Data.OleDb.dll": {
+          "runtimes/win/lib/net6.0/System.Data.OleDb.dll": {
             "assetType": "runtime",
             "rid": "win"
           }
@@ -1403,17 +1404,15 @@
       "System.Diagnostics.PerformanceCounter/6.0.0": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Win32.Registry": "5.0.0",
-          "System.Configuration.ConfigurationManager": "6.0.0",
-          "System.Security.Principal.Windows": "5.0.0"
+          "System.Configuration.ConfigurationManager": "6.0.0"
         },
         "compile": {
-          "lib/netcoreapp3.1/System.Diagnostics.PerformanceCounter.dll": {
+          "lib/net6.0/System.Diagnostics.PerformanceCounter.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/netcoreapp3.1/System.Diagnostics.PerformanceCounter.dll": {
+          "lib/net6.0/System.Diagnostics.PerformanceCounter.dll": {
             "related": ".xml"
           }
         },
@@ -1421,7 +1420,7 @@
           "buildTransitive/netcoreapp3.1/_._": {}
         },
         "runtimeTargets": {
-          "runtimes/win/lib/netcoreapp3.1/System.Diagnostics.PerformanceCounter.dll": {
+          "runtimes/win/lib/net6.0/System.Diagnostics.PerformanceCounter.dll": {
             "assetType": "runtime",
             "rid": "win"
           }
@@ -1459,12 +1458,12 @@
           "Microsoft.Win32.SystemEvents": "6.0.0"
         },
         "compile": {
-          "lib/netcoreapp3.1/System.Drawing.Common.dll": {
+          "lib/net6.0/System.Drawing.Common.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/netcoreapp3.1/System.Drawing.Common.dll": {
+          "lib/net6.0/System.Drawing.Common.dll": {
             "related": ".xml"
           }
         },
@@ -1472,11 +1471,11 @@
           "buildTransitive/netcoreapp3.1/_._": {}
         },
         "runtimeTargets": {
-          "runtimes/unix/lib/netcoreapp3.1/System.Drawing.Common.dll": {
+          "runtimes/unix/lib/net6.0/System.Drawing.Common.dll": {
             "assetType": "runtime",
             "rid": "unix"
           },
-          "runtimes/win/lib/netcoreapp3.1/System.Drawing.Common.dll": {
+          "runtimes/win/lib/net6.0/System.Drawing.Common.dll": {
             "assetType": "runtime",
             "rid": "win"
           }
@@ -1659,15 +1658,6 @@
         },
         "runtime": {
           "lib/netstandard1.6/System.Linq.Expressions.dll": {}
-        }
-      },
-      "System.Memory/4.5.4": {
-        "type": "package",
-        "compile": {
-          "ref/netcoreapp2.1/_._": {}
-        },
-        "runtime": {
-          "lib/netcoreapp2.1/_._": {}
         }
       },
       "System.Net.NameResolution/4.3.0": {
@@ -2036,16 +2026,13 @@
       },
       "System.Security.AccessControl/6.0.0": {
         "type": "package",
-        "dependencies": {
-          "System.Security.Principal.Windows": "5.0.0"
-        },
         "compile": {
-          "lib/netstandard2.0/System.Security.AccessControl.dll": {
+          "lib/net6.0/System.Security.AccessControl.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/netstandard2.0/System.Security.AccessControl.dll": {
+          "lib/net6.0/System.Security.AccessControl.dll": {
             "related": ".xml"
           }
         },
@@ -2053,7 +2040,7 @@
           "buildTransitive/netcoreapp3.1/_._": {}
         },
         "runtimeTargets": {
-          "runtimes/win/lib/netstandard2.0/System.Security.AccessControl.dll": {
+          "runtimes/win/lib/net6.0/System.Security.AccessControl.dll": {
             "assetType": "runtime",
             "rid": "win"
           }
@@ -2116,16 +2103,13 @@
       },
       "System.Security.Cryptography.ProtectedData/6.0.0": {
         "type": "package",
-        "dependencies": {
-          "System.Memory": "4.5.4"
-        },
         "compile": {
-          "lib/netstandard2.0/System.Security.Cryptography.ProtectedData.dll": {
+          "lib/net6.0/System.Security.Cryptography.ProtectedData.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/netstandard2.0/System.Security.Cryptography.ProtectedData.dll": {
+          "lib/net6.0/System.Security.Cryptography.ProtectedData.dll": {
             "related": ".xml"
           }
         },
@@ -2133,7 +2117,7 @@
           "buildTransitive/netcoreapp3.1/_._": {}
         },
         "runtimeTargets": {
-          "runtimes/win/lib/netstandard2.0/System.Security.Cryptography.ProtectedData.dll": {
+          "runtimes/win/lib/net6.0/System.Security.Cryptography.ProtectedData.dll": {
             "assetType": "runtime",
             "rid": "win"
           }
@@ -2161,12 +2145,12 @@
           "System.Windows.Extensions": "6.0.0"
         },
         "compile": {
-          "lib/net5.0/System.Security.Permissions.dll": {
+          "lib/net6.0/System.Security.Permissions.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net5.0/System.Security.Permissions.dll": {
+          "lib/net6.0/System.Security.Permissions.dll": {
             "related": ".xml"
           }
         },
@@ -2174,7 +2158,7 @@
           "buildTransitive/netcoreapp3.1/_._": {}
         }
       },
-      "System.Security.Principal.Windows/5.0.0": {
+      "System.Security.Principal.Windows/4.7.0": {
         "type": "package",
         "compile": {
           "ref/netcoreapp3.0/System.Security.Principal.Windows.dll": {
@@ -2351,17 +2335,17 @@
           "System.Drawing.Common": "6.0.0"
         },
         "compile": {
-          "lib/netcoreapp3.1/System.Windows.Extensions.dll": {
+          "lib/net6.0/System.Windows.Extensions.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/netcoreapp3.1/System.Windows.Extensions.dll": {
+          "lib/net6.0/System.Windows.Extensions.dll": {
             "related": ".xml"
           }
         },
         "runtimeTargets": {
-          "runtimes/win/lib/netcoreapp3.1/System.Windows.Extensions.dll": {
+          "runtimes/win/lib/net6.0/System.Windows.Extensions.dll": {
             "assetType": "runtime",
             "rid": "win"
           }
@@ -3783,14 +3767,13 @@
         "microsoft.openapi.nuspec"
       ]
     },
-    "Microsoft.Win32.Registry/5.0.0": {
-      "sha512": "dDoKi0PnDz31yAyETfRntsLArTlVAVzUzCIvvEDsDsucrl33Dl8pIJG06ePTJTI3tGpeyHS9Cq7Foc/s4EeKcg==",
+    "Microsoft.Win32.Registry/4.7.0": {
+      "sha512": "KSrRMb5vNi0CWSGG1++id2ZOs/1QhRqROt+qgbEAdQuGjGrFcl4AOl4/exGPUYz2wUnU42nvJqon1T3U0kPXLA==",
       "type": "package",
-      "path": "microsoft.win32.registry/5.0.0",
+      "path": "microsoft.win32.registry/4.7.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
-        "Icon.png",
         "LICENSE.TXT",
         "THIRD-PARTY-NOTICES.TXT",
         "lib/net46/Microsoft.Win32.Registry.dll",
@@ -3799,11 +3782,13 @@
         "lib/netstandard1.3/Microsoft.Win32.Registry.dll",
         "lib/netstandard2.0/Microsoft.Win32.Registry.dll",
         "lib/netstandard2.0/Microsoft.Win32.Registry.xml",
-        "microsoft.win32.registry.5.0.0.nupkg.sha512",
+        "microsoft.win32.registry.4.7.0.nupkg.sha512",
         "microsoft.win32.registry.nuspec",
         "ref/net46/Microsoft.Win32.Registry.dll",
         "ref/net461/Microsoft.Win32.Registry.dll",
         "ref/net461/Microsoft.Win32.Registry.xml",
+        "ref/net472/Microsoft.Win32.Registry.dll",
+        "ref/net472/Microsoft.Win32.Registry.xml",
         "ref/netstandard1.3/Microsoft.Win32.Registry.dll",
         "ref/netstandard1.3/Microsoft.Win32.Registry.xml",
         "ref/netstandard1.3/de/Microsoft.Win32.Registry.xml",
@@ -3817,6 +3802,8 @@
         "ref/netstandard1.3/zh-hant/Microsoft.Win32.Registry.xml",
         "ref/netstandard2.0/Microsoft.Win32.Registry.dll",
         "ref/netstandard2.0/Microsoft.Win32.Registry.xml",
+        "runtimes/unix/lib/netstandard2.0/Microsoft.Win32.Registry.dll",
+        "runtimes/unix/lib/netstandard2.0/Microsoft.Win32.Registry.xml",
         "runtimes/win/lib/net46/Microsoft.Win32.Registry.dll",
         "runtimes/win/lib/net461/Microsoft.Win32.Registry.dll",
         "runtimes/win/lib/net461/Microsoft.Win32.Registry.xml",
@@ -5368,29 +5355,6 @@
         "system.linq.expressions.nuspec"
       ]
     },
-    "System.Memory/4.5.4": {
-      "sha512": "1MbJTHS1lZ4bS4FmsJjnuGJOu88ZzTT2rLvrhW7Ygic+pC0NWA+3hgAen0HRdsocuQXCkUTdFn9yHJJhsijDXw==",
-      "type": "package",
-      "path": "system.memory/4.5.4",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "LICENSE.TXT",
-        "THIRD-PARTY-NOTICES.TXT",
-        "lib/net461/System.Memory.dll",
-        "lib/net461/System.Memory.xml",
-        "lib/netcoreapp2.1/_._",
-        "lib/netstandard1.1/System.Memory.dll",
-        "lib/netstandard1.1/System.Memory.xml",
-        "lib/netstandard2.0/System.Memory.dll",
-        "lib/netstandard2.0/System.Memory.xml",
-        "ref/netcoreapp2.1/_._",
-        "system.memory.4.5.4.nupkg.sha512",
-        "system.memory.nuspec",
-        "useSharedDesignerContext.txt",
-        "version.txt"
-      ]
-    },
     "System.Net.NameResolution/4.3.0": {
       "sha512": "AFYl08R7MrsrEjqpQWTZWBadqXyTzNDaWpMqyxhb0d6sGhV6xMDKueuBXlLL30gz+DIRY6MpdgnHWlCh5wmq9w==",
       "type": "package",
@@ -6859,14 +6823,13 @@
         "useSharedDesignerContext.txt"
       ]
     },
-    "System.Security.Principal.Windows/5.0.0": {
-      "sha512": "t0MGLukB5WAVU9bO3MGzvlGnyJPgUlcwerXn1kzBRjwLKixT96XV0Uza41W49gVd8zEMFu9vQEFlv0IOrytICA==",
+    "System.Security.Principal.Windows/4.7.0": {
+      "sha512": "ojD0PX0XhneCsUbAZVKdb7h/70vyYMDYs85lwEI+LngEONe/17A0cFaRFqZU+sOEidcVswYWikYOQ9PPfjlbtQ==",
       "type": "package",
-      "path": "system.security.principal.windows/5.0.0",
+      "path": "system.security.principal.windows/4.7.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
-        "Icon.png",
         "LICENSE.TXT",
         "THIRD-PARTY-NOTICES.TXT",
         "lib/net46/System.Security.Principal.Windows.dll",
@@ -6908,7 +6871,7 @@
         "runtimes/win/lib/netcoreapp2.1/System.Security.Principal.Windows.xml",
         "runtimes/win/lib/netstandard1.3/System.Security.Principal.Windows.dll",
         "runtimes/win/lib/uap10.0.16299/_._",
-        "system.security.principal.windows.5.0.0.nupkg.sha512",
+        "system.security.principal.windows.4.7.0.nupkg.sha512",
         "system.security.principal.windows.nuspec",
         "useSharedDesignerContext.txt",
         "version.txt"
@@ -7667,7 +7630,7 @@
     }
   },
   "projectFileDependencyGroups": {
-    "net5.0": [
+    "net6.0": [
       "AutoMapper >= 10.1.1",
       "AutoMapper.Extensions.Microsoft.DependencyInjection >= 8.1.1",
       "ExcelDataReader >= 3.6.0",
@@ -7699,14 +7662,14 @@
         "/Users/macbook/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
-        "net5.0"
+        "net6.0"
       ],
       "sources": {
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
-        "net5.0": {
-          "targetAlias": "net5.0",
+        "net6.0": {
+          "targetAlias": "net6.0",
           "projectReferences": {}
         }
       },
@@ -7717,8 +7680,8 @@
       }
     },
     "frameworks": {
-      "net5.0": {
-        "targetAlias": "net5.0",
+      "net6.0": {
+        "targetAlias": "net6.0",
         "dependencies": {
           "AutoMapper": {
             "target": "Package",
@@ -7780,16 +7743,6 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
-        "downloadDependencies": [
-          {
-            "name": "Microsoft.AspNetCore.App.Ref",
-            "version": "[5.0.0, 5.0.0]"
-          },
-          {
-            "name": "Microsoft.NETCore.App.Ref",
-            "version": "[5.0.0, 5.0.0]"
-          }
-        ],
         "frameworkReferences": {
           "Microsoft.NETCore.App": {
             "privateAssets": "all"

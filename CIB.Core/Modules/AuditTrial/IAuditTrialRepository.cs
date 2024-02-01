@@ -7,9 +7,9 @@ using CIB.Core.Entities;
 
 namespace CIB.Core.Modules.AuditTrial
 {
-    public interface IAuditTrialRepository : IRepository<TblAuditTrail>
-    {
-        IEnumerable<TblAuditTrail> Search(Guid? userId, string userName, string action, DateTime dateFrom, DateTime dateTo);
-   
-    }
+	public interface IAuditTrialRepository : IRepository<TblAuditTrail>
+	{
+		IEnumerable<TblAuditTrail> Search(Guid? userId, string userName, string action, DateTime dateFrom, DateTime dateTo, int pageNumber, int pageSize, out int totalRecord);
+
+	}
 }

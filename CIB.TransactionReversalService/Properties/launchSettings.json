@@ -2,7 +2,6 @@
   "profiles": {
     "CIB.TransactionReversalService": {
       "commandName": "Project",
-      "launchBrowser": true,
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development"
       },

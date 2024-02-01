@@ -12,7 +12,9 @@ namespace CIB.Core.Modules.TemCorporateCustomer
         CorporateUserStatus CheckDuplicate(TblTempCorporateCustomer profile, bool IsUpdate = false);
 
         TblTempCorporateCustomer GetCorporateCustomerByCustomerID(string id);
-       
+        TblTempCorporateCustomer GetCorporateCustomerByCustomerIDForOnboarding(string id, string action);
+        TblTempCorporateCustomer GetCorporateCustomerByCustomerByShortName(string corporateShortName);
+
         List<TblTempCorporateCustomer> CheckDuplicateRequest(TblCorporateCustomer profile, string action);
     }
 }

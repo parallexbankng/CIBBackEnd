@@ -10,7 +10,7 @@ namespace CIB.Core.Modules.TokenBlack
         void UpdateTokenBlack(TblTokenBlack update);
         void UpdateTokenBlackRange(List<TblTokenBlack> update);
         List<TblTokenBlack> GetBlackTokenById(Guid Id);
-        bool IsTokenStillValid(Guid UserId, string Token);
         TblTokenBlack GetTokenByUserId(Guid userId);
+        bool IsTokenStillValid(Guid UserId, string Token);
     }
 }

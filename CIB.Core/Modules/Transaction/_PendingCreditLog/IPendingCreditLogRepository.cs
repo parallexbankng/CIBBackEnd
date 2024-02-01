@@ -6,11 +6,13 @@ using CIB.Core.Modules.Transaction._PendingCreditLog.Dto;
 
 namespace CIB.Core.Modules.Transaction._PendingCreditLog
 {
-    public interface IPendingCreditLogRepository : IRepository<TblPendingCreditLog>
-    {
-    TblPendingCreditLog GetPendingCreditTranLogByTranLogId(Guid TranLogId);
-    List<TblPendingCreditLog> GetPendingCreditTranLogsByTranLogId(Guid tranLogId);
-    List<SingleTransactionDto> GetCompanyCreditTranLogs(Guid CorporateCustomerId);
-    void UpdatePendingCreditLog(TblPendingCreditLog update);
-  }
+	public interface IPendingCreditLogRepository : IRepository<TblPendingCreditLog>
+	{
+		TblPendingCreditLog GetPendingCreditTranLogByTranLogId(Guid TranLogId);
+		List<TblPendingCreditLog> GetPendingCreditTranLogsByTranLogId(Guid tranLogId);
+		List<SingleTransactionDto> GetCompanyCreditTranLogs(Guid CorporateCustomerId);
+		SingleTransactionDto GetCreditTranLog(Guid tranLogId);
+
+		void UpdatePendingCreditLog(TblPendingCreditLog update);
+	}
 }

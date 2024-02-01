@@ -7,55 +7,65 @@ using CIB.Core.Modules.CorporateProfile.Dto;
 
 namespace CIB.Core.Modules.TemCorporateCustomer
 {
-    public class TemCorporateCustomerRespository: Repository<TblTempCorporateCustomer>, ITemCorporateCustomerRespository
+  public class TemCorporateCustomerRespository : Repository<TblTempCorporateCustomer>, ITemCorporateCustomerRespository
+  {
+    public TemCorporateCustomerRespository(ParallexCIBContext context) : base(context)
     {
-        public TemCorporateCustomerRespository(ParallexCIBContext context) : base(context)
-        {
 
-        }
-        public ParallexCIBContext context
-        {
-          get { return _context as ParallexCIBContext; }
-        }
+    }
+    public ParallexCIBContext context
+    {
+      get { return _context as ParallexCIBContext; }
+    }
 
-        public List<TblTempCorporateCustomer> GetCorporateCustomerPendingApproval(int isTreated)
-        {
-          return _context.TblTempCorporateCustomers.Where(ctx => ctx.IsTreated == isTreated).ToList();
-        }
+    public List<TblTempCorporateCustomer> GetCorporateCustomerPendingApproval(int isTreated)
+    {
+      return _context.TblTempCorporateCustomers.Where(ctx => ctx.IsTreated == isTreated).ToList();
+    }
 
-        public void UpdateTemCorporateCustomer(TblTempCorporateCustomer update)
-        {
-          _context.Update(update).Property(x=>x.Sn).IsModified = false;
-        }
+    public void UpdateTemCorporateCustomer(TblTempCorporateCustomer update)
+    {
+      _context.Update(update).Property(x => x.Sn).IsModified = false;
+    }
 
-        public List<TblTempCorporateCustomer> CheckDuplicateRequest(TblCorporateCustomer profile, string action)
-        {
-          return _context.TblTempCorporateCustomers.Where(ctx => ctx.IsTreated == (int)ProfileStatus.Pending && ctx.Action == action && ctx.CorporateCustomerId == profile.Id).ToList();
-        }
+    public List<TblTempCorporateCustomer> CheckDuplicateRequest(TblCorporateCustomer profile, string action)
+    {
+      return _context.TblTempCorporateCustomers.Where(ctx => ctx.IsTreated == (int)ProfileStatus.Pending && ctx.Action == action && ctx.CorporateCustomerId == profile.Id).ToList();
+    }
 
-        public CorporateUserStatus CheckDuplicate(TblTempCorporateCustomer profile, bool IsUpdate)
+    public CorporateUserStatus CheckDuplicate(TblTempCorporateCustomer profile, bool IsUpdate)
+    {
+      var duplicateEmail = _context.TblTempCorporateCustomers.FirstOrDefault(x => x.CustomerId.Trim().Equals(profile.CustomerId.Trim()));
+      if (duplicateEmail != null)
+      {
+        if (IsUpdate)
         {
-          var duplicateEmail = _context.TblTempCorporateCustomers.FirstOrDefault(x => x.CustomerId.Trim().Equals(profile.CustomerId.Trim()));
-          if(duplicateEmail != null)
+          if (profile.Id != duplicateEmail.Id)
           {
-            if(IsUpdate)
-            {
-              if(profile.Id != duplicateEmail.Id)
-              {
-                return new CorporateUserStatus { Message = "Corporate Customer Already Exit or is Pending Approval", IsDuplicate = "01" };
-              }
-            }
-            else
-            {
-              return new CorporateUserStatus { Message = "Corporate Customer Already Exit or is Pending Approval", IsDuplicate = "01" };
-            }
+            return new CorporateUserStatus { Message = "Corporate Customer Already Exit or is Pending Approval", IsDuplicate = "01" };
           }
-          return new CorporateUserStatus { Message = "", IsDuplicate = "02" };
         }
-
-        public TblTempCorporateCustomer GetCorporateCustomerByCustomerID(string id)
+        else
         {
-          return _context.TblTempCorporateCustomers.FirstOrDefault(a => a.CustomerId == id);
+          return new CorporateUserStatus { Message = "Corporate Customer Already Exit or is Pending Approval", IsDuplicate = "01" };
         }
+      }
+      return new CorporateUserStatus { Message = "", IsDuplicate = "02" };
+    }
+
+    public TblTempCorporateCustomer GetCorporateCustomerByCustomerID(string id)
+    {
+      return _context.TblTempCorporateCustomers.FirstOrDefault(a => a.CustomerId == id);
+    }
+
+    public TblTempCorporateCustomer GetCorporateCustomerByCustomerIDForOnboarding(string id, string action)
+    {
+      return _context.TblTempCorporateCustomers.FirstOrDefault(a => a.CustomerId == id && a.Action.Trim().ToLower() == action.Trim().ToLower());
+    }
+
+    public TblTempCorporateCustomer GetCorporateCustomerByCustomerByShortName(string corporateShortName)
+    {
+      return _context.TblTempCorporateCustomers.FirstOrDefault(a => a.CorporateShortName.Trim().ToLower() == corporateShortName.Trim().ToLower());
+    }
   }
 }

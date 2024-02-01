@@ -8,6 +8,5 @@ public class TransactionRepository : Repository<TblTransaction>,ITransactionRepo
 { public TransactionRepository(ParallexCIBContext context) : base(context)
   {
   }
-  
-  public ParallexCIBContext Context { get { return _context as ParallexCIBContext; }}
+  public new ParallexCIBContext Context { get { return base.Context as ParallexCIBContext; }} 
 }

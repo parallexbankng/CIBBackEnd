@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using CIB.BankAdmin.Utils;
 using CIB.Core.Common;
 using CIB.Core.Common.Dto;
 using CIB.Core.Common.Interface;
@@ -9,7 +8,6 @@ using CIB.Core.Entities;
 using CIB.Core.Enums;
 using CIB.Core.Modules.BankAdminProfile.Dto;
 using CIB.Core.Modules.BankAdminProfile.Validation;
-using CIB.Core.Services.Api.Dto;
 using CIB.Core.Services.Authentication;
 using CIB.Core.Services.Email;
 using CIB.Core.Services.Notification;
@@ -18,7 +16,6 @@ using CIB.Core.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 
 namespace CIB.BankAdmin.Controllers
@@ -125,7 +122,6 @@ namespace CIB.BankAdmin.Controllers
 				var results = validator.Validate(payload);
 				if (!results.IsValid)
 				{
-					LogFormater<BankProfileController>.Error(_logger, "CreateProfile", $"VALIDATION ERROR : {results}", JsonConvert.SerializeObject(payload), JsonConvert.SerializeObject(BankProfile.Username));
 					return UnprocessableEntity(new ValidatorResponse(_data: new object(), _success: false, _validationResult: results.Errors));
 				}
 				var roleName = UnitOfWork.RoleRepo.GetRoleName(payload.UserRoleId);
@@ -175,7 +171,6 @@ namespace CIB.BankAdmin.Controllers
 				mapTempProfile.Action = nameof(TempTableAction.Create).Replace("_", " ");
 				mapTempProfile.UserRoles = payload.UserRoleId;
 
-
 				var tempResult = UnitOfWork.TemBankAdminProfileRepo.CheckDuplicate(mapProfile);
 				if (tempResult.IsDuplicate)
 				{
@@ -185,7 +180,6 @@ namespace CIB.BankAdmin.Controllers
 				responseObject.PhoneNumber = mapProfile.Phone;
 				responseObject.UserRoleName = roleName;
 				UnitOfWork.TemBankAdminProfileRepo.Add(mapTempProfile);
-				UnitOfWork.AuditTrialRepo.Add(auditTrail);
 				UnitOfWork.Complete();
 				notify.NotifyBankAdminAuthorizer(mapTempProfile, true, "BankProfile Onboarded");
 				return Ok(new ResponseDTO<BankAdminProfileResponse>(_data: responseObject, success: true, _message: Message.Success));
@@ -236,7 +230,7 @@ namespace CIB.BankAdmin.Controllers
 			}
 		}
 
-		[HttpPut("UpdateProfile")]
+		[HttpPost("UpdateProfile")]
 		[ProducesResponseType(StatusCodes.Status201Created)]
 		public ActionResult<ResponseDTO<BankAdminProfileResponse>> UpdateBankAdminProfile(GenericRequestDto model)
 		{
@@ -267,6 +261,7 @@ namespace CIB.BankAdmin.Controllers
 					return BadRequest("invalid request data");
 				}
 
+
 				var payload = new UpdateBankAdminProfileDTO
 				{
 					Id = requestData.Id,
@@ -287,7 +282,6 @@ namespace CIB.BankAdmin.Controllers
 				var results = validator.Validate(payload);
 				if (!results.IsValid)
 				{
-					LogFormater<BankProfileController>.Error(_logger, "UpdateProfile", $"VALIDATION ERROR : {results}", JsonConvert.SerializeObject(payload), JsonConvert.SerializeObject(BankProfile.Username));
 					return UnprocessableEntity(new ValidatorResponse(_data: new object(), _success: false, _validationResult: results.Errors));
 				}
 
@@ -325,9 +319,9 @@ namespace CIB.BankAdmin.Controllers
 					HostName = payload.HostName,
 					ClientStaffIpaddress = payload.ClientStaffIPAddress,
 					NewFieldValue = $"First Name: {payload.FirstName}, Last Name: {payload.LastName}, Username: {payload.Username}, Email Address:  {payload.Email}, " +
-					$"Middle Name: {payload.MiddleName}, Phone Number: {payload.PhoneNumber},Status: {nameof(ProfileStatus.Modified)}",
+						$"Middle Name: {payload.MiddleName}, Phone Number: {payload.PhoneNumber},Status: {nameof(ProfileStatus.Modified)}",
 					PreviousFieldValue = $"First Name: {profileData.FirstName}, Last Name: {profileData.LastName}, Username: {profileData.Username}, Email Address:  {profileData.Email}, " +
-					$"Middle Name: {profileData.MiddleName}, Phone Number: {profileData.Phone},Status: {status}",
+						$"Middle Name: {profileData.MiddleName}, Phone Number: {profileData.Phone},Status: {status}",
 					TransactionId = "",
 					UserId = BankProfile.Id,
 					Username = UserName,
@@ -390,7 +384,7 @@ namespace CIB.BankAdmin.Controllers
 			}
 		}
 
-		[HttpPut("RequestProfileApproval")]
+		[HttpPost("RequestProfileApproval")]
 		[ProducesResponseType(StatusCodes.Status201Created)]
 		public ActionResult<ResponseDTO<BankAdminProfileResponse>> RequestProfileApproval(GenericRequestDto model)
 		{
@@ -420,6 +414,7 @@ namespace CIB.BankAdmin.Controllers
 				{
 					return BadRequest("invalid request data");
 				}
+
 
 				var payload = new SimpleAction
 				{
@@ -465,7 +460,7 @@ namespace CIB.BankAdmin.Controllers
 			}
 		}
 
-		[HttpPut("ApproveProfile")]
+		[HttpPost("ApproveProfile")]
 		[ProducesResponseType(StatusCodes.Status201Created)]
 		public ActionResult<ResponseDTO<BankAdminProfileResponse>> ApproveProfile(GenericRequestDto model)
 		{
@@ -496,7 +491,6 @@ namespace CIB.BankAdmin.Controllers
 				{
 					return BadRequest("invalid request data");
 				}
-
 
 				var payload = new SimpleAction
 				{
@@ -531,37 +525,6 @@ namespace CIB.BankAdmin.Controllers
 				{
 					return BadRequest("Invalid Profile Id");
 				}
-
-
-				// var status = (ProfileStatus)entity.Status;
-				// var auditTrail = new TblAuditTrail
-				// {
-				//   Id = Guid.NewGuid(),
-				//   ActionCarriedOut = nameof(AuditTrailAction.Approve).Replace("_", " "),
-				//   Ipaddress = payload.IPAddress,
-				//   Macaddress = payload.MACAddress,
-				//   HostName = payload.HostName,
-				//   ClientStaffIpaddress = payload.ClientStaffIPAddress,
-				//   NewFieldValue =  $"Profile Status: {nameof(ProfileStatus.Active)}, Username: {entity.Username}First Name: {entity.FirstName}, Last Name: {entity.LastName}",
-				//   PreviousFieldValue = $"Profile Status: {status},Username: {entity.Username},First Name: {entity.FirstName}, Last Name: {entity.LastName}",
-				//   TransactionId = "",
-				//   UserId = BankProfile.Id,
-				//   Username = UserName,
-				//   Description = "Approved Bank User Profile",
-				//   TimeStamp = DateTime.Now
-				// };
-				// //update status
-				// entity.Status = (int)ProfileStatus.Active;
-				// int? regStage = entity.RegStage;
-				// if (regStage == 0)
-				// {
-				//   string fullName = entity.LastName + " " + entity.MiddleName + " " + entity.FirstName;
-				//   _emailService.SendEmail(EmailTemplate.LoginCredentialAdminMail(entity.Email, fullName, entity.Username, "", ""));
-				// }
-				// entity.RegStage = 1;
-				// UnitOfWork.BankProfileRepo.UpdateBankProfile(entity);
-				// UnitOfWork.AuditTrialRepo.Add(auditTrail);
-				// UnitOfWork.Complete();
 				var mapResponse = Mapper.Map<BankAdminProfileResponse>(profile);
 				return Ok(new ResponseDTO<BankAdminProfileResponse>(_data: mapResponse, success: true, _message: Message.Success));
 			}
@@ -572,7 +535,7 @@ namespace CIB.BankAdmin.Controllers
 			}
 		}
 
-		[HttpPut("ReActivateProfile")]
+		[HttpPost("ReActivateProfile")]
 		[ProducesResponseType(StatusCodes.Status201Created)]
 		public ActionResult<ResponseDTO<BankAdminProfileResponse>> ReActivateProfile(GenericRequestDto model)
 		{
@@ -598,12 +561,11 @@ namespace CIB.BankAdmin.Controllers
 					return BadRequest("invalid request");
 				}
 
-				var requestData = JsonConvert.DeserializeObject<SimpleAction>(Encryption.DecryptStrings(model.Data));
+				var requestData = JsonConvert.DeserializeObject<DeclineBankAdminProfileDTO>(Encryption.DecryptStrings(model.Data));
 				if (requestData == null)
 				{
 					return BadRequest("invalid request data");
 				}
-
 				var payload = new SimpleAction
 				{
 					Id = requestData.Id,
@@ -617,7 +579,6 @@ namespace CIB.BankAdmin.Controllers
 				{
 					return BadRequest("Invalid format");
 				}
-
 				var entity = UnitOfWork.BankProfileRepo.GetByIdAsync(payload.Id);
 				if (entity == null)
 				{
@@ -686,7 +647,7 @@ namespace CIB.BankAdmin.Controllers
 			}
 		}
 
-		[HttpPut("DeclineProfile")]
+		[HttpPost("DeclineProfile")]
 		[ProducesResponseType(StatusCodes.Status201Created)]
 		public ActionResult<ResponseDTO<BankAdminProfileResponse>> DeclineProfile(GenericRequestDto model)
 		{
@@ -788,9 +749,9 @@ namespace CIB.BankAdmin.Controllers
 			}
 		}
 
-		[HttpPut("DeactivateProfile")]
+		[HttpPost("DeactivateProfile")]
 		[ProducesResponseType(StatusCodes.Status201Created)]
-		public ActionResult<ResponseDTO<BankAdminProfileResponse>> DeactivateProfile(AppAction model)
+		public ActionResult<ResponseDTO<BankAdminProfileResponse>> DeactivateProfile(GenericRequestDto model)
 		{
 			try
 			{
@@ -808,10 +769,21 @@ namespace CIB.BankAdmin.Controllers
 					return BadRequest("UnAuthorized Access");
 				}
 
+				if (string.IsNullOrEmpty(model.Data))
+				{
+					return BadRequest("invalid request");
+				}
+
+				var requestData = JsonConvert.DeserializeObject<DeactivateBankAdminProfileDTO>(Encryption.DecryptStrings(model.Data));
+				if (requestData == null)
+				{
+					return BadRequest("invalid request data");
+				}
+
 				var payload = new DeactivateBankAdminProfileDTO
 				{
-					Id = Encryption.DecryptGuid(model.Id),
-					Reason = Encryption.DecryptStrings(model.Reason),
+					Id = requestData.Id,
+					Reason = requestData.Reason,
 					IPAddress = Encryption.DecryptStrings(model.IPAddress),
 					HostName = Encryption.DecryptStrings(model.HostName),
 					ClientStaffIPAddress = Encryption.DecryptStrings(model.ClientStaffIPAddress),
@@ -885,9 +857,9 @@ namespace CIB.BankAdmin.Controllers
 			}
 		}
 
-		[HttpPut("UpdateProfileUserRole")]
+		[HttpPost("UpdateProfileUserRole")]
 		[ProducesResponseType(StatusCodes.Status201Created)]
-		public ActionResult<ResponseDTO<BankAdminProfileResponse>> UpdateProfileUserRole(UpdateBankAdminProfileUserRole model)
+		public ActionResult<ResponseDTO<BankAdminProfileResponse>> UpdateProfileUserRole(GenericRequestDto model)
 		{
 			try
 			{
@@ -906,6 +878,17 @@ namespace CIB.BankAdmin.Controllers
 					return BadRequest("UnAuthorized Access");
 				}
 
+				if (string.IsNullOrEmpty(model.Data))
+				{
+					return BadRequest("invalid request");
+				}
+
+				var requestData = JsonConvert.DeserializeObject<UpdateBankAdminProfileUserRoleDTO>(Encryption.DecryptStrings(model.Data));
+				if (requestData == null)
+				{
+					return BadRequest("invalid request data");
+				}
+
 				string errormsg = string.Empty;
 
 				if (!IsUserActive(out errormsg))
@@ -914,8 +897,8 @@ namespace CIB.BankAdmin.Controllers
 				}
 				var payload = new UpdateBankAdminProfileUserRoleDTO
 				{
-					Id = Encryption.DecryptGuid(model.Id),
-					RoleId = Encryption.DecryptGuid(model.RoleId),
+					Id = requestData.Id,
+					RoleId = requestData.RoleId,
 					IPAddress = Encryption.DecryptStrings(model.IPAddress),
 					HostName = Encryption.DecryptStrings(model.HostName),
 					ClientStaffIPAddress = Encryption.DecryptStrings(model.ClientStaffIPAddress),
@@ -1006,9 +989,9 @@ namespace CIB.BankAdmin.Controllers
 			}
 		}
 
-		[HttpPut("EnableProfileLoggedOut")]
+		[HttpPost("EnableProfileLoggedOut")]
 		[ProducesResponseType(StatusCodes.Status201Created)]
-		public ActionResult<ResponseDTO<BankAdminProfileResponse>> EnableProfileLoggedOut(SimpleActionDto model)
+		public ActionResult<ResponseDTO<BankAdminProfileResponse>> EnableProfileLoggedOut(GenericRequestDto model)
 		{
 			try
 			{
@@ -1029,18 +1012,31 @@ namespace CIB.BankAdmin.Controllers
 					return BadRequest("UnAuthorized Access");
 				}
 
-				if (string.IsNullOrEmpty(model.Id))
+				if (string.IsNullOrEmpty(model.Data))
 				{
-					return BadRequest("Invalid format");
+					return BadRequest("invalid request");
 				}
+
+				var requestData = JsonConvert.DeserializeObject<SimpleAction>(Encryption.DecryptStrings(model.Data));
+				if (requestData == null)
+				{
+					return BadRequest("invalid request data");
+				}
+
+
 				var payload = new SimpleAction
 				{
-					Id = Encryption.DecryptGuid(model.Id),
+					Id = requestData.Id,
 					IPAddress = Encryption.DecryptStrings(model.IPAddress),
 					HostName = Encryption.DecryptStrings(model.HostName),
 					ClientStaffIPAddress = Encryption.DecryptStrings(model.ClientStaffIPAddress),
 					MACAddress = Encryption.DecryptStrings(model.MACAddress)
 				};
+
+				if (string.IsNullOrEmpty(payload.Id.ToString()))
+				{
+					return BadRequest("Invalid format");
+				}
 
 				var entity = UnitOfWork.BankProfileRepo.GetByIdAsync(payload.Id);
 				if (entity == null)
@@ -1127,6 +1123,7 @@ namespace CIB.BankAdmin.Controllers
 				return BadRequest(new ErrorResponse(responsecode: ResponseCode.SERVER_ERROR, responseDescription: Message.ServerError, responseStatus: false));
 			}
 		}
+
 		private bool ApprovedRequest(TblTempBankProfile profile, SimpleAction payload, out string errorMessage)
 		{
 			var tblRole = UnitOfWork.RoleRepo.GetByIdAsync(Guid.Parse(profile.UserRoles));
@@ -1186,14 +1183,39 @@ namespace CIB.BankAdmin.Controllers
 				profile.ApprovedId = BankProfile.Id;
 				profile.ApprovalUsername = UserName;
 				profile.ActionResponseDate = DateTime.Now;
-				mapProfile.DateStarted = profile.DateRequested;
-				mapProfile.DateCompleted = DateTime.Now;
 				UnitOfWork.TemBankAdminProfileRepo.UpdateTemBankAdminProfile(profile);
 				UnitOfWork.BankProfileRepo.Add(mapProfile);
 				UnitOfWork.AuditTrialRepo.Add(auditTrail);
 				UnitOfWork.Complete();
 				errorMessage = "";
 				return true;
+
+				//update status
+				// if (mapProfile.RegStage == 0)
+				// {
+				//     var password = Encryption.DecriptPassword(mapProfile.Password);
+				//     var authUrl = _config.GetValue<string>("authUrl:coporate");
+				//     ThreadPool.QueueUserWorkItem(_ => _emailService.SendEmail(EmailTemplate.LoginCredentialMail(mapProfile.Email, mapProfile.FullName, mapProfile.Username, password, corporateCustomerDto.CustomerId,authUrl)));
+				// }
+				// var auditTrail = new TblAuditTrail
+				// {
+				//     Id = Guid.NewGuid(),
+				//     ActionCarriedOut = nameof(AuditTrailAction.Create).Replace("_", " "),
+				//     Ipaddress = payload.IPAddress,
+				//     Macaddress = payload.MACAddress,
+				//     HostName = payload.HostName,
+				//     ClientStaffIpaddress = payload.ClientStaffIPAddress,
+				//     NewFieldValue = $"Company Name: {corporateCustomerDto.CompanyName}, Customer ID: {corporateCustomerDto.CustomerId}, First Name: {requestInfo.FirstName}, " +
+				//         $"Last Name: {requestInfo.LastName}, Username: {requestInfo.Username}, Email Address:  {requestInfo.Email}, " +
+				//         $"Middle Name: {requestInfo.MiddleName}, Phone Number: {requestInfo.Phone1}, Role: {tblRole?.RoleName}, " +
+				//         $"Approval Limit: {requestInfo.ApprovalLimit}, Status: {nameof(ProfileStatus.Active)}",
+				//     PreviousFieldValue = "",
+				//     TransactionId = "",
+				//     UserId = BankProfile.Id,
+				//     Username = UserName,
+				//     Description = $"Approved Newly Created Corporate Profile. Action was carried out by a Bank user",
+				//     TimeStamp = DateTime.Now
+				// };
 			}
 
 			if (profile.Action == nameof(TempTableAction.Update_Phone_Number).Replace("_", " "))
@@ -1208,9 +1230,9 @@ namespace CIB.BankAdmin.Controllers
 					HostName = payload.HostName,
 					ClientStaffIpaddress = payload.ClientStaffIPAddress,
 					NewFieldValue = $" First Name: {profile.FirstName},Last Name: {profile.LastName}, Username: {profile.Username}, Email Address:  {profile.Email}, " +
-					$"Middle Name: {profile.MiddleName}, Phone Number: {profile.Phone},Status: {nameof(ProfileStatus.Active)}",
+							$"Middle Name: {profile.MiddleName}, Phone Number: {profile.Phone},Status: {nameof(ProfileStatus.Active)}",
 					PreviousFieldValue = $"First Name: {entity.FirstName}, Status: {nameof(ProfileStatus.Active)}" +
-					$"Last Name: {entity.LastName}, Username: {entity.Username}, Email Address:  {entity.Email},Middle Name: {entity.MiddleName}, Phone Number: {entity.Phone},",
+							$"Last Name: {entity.LastName}, Username: {entity.Username}, Email Address:  {entity.Email},Middle Name: {entity.MiddleName}, Phone Number: {entity.Phone},",
 					TransactionId = "",
 					UserId = BankProfile.Id,
 					Username = UserName,
@@ -1265,9 +1287,9 @@ namespace CIB.BankAdmin.Controllers
 					HostName = payload.HostName,
 					ClientStaffIpaddress = payload.ClientStaffIPAddress,
 					NewFieldValue = $"First Name: {profile.FirstName}, Last Name: {profile.LastName}, Username: {profile.Username}, Email Address:  {profile.Email}, " +
-						$"Middle Name: {profile.MiddleName}, Phone Number: {profile.Phone}, Role: {tblRole?.RoleName},Status: {nameof(ProfileStatus.Modified)}",
+								$"Middle Name: {profile.MiddleName}, Phone Number: {profile.Phone}, Role: {tblRole?.RoleName},Status: {nameof(ProfileStatus.Modified)}",
 					PreviousFieldValue = $"First Name: {entity.FirstName},Last Name: {entity.LastName}, Username: {entity.Username}, Email Address:  {entity.Email}, " +
-						$"Middle Name: {entity.MiddleName}, Phone Number: {entity.Phone}, Role: {previousRole?.RoleName},Status: {nameof(ProfileStatus.Active)}",
+								$"Middle Name: {entity.MiddleName}, Phone Number: {entity.Phone}, Role: {previousRole?.RoleName},Status: {nameof(ProfileStatus.Active)}",
 					TransactionId = "",
 					UserId = BankProfile.Id,
 					Username = UserName,
@@ -1309,9 +1331,9 @@ namespace CIB.BankAdmin.Controllers
 					HostName = payload.HostName,
 					ClientStaffIpaddress = payload.ClientStaffIPAddress,
 					NewFieldValue = $"First Name: {profile.FirstName},Last Name: {profile.LastName}, Username: {profile.Username}, Email Address:  {profile.Email}, " +
-						$"Middle Name: {profile.MiddleName}, Phone Number: {profile.Phone}, Role: {tblRole?.RoleName}, Status: {nameof(ProfileStatus.Modified)}",
+								$"Middle Name: {profile.MiddleName}, Phone Number: {profile.Phone}, Role: {tblRole?.RoleName}, Status: {nameof(ProfileStatus.Modified)}",
 					PreviousFieldValue = $"First Name: {entity.FirstName},Last Name: {entity.LastName}, Username: {entity.Username}, Email Address:  {entity.Email}, " +
-						$"Middle Name: {entity.MiddleName}, Phone Number: {entity.Phone},Status: {nameof(ProfileStatus.Active)}",
+								$"Middle Name: {entity.MiddleName}, Phone Number: {entity.Phone},Status: {nameof(ProfileStatus.Active)}",
 					TransactionId = "",
 					UserId = BankProfile.Id,
 					Username = UserName,
@@ -1360,9 +1382,9 @@ namespace CIB.BankAdmin.Controllers
 					HostName = payload.HostName,
 					ClientStaffIpaddress = payload.ClientStaffIPAddress,
 					NewFieldValue = $"First Name: {profile.FirstName}, Last Name: {profile.LastName}, Username: {profile.Username}, Email Address:  {profile.Email}, " +
-						$"Middle Name: {profile.MiddleName}, Phone Number: {profile.Phone}, Role: {tblRole?.RoleName},Status: {nameof(ProfileStatus.Modified)}",
+								$"Middle Name: {profile.MiddleName}, Phone Number: {profile.Phone}, Role: {tblRole?.RoleName},Status: {nameof(ProfileStatus.Modified)}",
 					PreviousFieldValue = $"First Name: {entity.FirstName},Last Name: {entity.LastName}, Username: {entity.Username}, Email Address:  {entity.Email}, " +
-					$"Middle Name: {entity.MiddleName}, Phone Number: {entity.Phone}, Role: {previousRole?.RoleName},Status: {nameof(ProfileStatus.Active)}",
+							$"Middle Name: {entity.MiddleName}, Phone Number: {entity.Phone}, Role: {previousRole?.RoleName},Status: {nameof(ProfileStatus.Active)}",
 					TransactionId = "",
 					UserId = BankProfile.Id,
 					Username = UserName,
@@ -1471,9 +1493,9 @@ namespace CIB.BankAdmin.Controllers
 					HostName = payload.HostName,
 					ClientStaffIpaddress = payload.ClientStaffIPAddress,
 					NewFieldValue = $"First Name: {entity.FirstName}, Last Name: {entity.LastName}, Username: {entity.Username}, Email Address:  {entity.Email}, " +
-				$"Middle Name: {entity.MiddleName}, Phone Number: {entity.Phone},Status: {nameof(ProfileStatus.Modified)}",
+					$"Middle Name: {entity.MiddleName}, Phone Number: {entity.Phone},Status: {nameof(ProfileStatus.Modified)}",
 					PreviousFieldValue = $"First Name: {profile.FirstName}, Last Name: {profile.LastName}, Username: {profile.Username}, Email Address:  {profile.Email}, " +
-				$"Middle Name: {profile.MiddleName}, Phone Number: {profile.Phone},Status: {status}",
+					$"Middle Name: {profile.MiddleName}, Phone Number: {profile.Phone},Status: {status}",
 					TransactionId = "",
 					UserId = BankProfile.Id,
 					Username = UserName,
@@ -1577,7 +1599,7 @@ namespace CIB.BankAdmin.Controllers
 					HostName = payload.HostName,
 					ClientStaffIpaddress = payload.ClientStaffIPAddress,
 					NewFieldValue = $"First Name: {entity.FirstName},Last Name: {entity.LastName}, Username: {entity.Username}, Email Address:  {entity.Email}, " +
-					$"Middle Name: {entity.MiddleName}, Phone Number: {entity.Phone}, Role: {tblRole?.RoleName}, Status: {nameof(ProfileStatus.Pending)}",
+							$"Middle Name: {entity.MiddleName}, Phone Number: {entity.Phone}, Role: {tblRole?.RoleName}, Status: {nameof(ProfileStatus.Pending)}",
 					PreviousFieldValue = "",
 					TransactionId = "",
 					UserId = BankProfile.Id,
@@ -1628,7 +1650,7 @@ namespace CIB.BankAdmin.Controllers
 					HostName = payload.HostName,
 					ClientStaffIpaddress = payload.ClientStaffIPAddress,
 					NewFieldValue = $"First Name: {entity.FirstName},Last Name: {entity.LastName}, Username: {entity.Username}, Email Address:  {entity.Email}, " +
-				$"Middle Name: {entity.MiddleName}, Phone Number: {entity.Phone},Status: {nameof(ProfileStatus.Pending)}",
+					$"Middle Name: {entity.MiddleName}, Phone Number: {entity.Phone},Status: {nameof(ProfileStatus.Pending)}",
 					PreviousFieldValue = "",
 					TransactionId = "",
 					UserId = BankProfile.Id,
@@ -1682,7 +1704,7 @@ namespace CIB.BankAdmin.Controllers
 					HostName = payload.HostName,
 					ClientStaffIpaddress = payload.ClientStaffIPAddress,
 					NewFieldValue = $"First Name: {entity.FirstName},Last Name: {entity.LastName}, Username: {entity.Username}, Email Address:  {entity.Email}, " +
-					$"Middle Name: {entity.MiddleName}, Phone Number: {entity.Phone}, Role: {tblRole?.RoleName},Status: {nameof(ProfileStatus.Pending)}",
+							$"Middle Name: {entity.MiddleName}, Phone Number: {entity.Phone}, Role: {tblRole?.RoleName},Status: {nameof(ProfileStatus.Pending)}",
 					PreviousFieldValue = "",
 					TransactionId = "",
 					UserId = BankProfile.Id,
@@ -1732,7 +1754,7 @@ namespace CIB.BankAdmin.Controllers
 					HostName = payload.HostName,
 					ClientStaffIpaddress = payload.ClientStaffIPAddress,
 					NewFieldValue = $"First Name: {entity.FirstName},Last Name: {entity.LastName}, Username: {entity.Username}, Email Address:  {entity.Email}, " +
-					$"Middle Name: {entity.MiddleName}, Phone Number: {entity.Phone},Status: {status}",
+							$"Middle Name: {entity.MiddleName}, Phone Number: {entity.Phone},Status: {status}",
 					PreviousFieldValue = "",
 					TransactionId = "",
 					UserId = BankProfile.Id,
@@ -1761,5 +1783,8 @@ namespace CIB.BankAdmin.Controllers
 			errorMessage = "invalid Request";
 			return false;
 		}
+
+
+
 	}
 }

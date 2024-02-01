@@ -8,7 +8,6 @@ using CIB.Core.Modules.Authentication.Dto;
 
 namespace CIB.Core.Modules.CorporateUserRoleAccess.Mapper
 {
- 
     public class CorporateUserRoleAccessMapper : Profile
     {
        public CorporateUserRoleAccessMapper()

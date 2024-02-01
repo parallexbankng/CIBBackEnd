@@ -13,15 +13,15 @@
     <SourceRoot Include="/Users/macbook/.nuget/packages/" />
   </ItemGroup>
   <ItemGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
-    <None Include="$(NuGetPackageRoot)nlog.config/4.7.10/contentFiles/any/any/NLog.config" Condition="Exists('$(NuGetPackageRoot)nlog.config/4.7.10/contentFiles/any/any/NLog.config')">
+    <None Include="$(NuGetPackageRoot)nlog.config/4.7.10/contentFiles/any/any/.DS_Store" Condition="Exists('$(NuGetPackageRoot)nlog.config/4.7.10/contentFiles/any/any/.DS_Store')">
       <NuGetPackageId>NLog.Config</NuGetPackageId>
       <NuGetPackageVersion>4.7.10</NuGetPackageVersion>
       <NuGetItemType>None</NuGetItemType>
       <Pack>false</Pack>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <TargetPath>NLog.config</TargetPath>
+      <TargetPath>.DS_Store</TargetPath>
       <Private>True</Private>
-      <Link>NLog.config</Link>
+      <Link>.DS_Store</Link>
     </None>
   </ItemGroup>
   <ImportGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">

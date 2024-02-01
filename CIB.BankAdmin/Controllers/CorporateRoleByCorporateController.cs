@@ -6,6 +6,7 @@ using CIB.Core.Common.Dto;
 using CIB.Core.Common.Interface;
 using CIB.Core.Common.Response;
 using CIB.Core.Entities;
+using CIB.Core.Modules.BankAdminProfile.Dto;
 using CIB.Core.Services.Authentication;
 using CIB.Core.Services.Email;
 using CIB.Core.Services.Notification;
@@ -22,12 +23,11 @@ namespace CIB.BankAdmin.Controllers
     {
         protected readonly IEmailService _emailService;
         private readonly ILogger<CorporateRoleByCorporateController> _logger;
-        protected readonly INotificationService notify;
-        public CorporateRoleByCorporateController(INotificationService notify,ILogger<CorporateRoleByCorporateController> _logger,IUnitOfWork unitOfWork,IEmailService emailService, IMapper mapper, IHttpContextAccessor accessor,IAuthenticationService authService):base(mapper,unitOfWork,accessor,authService)
+      
+        public CorporateRoleByCorporateController(ILogger<CorporateRoleByCorporateController> _logger,IUnitOfWork unitOfWork,IEmailService emailService, IMapper mapper, IHttpContextAccessor accessor,IAuthenticationService authService):base(mapper,unitOfWork,accessor,authService)
         {
             this._emailService = emailService;
             this._logger = _logger;
-            this.notify = notify;
         }
 
         [HttpGet("GetUserAccesses")]
@@ -63,37 +63,40 @@ namespace CIB.BankAdmin.Controllers
                 return BadRequest(new ErrorResponse(responsecode:ResponseCode.SERVER_ERROR, responseDescription: Message.ServerError, responseStatus:false));
             }
         }
-
-        [HttpPost("encryption")]
+        [HttpPost("encyption")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
-        public ActionResult<string> encryption(string item)
+        public ActionResult<string> CreateBankAdminProfile(string item)
         {
             try
             {
                 var result = Encryption.EncryptStrings(item);
-                return $"{result}";
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                if(ex.Message.Contains("Padding is invalid and cannot be removed"))
+                {
+                    return BadRequest("Beneficairy Account could not be verify");
+                }
+                return StatusCode(500, ex.InnerException != null ? ex.InnerException.Message : ex.Message);
+            }
+        }
+        [HttpPost("decyption")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+        public ActionResult<BankAdminProfileResponse> BankAdminProfile(string item)
+        {
+            try
+            {
+                //var items = notify.GetSuperAdminAuthorizer();
+                var decrupt = Encryption.DecryptStrings(item);
+                return Ok(decrupt);
             }
             catch (Exception ex)
             {
                 return StatusCode(500, ex.InnerException != null ? ex.InnerException.Message : ex.Message);
             }
         }
-
-		[HttpPost("dencryption")]
-		[ProducesResponseType(StatusCodes.Status201Created)]
-		[ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
-		public ActionResult<string> dencryption(string item)
-		{
-			try
-			{
-				var result = Encryption.DecryptStrings(item);
-				return $"{result}";
-			}
-			catch (Exception ex)
-			{
-				return StatusCode(500, ex.InnerException != null ? ex.InnerException.Message : ex.Message);
-			}
-		}
-	}
+    }
 }

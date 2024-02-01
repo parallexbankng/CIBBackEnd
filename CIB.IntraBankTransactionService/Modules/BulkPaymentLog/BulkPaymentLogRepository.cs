@@ -1,6 +1,7 @@
 
 using CIB.IntraBankTransactionService.Entities;
 using CIB.IntraBankTransactionService.Modules.Common.Repository;
+using CIB.IntraBankTransactionService.Utils;
 
 namespace CIB.IntraBankTransactionService.Modules.BulkPaymentLog;
 
@@ -11,19 +12,24 @@ public class BulkPaymentLogRepository : Repository<TblNipbulkTransferLog>, IBulk
   }
   public ParallexCIBContext Context { get { return _context as ParallexCIBContext; } }
 
-  public List<TblNipbulkTransferLog> GetPendingTransferItems(int status, int perProcess, int tryCount, DateTime processDate)
+  public List<TblNipbulkTransferLog> GetPendingTransferItems(int status, int perProcess, DateTime? processDate, int tryCount)
   {
     return _context.TblNipbulkTransferLogs.Where(ctx =>
     ctx.TransactionStatus == status &&
     ctx.ApprovalStatus == 1 &&
     ctx.IntraBankStatus == 0 &&
-    ctx.DateProccessed.Value.Date == processDate &&
+    ctx.DateProccessed == processDate &&
+    //ctx.ServerIp == Transactions.GetHostIp() &&
     ctx.TryCount < tryCount
     ).OrderBy(a => a.TryCount).Take(perProcess).ToList();
   }
   public List<TblNipbulkTransferLog> CheckInterBankStatus(Guid? tranId, int isPending)
   {
-    return _context.TblNipbulkTransferLogs.Where(ctx => ctx.Id == tranId && ctx.ApprovalStatus == 1 && ctx.InterBankStatus == 0).ToList();
+    return _context.TblNipbulkTransferLogs.Where(ctx =>
+     ctx.Id == tranId &&
+     ctx.ApprovalStatus == 1 &&
+     ctx.InterBankStatus == 0
+     ).ToList();
   }
 
   public int GetInterBankTotalCredit(Guid tranLogId, string bankCode, DateTime processDate)
