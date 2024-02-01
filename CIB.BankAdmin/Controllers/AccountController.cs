@@ -103,66 +103,39 @@ namespace CIB.BankAdmin.Controllers
 					return UnprocessableEntity(new ValidatorResponse(_data: new Object(), _success: false, _validationResult: results.Errors));
 				}
 
-				//TODO REQUEST ACTIVE DIRECTOR API
-				if (payLoad.Token != "0000")
+
+				var userName = $"{payLoad.Username}";
+				var validOTP = await _2fa.TokenAuth(userName, payLoad.Token);
+				if (validOTP.ResponseCode != "00")
 				{
-					var userName = $"{payLoad.Username}";
-					var validOTP = await _2fa.TokenAuth(userName, payLoad.Token);
-					if (validOTP.ResponseCode != "00")
+					_logger.LogError("2FA API ERROR {0}", $"{validOTP.ResponseMessage}");
+					return BadRequest(validOTP.ResponseMessage);
+				}
+
+				var authResult = await _apiService.ADLogin(payLoad.Username, payLoad.Password);
+				payLoad.Password = "";
+				payLoad.Token = "";
+				if (!authResult.IsAuthenticated)
+				{
+					_logger.LogInformation("AD Authentication Failed {0}", JsonConvert.SerializeObject(authResult));
+					var bankUser = UnitOfWork.BankAuthenticationRepo.BankUserLogin(payLoad);
+					if (bankUser == null)
 					{
-						_logger.LogError("2FA API ERROR {0}", $"{validOTP.ResponseMessage}");
-						return BadRequest(validOTP.ResponseMessage);
+						_logger.LogInformation("you are not profile on this application {0}", JsonConvert.SerializeObject(payLoad));
+						return BadRequest(new LoginResponsedata { Responsecode = "11", ResponseDescription = "you are not profile on this application, Please Contact Bank Admin", UserpasswordChanged = 0, CustomerIdentity = "" });
 					}
-
-					var authResult = await _apiService.ADLogin(payLoad.Username, payLoad.Password);
-					payLoad.Password = "";
-					payLoad.Token = "";
-					if (!authResult.IsAuthenticated)
+					if (bankUser.NoOfWrongAttempts == 3 || bankUser.NoOfWrongAttempts > 3)
 					{
-						_logger.LogInformation("AD Authentication Failed {0}", JsonConvert.SerializeObject(authResult));
-						var bankUser = UnitOfWork.BankAuthenticationRepo.BankUserLogin(payLoad);
-						if (bankUser == null)
-						{
-							_logger.LogInformation("you are not profile on this application {0}", JsonConvert.SerializeObject(payLoad));
-							return BadRequest(new LoginResponsedata { Responsecode = "11", ResponseDescription = "you are not profile on this application, Please Contact Bank Admin", UserpasswordChanged = 0, CustomerIdentity = "" });
-						}
-						if (bankUser.NoOfWrongAttempts == 3 || bankUser.NoOfWrongAttempts > 3)
-						{
 
-							bankUser.ReasonsForDeactivation = "Multiple incorrect login attempt";
-							bankUser.Status = -1;
-							var auditt = new TblAuditTrail
-							{
-								Id = Guid.NewGuid(),
-								ActionCarriedOut = nameof(AuditTrailAction.Login),
-								Ipaddress = payLoad.IPAddress,
-								ClientStaffIpaddress = payLoad.ClientStaffIPAddress,
-								Macaddress = payLoad.MACAddress,
-								HostName = payLoad.HostName,
-								NewFieldValue = $"First Name: {bankUser.FirstName}, Last Name: {bankUser.LastName}, Username: {bankUser.Username}, Email Address:  {bankUser.Email}, " +
-									$"Middle Name: {bankUser.MiddleName}, Phone Number: {bankUser.Phone}",
-								PreviousFieldValue = "",
-								TransactionId = "",
-								UserId = bankUser.Id,
-								Username = bankUser.Username,
-								Description = "Login Attempt Failure. Multiple incorrect login",
-								TimeStamp = DateTime.Now
-							};
-							UnitOfWork.AuditTrialRepo.Add(auditt);
-							UnitOfWork.BankProfileRepo.UpdateBankProfile(bankUser);
-							UnitOfWork.Complete();
-							_logger.LogInformation("Login Attempt Failure. Multiple incorrect login {0}", JsonConvert.SerializeObject(payLoad));
-							return BadRequest(new LoginResponsedata { Responsecode = "11", ResponseDescription = "Sorry, your profile has been deactivated, please contact our support team", UserpasswordChanged = 0, CustomerIdentity = "" });
-						}
-						int wrontloginatempt = bankUser.NoOfWrongAttempts ?? 0;
-						bankUser.NoOfWrongAttempts = wrontloginatempt + 1;
-						bankUser.LastLoginAttempt = DateTime.Now;
-						var audit = new AuditTrialDto
+						bankUser.ReasonsForDeactivation = "Multiple incorrect login attempt";
+						bankUser.Status = -1;
+						var auditt = new TblAuditTrail
 						{
+							Id = Guid.NewGuid(),
 							ActionCarriedOut = nameof(AuditTrailAction.Login),
 							Ipaddress = payLoad.IPAddress,
-							ClientStaffIPAddress = payLoad.ClientStaffIPAddress,
-							MACAddress = payLoad.MACAddress,
+							ClientStaffIpaddress = payLoad.ClientStaffIPAddress,
+							Macaddress = payLoad.MACAddress,
 							HostName = payLoad.HostName,
 							NewFieldValue = $"First Name: {bankUser.FirstName}, Last Name: {bankUser.LastName}, Username: {bankUser.Username}, Email Address:  {bankUser.Email}, " +
 								$"Middle Name: {bankUser.MiddleName}, Phone Number: {bankUser.Phone}",
@@ -170,17 +143,42 @@ namespace CIB.BankAdmin.Controllers
 							TransactionId = "",
 							UserId = bankUser.Id,
 							Username = bankUser.Username,
-							Description = "Login Attempt Failure. Incorrect Password",
+							Description = "Login Attempt Failure. Multiple incorrect login",
 							TimeStamp = DateTime.Now
 						};
-						var audtrl = Mapper.Map<TblAuditTrail>(audit);
-						UnitOfWork.AuditTrialRepo.Add(audtrl);
+						UnitOfWork.AuditTrialRepo.Add(auditt);
 						UnitOfWork.BankProfileRepo.UpdateBankProfile(bankUser);
 						UnitOfWork.Complete();
-						_logger.LogInformation("Invalid login attempt {0}", JsonConvert.SerializeObject(payLoad));
-						return BadRequest(new LoginResponsedata { Responsecode = "11", ResponseDescription = "Invalid login attempt", UserpasswordChanged = 0, CustomerIdentity = "" });
+						_logger.LogInformation("Login Attempt Failure. Multiple incorrect login {0}", JsonConvert.SerializeObject(payLoad));
+						return BadRequest(new LoginResponsedata { Responsecode = "11", ResponseDescription = "Sorry, your profile has been deactivated, please contact our support team", UserpasswordChanged = 0, CustomerIdentity = "" });
 					}
+					int wrontloginatempt = bankUser.NoOfWrongAttempts ?? 0;
+					bankUser.NoOfWrongAttempts = wrontloginatempt + 1;
+					bankUser.LastLoginAttempt = DateTime.Now;
+					var audit = new AuditTrialDto
+					{
+						ActionCarriedOut = nameof(AuditTrailAction.Login),
+						Ipaddress = payLoad.IPAddress,
+						ClientStaffIPAddress = payLoad.ClientStaffIPAddress,
+						MACAddress = payLoad.MACAddress,
+						HostName = payLoad.HostName,
+						NewFieldValue = $"First Name: {bankUser.FirstName}, Last Name: {bankUser.LastName}, Username: {bankUser.Username}, Email Address:  {bankUser.Email}, " +
+							$"Middle Name: {bankUser.MiddleName}, Phone Number: {bankUser.Phone}",
+						PreviousFieldValue = "",
+						TransactionId = "",
+						UserId = bankUser.Id,
+						Username = bankUser.Username,
+						Description = "Login Attempt Failure. Incorrect Password",
+						TimeStamp = DateTime.Now
+					};
+					var audtrl = Mapper.Map<TblAuditTrail>(audit);
+					UnitOfWork.AuditTrialRepo.Add(audtrl);
+					UnitOfWork.BankProfileRepo.UpdateBankProfile(bankUser);
+					UnitOfWork.Complete();
+					_logger.LogInformation("Invalid login attempt {0}", JsonConvert.SerializeObject(payLoad));
+					return BadRequest(new LoginResponsedata { Responsecode = "11", ResponseDescription = "Invalid login attempt", UserpasswordChanged = 0, CustomerIdentity = "" });
 				}
+
 
 				var cusauth = UnitOfWork.BankAuthenticationRepo.BankUserLogin(payLoad);
 				if (cusauth == null)
@@ -189,43 +187,6 @@ namespace CIB.BankAdmin.Controllers
 					payLoad.Token = "";
 					_logger.LogInformation("you are not profile on this application, Please Contact Bank Admin {0}", JsonConvert.SerializeObject(payLoad));
 					return BadRequest(new LoginResponsedata { Responsecode = ResponseCode.NOT_PROFILE, ResponseDescription = "you are not profile on this application, Please Contact Bank Admin", UserpasswordChanged = 0, CustomerIdentity = "" });
-				}
-
-				//TODO: To be taken out before sent to the bank
-				if (payLoad.Token.Equals("0000"))
-				{
-					string emppass = Encryption.OpenSSLDecrypt(cusauth.Password, Encryption.GetEncrptionKey());
-					if (emppass != payLoad.Password.Trim())
-					{
-						payLoad.Password = "";
-						payLoad.Token = "";
-						int wrontloginatempt = cusauth.NoOfWrongAttempts ?? 0;
-						cusauth.NoOfWrongAttempts = wrontloginatempt + 1;
-						cusauth.LastLoginAttempt = DateTime.Now;
-						var auditt = new TblAuditTrail
-						{
-							Id = Guid.NewGuid(),
-							ActionCarriedOut = nameof(AuditTrailAction.Login),
-							Ipaddress = login.ClientStaffIPAddress,
-							ClientStaffIpaddress = login.ClientStaffIPAddress,
-							Macaddress = login.MACAddress,
-							HostName = login.HostName,
-							NewFieldValue = $"First Name: {cusauth.FirstName}, Last Name: {cusauth.LastName}, Username: {cusauth.Username}, Email Address:  {cusauth.Email}, " +
-								$"Middle Name: {cusauth.MiddleName}, Phone Number: {cusauth.Phone}",
-							PreviousFieldValue = "",
-							TransactionId = "",
-							UserId = cusauth.Id,
-							Username = cusauth.Username,
-							Description = "Login Attempt Failure. Invalid Password",
-							TimeStamp = DateTime.Now
-						};
-						UnitOfWork.AuditTrialRepo.Add(auditt);
-						UnitOfWork.BankProfileRepo.UpdateBankProfile(cusauth);
-						UnitOfWork.Complete();
-						payLoad.Password = "";
-						_logger.LogInformation("Invalid login attempt {0}", JsonConvert.SerializeObject(payLoad));
-						return BadRequest(new LoginResponsedata { Responsecode = ResponseCode.INVALID_ATTEMPT, ResponseDescription = "Invalid login attempt", UserpasswordChanged = 0, CustomerIdentity = "" });
-					}
 				}
 
 				if (cusauth.Status == (int)ProfileStatus.Deactivated)
@@ -310,13 +271,6 @@ namespace CIB.BankAdmin.Controllers
 					_logger.LogInformation("we noticed your account has been inactive for about 90 days and has been suspended. Please contact your bank admin. {0}", JsonConvert.SerializeObject(payLoad));
 					return BadRequest(new LoginResponsedata { Responsecode = ResponseCode.INACTIVE_ACCOUNT, ResponseDescription = "Sorry, we noticed your account has been inactive for about 90 days and has been suspended. Please contact your bank admin.", UserpasswordChanged = cusauth.Passwordchanged ?? 0, CustomerIdentity = "" });
 				}
-				// if(payLoad.Token != "0000" || payLoad.Token !="12345")
-				// {
-				//     var validOTP = await _2fa.TokenAuth(payLoad.Username, payLoad.Token);
-				//     if(validOTP.ResponseCode != "00"){
-				//         return BadRequest(validOTP.ResponseMessage);
-				//     }
-				// }
 
 				var tokenBlack = UnitOfWork.TokenBlackRepo.GetBlackTokenById(cusauth.Id);
 				foreach (var mykn in tokenBlack)
