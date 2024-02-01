@@ -7885,11 +7885,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/macbook/Projects/parallex-backend/CIB.InterBankTransactionService/CIB.InterBankTransactionService.csproj",
+      "projectUniqueName": "/Users/macbook/Projects/CIBBackEnd/CIB.InterBankTransactionService/CIB.InterBankTransactionService.csproj",
       "projectName": "CIB.InterBankTransactionService",
-      "projectPath": "/Users/macbook/Projects/parallex-backend/CIB.InterBankTransactionService/CIB.InterBankTransactionService.csproj",
+      "projectPath": "/Users/macbook/Projects/CIBBackEnd/CIB.InterBankTransactionService/CIB.InterBankTransactionService.csproj",
       "packagesPath": "/Users/macbook/.nuget/packages/",
-      "outputPath": "/Users/macbook/Projects/parallex-backend/CIB.InterBankTransactionService/obj/",
+      "outputPath": "/Users/macbook/Projects/CIBBackEnd/CIB.InterBankTransactionService/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/macbook/Projects/NuGet.Config",
@@ -7986,7 +7986,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/6.0.412/RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/7.0.307/RuntimeIdentifierGraph.json"
       }
     }
   }

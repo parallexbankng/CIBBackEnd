@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "AokhOH62rKIUGc66Ex9KsoFt9MnTpLQQY5Jt14Uxc07vLBLCOL6xH8IjnGm/b+oG+BPGo+EQ/jAbPU3J+LmVNg==",
+  "dgSpecHash": "gXbfje3ZFA85/rtfyK5+yRmm7bXERg39u0Mwz2wORbMy6F1aGiK4jCwM9sY97zT5cpkqopUYUuGdnM+P2wQ7Jg==",
   "success": true,
-  "projectFilePath": "/Users/macbook/Projects/parallex-backend/CIB.InterBankTransactionService/CIB.InterBankTransactionService.csproj",
+  "projectFilePath": "/Users/macbook/Projects/CIBBackEnd/CIB.InterBankTransactionService/CIB.InterBankTransactionService.csproj",
   "expectedPackageFiles": [
     "/Users/macbook/.nuget/packages/humanizer.core/2.8.26/humanizer.core.2.8.26.nupkg.sha512",
     "/Users/macbook/.nuget/packages/microsoft.csharp/4.7.0/microsoft.csharp.4.7.0.nupkg.sha512",
