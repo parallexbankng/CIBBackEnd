@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "Wjw8IWry8iYYbzZqKT5MEvge5bmdIpdNdM4A/LWhYoYQ1MCVSNT+kGgjNjz5wm/i7016HENwjD51LdwC0ODXxQ==",
+  "dgSpecHash": "dvh6vDKk+NzFHrlXbgJOtVPyU1ysbef/kQ6RVbKW7UI06ibR0Os7v+WuwWjYK9ScHLjMHwoWeuBrXoZefvdEyg==",
   "success": true,
-  "projectFilePath": "/Users/macbook/Projects/parallex-backend/CIB.Core/CIB.Core.csproj",
+  "projectFilePath": "/Users/macbook/Projects/CIBBackEnd/CIB.Core/CIB.Core.csproj",
   "expectedPackageFiles": [
     "/Users/macbook/.nuget/packages/automapper/10.1.1/automapper.10.1.1.nupkg.sha512",
     "/Users/macbook/.nuget/packages/automapper.extensions.microsoft.dependencyinjection/8.1.1/automapper.extensions.microsoft.dependencyinjection.8.1.1.nupkg.sha512",

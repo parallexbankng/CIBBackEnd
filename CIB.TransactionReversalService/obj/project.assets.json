@@ -7468,11 +7468,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/macbook/Projects/parallex-backend/CIB.TransactionReversalService/CIB.TransactionReversalService.csproj",
+      "projectUniqueName": "/Users/macbook/Projects/CIBBackEnd/CIB.TransactionReversalService/CIB.TransactionReversalService.csproj",
       "projectName": "CIB.TransactionReversalService",
-      "projectPath": "/Users/macbook/Projects/parallex-backend/CIB.TransactionReversalService/CIB.TransactionReversalService.csproj",
+      "projectPath": "/Users/macbook/Projects/CIBBackEnd/CIB.TransactionReversalService/CIB.TransactionReversalService.csproj",
       "packagesPath": "/Users/macbook/.nuget/packages/",
-      "outputPath": "/Users/macbook/Projects/parallex-backend/CIB.TransactionReversalService/obj/",
+      "outputPath": "/Users/macbook/Projects/CIBBackEnd/CIB.TransactionReversalService/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/macbook/Projects/NuGet.Config",
@@ -7565,7 +7565,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/6.0.412/RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/7.0.307/RuntimeIdentifierGraph.json"
       }
     }
   }

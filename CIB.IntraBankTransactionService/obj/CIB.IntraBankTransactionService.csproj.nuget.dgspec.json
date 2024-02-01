@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/Users/macbook/Projects/parallex-backend/CIB.IntraBankTransactionService/CIB.IntraBankTransactionService.csproj": {}
+    "/Users/macbook/Projects/CIBBackEnd/CIB.IntraBankTransactionService/CIB.IntraBankTransactionService.csproj": {}
   },
   "projects": {
-    "/Users/macbook/Projects/parallex-backend/CIB.IntraBankTransactionService/CIB.IntraBankTransactionService.csproj": {
+    "/Users/macbook/Projects/CIBBackEnd/CIB.IntraBankTransactionService/CIB.IntraBankTransactionService.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/macbook/Projects/parallex-backend/CIB.IntraBankTransactionService/CIB.IntraBankTransactionService.csproj",
+        "projectUniqueName": "/Users/macbook/Projects/CIBBackEnd/CIB.IntraBankTransactionService/CIB.IntraBankTransactionService.csproj",
         "projectName": "CIB.IntraBankTransactionService",
-        "projectPath": "/Users/macbook/Projects/parallex-backend/CIB.IntraBankTransactionService/CIB.IntraBankTransactionService.csproj",
+        "projectPath": "/Users/macbook/Projects/CIBBackEnd/CIB.IntraBankTransactionService/CIB.IntraBankTransactionService.csproj",
         "packagesPath": "/Users/macbook/.nuget/packages/",
-        "outputPath": "/Users/macbook/Projects/parallex-backend/CIB.IntraBankTransactionService/obj/",
+        "outputPath": "/Users/macbook/Projects/CIBBackEnd/CIB.IntraBankTransactionService/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/macbook/Projects/NuGet.Config",
@@ -104,7 +104,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/6.0.412/RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/7.0.307/RuntimeIdentifierGraph.json"
         }
       }
     }
