@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "CIB.InterBankTransactionService": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      },
+      "dotnetRunMessages": true
+    }
+  }
+}
